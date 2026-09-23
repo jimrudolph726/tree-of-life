@@ -12,16 +12,22 @@
   top: 20px;
   left: 24px;
   z-index: 10;
-  pointer-events: none;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 9px;
+
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.02em;
+
+  pointer-events: none;
 }
 
 .brand-mark {
@@ -197,4 +203,25 @@
     right: 20px;
     max-width: none;
   }
+}
+.home-button {
+  padding: 7px 11px;
+
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 7px;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  color: #555;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(10px);
+}
+
+.home-button:hover {
+  background: white;
+  color: #222;
 }
