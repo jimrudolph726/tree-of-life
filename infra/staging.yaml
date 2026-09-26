@@ -13,10 +13,11 @@ Parameters:
     Type: Number
     MinValue: 1
     Description: Account-wide monthly cost alert threshold. This does not cap spending.
-  GitHubRepository:
+  GitHubOidcSubjectPrefix:
     Type: String
-    Default: jimrudolph726/tree-of-life
-    AllowedPattern: '[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+'
+    Default: repo:jimrudolph726@130412104/tree-of-life@1384292559
+    AllowedPattern: 'repo:[A-Za-z0-9_.@-]+/[A-Za-z0-9_.@-]+'
+    Description: Exact sub_claim_prefix from GitHub's repository OIDC customization API; retains immutable owner/repository IDs.
   GitHubOidcProviderArn:
     Type: String
     Default: ''
@@ -190,7 +191,7 @@ Resources:
             Condition:
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
-                token.actions.githubusercontent.com:sub: !Sub 'repo:${GitHubRepository}:environment:staging'
+                token.actions.githubusercontent.com:sub: !Sub '${GitHubOidcSubjectPrefix}:environment:staging'
       Policies:
         - PolicyName: DeployStaging
           PolicyDocument:

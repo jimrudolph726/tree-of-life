@@ -1,5 +1,7 @@
 name: Deploy or roll back staging
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       release:
@@ -27,6 +29,12 @@ jobs:
       ROLLBACK_RELEASE: ${{ inputs.release }}
     steps:
       - uses: actions/checkout@v4
+      # Fail authentication before downloading or rebuilding millions of nodes.
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.STAGING_ROLE_ARN }}
+          aws-region: us-east-1
+          retry-max-attempts: 3
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -38,6 +46,7 @@ jobs:
       - run: python -m pip install -r pipeline/requirements.txt -r pipeline/requirements-cloud.txt cfn-lint
       - run: cfn-lint infra/staging.yaml
       - run: npm run data:test
+      - run: npm run data:validate
       - if: inputs.release == ''
         run: |
           npm run data:life
@@ -47,10 +56,6 @@ jobs:
           npm run lint
           npm run build
           python pipeline/deploy_cloud.py preflight
-      - uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.STAGING_ROLE_ARN }}
-          aws-region: us-east-1
       - name: Record previous release
         run: python pipeline/deploy_cloud.py status --distribution "$STAGING_DISTRIBUTION" > staging-before.json
       - name: Publish and activate

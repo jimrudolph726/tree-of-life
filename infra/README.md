@@ -83,13 +83,13 @@ Activation re-verifies all objects in the retained release inventory, changes on
 
 ## GitHub Actions
 
-The manual `Deploy or roll back staging` workflow performs the same validated build, upload and smoke check. It uses short-lived OIDC credentials, not saved AWS access keys.
+The `Deploy or roll back staging` workflow runs automatically on pushes to `main` and performs the same validated build, upload and smoke check. The deployment job runs its own validation before publishing; it does not depend on the timing of the separate CI workflow. It uses short-lived OIDC credentials, not saved AWS access keys. Authentication is checked before the expensive data build. Manual dispatch remains available for retry or rollback.
 
 1. Commit and push the reviewed project and workflows. The generated full tree stays ignored; CI recreates it from its pinned source.
-2. Use/create the account's GitHub OIDC provider (`https://token.actions.githubusercontent.com`, audience `sts.amazonaws.com`). Supply its ARN as `GitHubOidcProviderArn` when updating the stack, preserving the current `ReleaseId`. The template deliberately does not create another account-wide provider automatically.
+2. Use/create the account's GitHub OIDC provider (`https://token.actions.githubusercontent.com`, audience `sts.amazonaws.com`). Supply its ARN as `GitHubOidcProviderArn` when updating the stack, preserving the current `ReleaseId`. Obtain `sub_claim_prefix` with `gh api repos/OWNER/REPO/actions/oidc/customization/sub` and supply that exact value as `GitHubOidcSubjectPrefix`. This repository uses immutable owner/repository IDs in the prefix; the older name-only subject does not match. The template appends `:environment:staging` and requires an exact match, with no wildcard. The template deliberately does not create another account-wide provider automatically.
 3. Create GitHub environment **staging**. Restrict deployments to the intended branch and configure required reviewers if desired; the OIDC trust is restricted to this repository and environment.
 4. Set environment variables `STAGING_ROLE_ARN`, `STAGING_BUCKET`, `STAGING_DISTRIBUTION`, and `STAGING_URL` using stack outputs.
-5. Dispatch the workflow with an empty release field for deployment, or a retained release ID for rollback. Deployment results preserve the previous ID and HTTP smoke measurements as workflow artifacts.
+5. Push a commit to `main` to deploy automatically. Alternatively, dispatch the workflow with an empty release field for retry, or a retained release ID for rollback. Deployment results preserve the previous ID and HTTP smoke measurements as workflow artifacts. The full dataset is still rebuilt and checked on deployment; a small UI change therefore takes several minutes even though unchanged S3 objects are reused.
 
 The deployment role can only read/write this bucket's app/data/release prefixes and update this CloudFront distribution. It cannot delete objects, provision infrastructure or modify IAM. Infrastructure provisioning requires a separately authenticated administrative/setup identity.
 
