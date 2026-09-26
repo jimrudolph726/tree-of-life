@@ -9,6 +9,8 @@ import type { Scene } from '../src/stream/format.ts';
 import { TreeStore } from '../src/stream/store.ts';
 import { fitBounds, focusBounds, mapInsets, project } from '../src/tree/navigation.ts';
 import type { Camera } from '../src/tree/navigation.ts';
+import { cameraFromView, reframe, sameView } from '../src/stream/reframe.ts';
+import { OrthographicViewport } from '@deck.gl/core';
 
 const directory = mkdtempSync(join(tmpdir(), 'tree-tests-'));
 after(() => {
@@ -97,7 +99,7 @@ test('zooming out and panning beyond a local frame preserve screen positions whe
   for (const oldCamera of [camera, { ...camera, zoom: 4, target: [1600, 0, 0] as Camera['target'] }]) {
     const scene = await store.view({ anchor: details.anchor, camera: oldCamera, size });
     assert.ok(scene.rebase);
-    assert.equal(scene.rebase.anchor, (await store.node(details.anchor)).record.parent);
+    assert.ok(scene.rebase.anchor < details.anchor);
     const nextCamera = rebaseCamera(oldCamera, scene.rebase);
     const oldPoint: [number, number] = [12, 34];
     const factor = 1000 / scene.rebase.radius;
@@ -105,6 +107,36 @@ test('zooming out and panning beyond a local frame preserve screen positions whe
     const a = project(oldPoint, oldCamera, size), b = project(nextPoint, nextCamera, size);
     assert.ok(Math.hypot(a[0] - b[0], a[1] - b[1]) < 1e-8);
   }
+});
+
+test('controller round trips after rebasing do not restore stale axis zoom or lose button limits', async () => {
+  const store = new TreeStore(deep, reader('deep'));
+  const details = await store.details((await store.search('test-0009999'))[0].index);
+  const scene = await store.view({ anchor: details.anchor, camera, size });
+  assert.ok(scene.rebase);
+  const callback = { target: camera.target, zoom: camera.zoom, zoomX: camera.zoom, zoomY: camera.zoom,
+    minZoomX: -12, maxZoomX: 32 };
+  const clean = cameraFromView(callback, camera);
+  assert.equal('zoomX' in clean, false);
+  assert.equal(clean.minZoom, -12);
+  const next = reframe(scene, clean);
+  const before = new OrthographicViewport({ ...size, ...clean, flipY: true });
+  const after = new OrthographicViewport({ ...size, ...next.camera, flipY: true });
+  assert.equal(next.scene.nodes.length, scene.nodes.length);
+  assert.ok(scene.nodes.length > 0);
+  scene.nodes.forEach((node, i) => {
+    const a = before.project(node.position), b = after.project(next.scene.nodes[i].position);
+    assert.ok(Math.hypot(a[0] - b[0], a[1] - b[1]) < 1e-6);
+  });
+  for (let i = 0; i < scene.lines.length; i += 2) {
+    const a = before.project(Array.from(scene.lines.slice(i, i + 2)));
+    const b = after.project(Array.from(next.scene.lines.slice(i, i + 2)));
+    assert.ok(Math.hypot(a[0] - b[0], a[1] - b[1]) < 1e-6);
+  }
+  assert.equal(next.scene.rebase, undefined);
+  const request = { anchor: scene.anchor, camera, size };
+  assert.equal(sameView(request, { ...request, camera: { ...camera, target: [5000, 0, 0] } }, 100, 0.3), false);
+  assert.deepEqual(cameraFromView({ zoom: NaN }, clean), clean);
 });
 
 test('bounded cache evicts old pages and reloads them correctly', async () => {

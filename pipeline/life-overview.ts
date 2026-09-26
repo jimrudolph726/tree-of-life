@@ -44,8 +44,11 @@ export function lifeGeometry(graph: Graph, order: Uint32Array, inverse: Uint32Ar
       const offset = inverse[child] * RECORD_BYTES;
       const sector = Math.PI * weight(child) / total;
       const angle = frontier.length === 1 ? heading : cursor + sector / 2;
-      const sine = Math.sin(sector / 2);
-      let ratio = frontier.length === 1 ? 0.82 : sine / (1 + sine) * 0.96;
+      // Descendants occupy forward HALF discs, not full discs. Their angular
+      // extent is atan(radius / distance), so tangent packing safely brings
+      // large clades closer and gives them more room without crossing sectors.
+      const tangent = Math.tan(Math.min(sector, Math.PI - 1e-8) / 2);
+      let ratio = frontier.length === 1 ? 0.90 : tangent / (1 + tangent) * 0.96;
       let x = (1 - ratio) * Math.cos(angle), y = (1 - ratio) * Math.sin(angle), direction = angle, color = group;
       if (i === root) {
         const id = graph.metadata(child).id;

@@ -2,21 +2,22 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type { Camera, Size } from '../tree/navigation.ts';
 import type { Scene, ViewRequest } from './format.ts';
 import type { TreeClient } from './client.ts';
+import { reframe, sameView } from './reframe.ts';
 
 export function useScene(client: TreeClient, anchor: number, camera: Camera, size: Size,
-  onRebase: (anchor: number, camera: Camera) => void) {
+  onRebase: (anchor: number, camera: Camera) => void, canRebase: () => boolean = () => true) {
   const [scene, setScene] = useState<Scene | null>(null);
   const [error, setError] = useState<string | null>(null);
   const latest = useRef<ViewRequest>({ anchor, camera, size });
   useEffect(() => { latest.current = { anchor, camera, size }; }, [anchor, camera, size]);
   const receive = useEffectEvent((result: Scene, request: ViewRequest) => {
     if (result.anchor !== anchor) return;
-    const delta = Math.hypot(camera.target[0] - request.camera.target[0], camera.target[1] - request.camera.target[1]) * 2 ** camera.zoom;
-    if (result.rebase && delta < 1 && Math.abs(camera.zoom - request.camera.zoom) < 0.01) {
-      const r = result.rebase;
-      const factor = 1000 / r.radius;
-      onRebase(r.anchor, { ...camera, target: [(camera.target[0] - r.x) * factor, (camera.target[1] - r.y) * factor, 0],
-        zoom: camera.zoom - Math.log2(factor) });
+    // Do not replace a newer view with geometry requested before a fast pan.
+    if (!sameView(request, { anchor, camera, size }, 100, 0.3)) return;
+    if (result.rebase && canRebase() && sameView(request, { anchor, camera, size })) {
+      const next = reframe(result, camera);
+      setScene(next.scene); // Keep every visible point in place while new pages arrive.
+      onRebase(next.scene.anchor, next.camera);
     } else setScene(result);
     setError(null);
   });

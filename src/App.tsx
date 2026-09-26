@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeckGL } from '@deck.gl/react';
-import { LinearInterpolator, OrthographicView } from '@deck.gl/core';
+import { LinearInterpolator, OrthographicView, type TransitionInterpolator } from '@deck.gl/core';
 import { LineLayer, PolygonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
 import type { MapTreeNode } from './tree/layoutTreeV3';
 import { fitBounds, focusBounds, labelOffset, labelSize, labelText, mapInsets, visibleLabels } from './tree/navigation';
@@ -9,14 +9,14 @@ import { TreeClient } from './stream/client';
 import type { Details, Manifest, StreamNode, Summary } from './stream/format';
 import { cacheBudget } from './stream/format';
 import { useScene } from './stream/useScene';
+import { cameraFromView } from './stream/reframe';
 import { useBrowserMetrics } from './stream/useBrowserMetrics';
 import './App.css';
 
-const VIEW = new OrthographicView({ id: 'tree', flipY: true });
 const TRANSITION = new LinearInterpolator(['target', 'zoom']);
 const PALETTE: [number, number, number, number][] = [[84, 143, 121, 24], [87, 125, 162, 24], [185, 141, 82, 24], [140, 117, 163, 24]];
 const DOMAIN_COLORS: [number, number, number, number][] = [[84, 143, 121, 18], [99, 140, 172, 32], [94, 153, 126, 32], [192, 137, 97, 32]];
-type CameraState = Camera & { transitionDuration?: number; transitionInterpolator?: LinearInterpolator };
+type CameraState = Camera & { transitionDuration?: number | 'auto'; transitionInterpolator?: TransitionInterpolator };
 type Visit = { camera: CameraState; anchor: number; details: Details | null; home: boolean };
 const getSize = (): Size => ({ width: window.innerWidth, height: window.innerHeight });
 const animate = (camera: Camera): CameraState => ({ ...camera,
@@ -44,6 +44,8 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
   const [size, setSize] = useState(getSize);
   const [camera, setCamera] = useState<CameraState>(() => openingCamera(root, getSize(), manifest));
   const [anchor, setAnchor] = useState(0);
+  const view = useMemo(() => new OrthographicView({ id: `tree-${anchor}`, flipY: true }), [anchor]);
+  const interaction = useRef({ active: false, changedAt: 0 });
   const [details, setDetails] = useState<Details | null>(null);
   const [pendingTaxon, setPendingTaxon] = useState<string | null>(null);
   const [past, setPast] = useState<Visit[]>([]);
@@ -61,7 +63,7 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
   const homeCamera = useMemo(() => openingCamera(root, size, manifest), [root, size, manifest]);
   const { scene, error: streamError, prime } = useScene(client, anchor, camera, size, (nextAnchor, nextCamera) => {
     setAnchor(nextAnchor); setCamera({ ...nextCamera, transitionDuration: 0 });
-  });
+  }, () => !interaction.current.active && performance.now() - interaction.current.changedAt > 300);
   const telemetry = useBrowserMetrics(benchmarkMode, camera, value => { atHome.current = false; setCamera({ ...value, transitionDuration: 0 }); });
   const { startFocus, recordSearch } = telemetry;
   const namedNodes = scene?.nodes ?? EMPTY_NODES;
@@ -177,11 +179,17 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
   }, [regions, showRegions, lineData, highlightedLines, lineageIds, namedNodes, selected, labelNodes, camera, size]);
   return (
     <main className="app" ref={container}>
-      <DeckGL views={VIEW} viewState={camera} layers={layers}
+      <DeckGL views={view} viewState={{ ...camera, zoomX: camera.zoom, zoomY: camera.zoom }} layers={layers}
         controller={{ dragPan: true, scrollZoom: { speed: 0.03, smooth: true }, doubleClickZoom: true, touchZoom: true, touchRotate: false, keyboard: true }}
         onViewStateChange={({ viewState, interactionState }) => {
           if (interactionState.isDragging || interactionState.isZooming) atHome.current = false;
-          setCamera(viewState as CameraState);
+          interaction.current.changedAt = performance.now();
+          setCamera({ ...cameraFromView(viewState, camera),
+            transitionDuration: viewState.transitionDuration,
+            transitionInterpolator: viewState.transitionInterpolator });
+        }}
+        onInteractionStateChange={state => {
+          interaction.current.active = !!(state.isDragging || state.isZooming || state.isPanning);
         }}
         getCursor={({ isDragging, isHovering }) => isDragging ? 'grabbing' : isHovering ? 'pointer' : 'grab'}
         getTooltip={({ object }) => object && 'scientificName' in object ? { text: object.scientificName } : null}

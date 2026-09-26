@@ -209,9 +209,18 @@ export class TreeStore {
     // Restore surrounding clades when panning beyond a local frame as well as zooming out.
     const escapesFrame = Math.max(Math.abs(left), Math.abs(right), Math.abs(top), Math.abs(bottom)) > 1000;
     if (anchor !== 0 && (camera.zoom < -1.5 || escapesFrame)) {
-      const r = initial.record;
-      // Convert current-frame coordinates into its parent frame without a global coordinate.
-      rebase = { anchor: r.parent, x: -r.dx * 1000 / r.ratio, y: -r.dy * 1000 / r.ratio, radius: 1000 / r.ratio };
+      let r = initial.record, nextAnchor = anchor, factor = 1, tx = 0, ty = 0;
+      // Resolve the whole outward move at once, including zero-length unnamed
+      // ancestors. One frame per network round trip left large pans empty.
+      do {
+        tx = tx * r.ratio + r.dx * 1000; ty = ty * r.ratio + r.dy * 1000;
+        factor *= r.ratio; nextAnchor = r.parent;
+        const extent = Math.max(Math.abs(left * factor + tx), Math.abs(right * factor + tx),
+          Math.abs(top * factor + ty), Math.abs(bottom * factor + ty));
+        if (nextAnchor === 0 || (camera.zoom - Math.log2(factor) >= -1.5 && extent <= 1000)) break;
+        r = (await this.node(nextAnchor, signal)).record;
+      } while (nextAnchor !== 0);
+      rebase = { anchor: nextAnchor, x: -tx / factor, y: -ty / factor, radius: 1000 / factor };
     }
     while (pending.length && visited < 12000 && nodes.length < 4000) {
       if (visited % 128 === 0) {
@@ -233,7 +242,7 @@ export class TreeStore {
         }
       }
       if (!onScreen) continue;
-      if (camera.zoom > 14 && p.index !== anchor && p.radius < 1 && p.radius * scale > Math.max(size.width, size.height) * 2 &&
+      if (!rebase && camera.zoom > 14 && p.index !== anchor && p.radius < 1 && p.radius * scale > Math.max(size.width, size.height) * 2 &&
           Math.hypot(camera.target[0] - p.x, camera.target[1] - p.y) < p.radius * 0.7) {
         rebase = { anchor: p.index, x: p.x, y: p.y, radius: p.radius };
       }

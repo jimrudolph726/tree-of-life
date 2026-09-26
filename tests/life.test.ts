@@ -41,6 +41,14 @@ test('whole-tree presentation preserves source ancestors and supplies one overvi
   const [structural] = await Promise.all([store.node(detail.lineage[2].index)]);
   assert.equal(structural.record.ratio, 1);
   assert.equal(structural.record.dx, 0);
+  // Equal binary children can use forward half discs: larger clades, shorter
+  // branches, disjoint angular sectors, and still inside the parent boundary.
+  const fungiRecord = (await store.node(fungi.index)).record;
+  const distance = Math.hypot(fungiRecord.dx, fungiRecord.dy);
+  assert.ok(distance < 0.53);
+  assert.ok(fungiRecord.ratio > 0.47);
+  assert.ok(Math.atan2(fungiRecord.ratio, distance) < Math.PI / 4);
+  assert.ok(distance + fungiRecord.ratio <= 1 + 1e-12);
 });
 
 test('spilled search remains globally sorted across short, numeric and OTT prefixes', () => {
