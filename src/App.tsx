@@ -9,11 +9,11 @@ import { TreeClient } from './stream/client';
 import type { Details, Manifest, StreamNode, Summary } from './stream/format';
 import { cacheBudget } from './stream/format';
 import { useScene } from './stream/useScene';
-import { cameraFromView } from './stream/reframe';
+import { cameraFromView, deckView } from './stream/reframe';
 import { useBrowserMetrics } from './stream/useBrowserMetrics';
 import './App.css';
 
-const TRANSITION = new LinearInterpolator(['target', 'zoom']);
+const TRANSITION = new LinearInterpolator(['target', 'zoomX', 'zoomY']);
 const PALETTE: [number, number, number, number][] = [[84, 143, 121, 24], [87, 125, 162, 24], [185, 141, 82, 24], [140, 117, 163, 24]];
 const DOMAIN_COLORS: [number, number, number, number][] = [[84, 143, 121, 18], [99, 140, 172, 32], [94, 153, 126, 32], [192, 137, 97, 32]];
 type CameraState = Camera & { transitionDuration?: number | 'auto'; transitionInterpolator?: TransitionInterpolator };
@@ -179,7 +179,7 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
   }, [regions, showRegions, lineData, highlightedLines, lineageIds, namedNodes, selected, labelNodes, camera, size]);
   return (
     <main className="app" ref={container}>
-      <DeckGL views={view} viewState={{ ...camera, zoomX: camera.zoom, zoomY: camera.zoom }} layers={layers}
+      <DeckGL views={view} viewState={deckView(camera)} layers={layers}
         controller={{ dragPan: true, scrollZoom: { speed: 0.03, smooth: true }, doubleClickZoom: true, touchZoom: true, touchRotate: false, keyboard: true }}
         onViewStateChange={({ viewState, interactionState }) => {
           if (interactionState.isDragging || interactionState.isZooming) atHome.current = false;

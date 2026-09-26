@@ -1,6 +1,14 @@
 import type { Camera } from '../tree/navigation.ts';
 import type { Scene, ViewRequest } from './format.ts';
 
+// Orthographic wheel transitions emit two-coordinate targets. Sending a third
+// coordinate back makes deck.gl treat its own animation frame as a new camera
+// request and cancel the transition. Keep this boundary consistently 2D, and
+// derive both zoom axes so a rebase cannot retain an old axis-specific scale.
+export function deckView<T extends Camera>(camera: T) {
+  return { ...camera, target: camera.target.slice(0, 2), zoomX: camera.zoom, zoomY: camera.zoom };
+}
+
 // deck.gl returns axis-specific zoom and constraint fields. Never store those
 // alongside our scalar zoom: they override it after a coordinate-frame change.
 export function cameraFromView(view: { target?: number[]; zoom?: number | number[] }, previous: Camera): Camera {
