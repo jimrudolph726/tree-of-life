@@ -209,7 +209,8 @@ export class TreeStore {
     // Restore surrounding clades when panning beyond a local frame as well as zooming out.
     const escapesFrame = Math.max(Math.abs(left), Math.abs(right), Math.abs(top), Math.abs(bottom)) > 1000;
     if (anchor !== 0 && (camera.zoom < -1.5 || escapesFrame)) {
-      let r = initial.record, nextAnchor = anchor, factor = 1, tx = 0, ty = 0;
+      let r = initial.record, factor = 1, tx = 0, ty = 0;
+      let nextAnchor: number;
       // Resolve the whole outward move at once, including zero-length unnamed
       // ancestors. One frame per network round trip left large pans empty.
       do {

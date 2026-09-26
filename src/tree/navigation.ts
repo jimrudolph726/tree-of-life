@@ -104,8 +104,15 @@ export function visibleLabels(nodes: MapTreeNode[], camera: Camera, size: Size, 
     if (x < -8 || x > size.width + 8) return [];
     const center = x + labelOffset(node, camera, size)[0];
     const halfWidth = labelHalfWidth(node, size);
-    for (const dy of labelPriority(node) > 0 ? [-12, fontSize + 12] : [-12]) {
-      const box: Bounds = [center - halfWidth, y + dy - fontSize - 6, center + halfWidth, y + dy + 4];
+    const clampCenter = (value: number) => Math.max(halfWidth + 4, Math.min(size.width - halfWidth - 4, value));
+    const left = clampCenter(x - halfWidth - 12), right = clampCenter(x + halfWidth + 12);
+    const placements: Position[] = labelPriority(node) > 0
+      ? [[center, -12], [center, fontSize + 12], [left, fontSize / 2], [right, fontSize / 2],
+          [left, -12], [right, -12], [left, fontSize + 12], [right, fontSize + 12],
+          [center, -fontSize - 18], [center, fontSize * 2 + 18]]
+      : [[center, -12]];
+    for (const [candidateCenter, dy] of placements) {
+      const box: Bounds = [candidateCenter - halfWidth, y + dy - fontSize - 6, candidateCenter + halfWidth, y + dy + 4];
       if (box[2] < 0 || box[0] > size.width || box[1] < 0 || box[3] > size.height) continue;
       const keys: string[] = []; let collision = false;
       for (let gx = Math.floor(box[0] / 64); gx <= Math.floor(box[2] / 64); gx++) {
@@ -120,7 +127,7 @@ export function visibleLabels(nodes: MapTreeNode[], camera: Camera, size: Size, 
         const bucket = cells.get(key);
         if (bucket) bucket.push(box); else cells.set(key, [box]);
       }
-      return [{ ...node, labelPlacement: [center - x, dy] as Position }];
+      return [{ ...node, labelPlacement: [candidateCenter - x, dy] as Position }];
     }
     return [];
   });

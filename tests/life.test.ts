@@ -41,12 +41,12 @@ test('whole-tree presentation preserves source ancestors and supplies one overvi
   const [structural] = await Promise.all([store.node(detail.lineage[2].index)]);
   assert.equal(structural.record.ratio, 1);
   assert.equal(structural.record.dx, 0);
-  // Equal binary children can use forward half discs: larger clades, shorter
-  // branches, disjoint angular sectors, and still inside the parent boundary.
+  // Equal binary children use forward half discs: the original clade scale is
+  // retained, while empty branch length is removed without crossing sectors.
   const fungiRecord = (await store.node(fungi.index)).record;
   const distance = Math.hypot(fungiRecord.dx, fungiRecord.dy);
-  assert.ok(distance < 0.53);
-  assert.ok(fungiRecord.ratio > 0.47);
+  assert.ok(distance < 0.45);
+  assert.ok(fungiRecord.ratio > 0.39 && fungiRecord.ratio < 0.41);
   assert.ok(Math.atan2(fungiRecord.ratio, distance) < Math.PI / 4);
   assert.ok(distance + fungiRecord.ratio <= 1 + 1e-12);
 });
