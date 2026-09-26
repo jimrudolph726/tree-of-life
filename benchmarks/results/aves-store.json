@@ -1,0 +1,135 @@
+{
+  "dataset": "Aves",
+  "version": "c55fd05c37ffd490",
+  "synthesis": "opentree16.1",
+  "measuredAt": "2026-09-25T00:11:46.138Z",
+  "environment": {
+    "node": "v24.15.0",
+    "platform": "win32"
+  },
+  "methodology": "Filesystem-backed store: three sequential clade selections, 120 camera queries each, both viewports. Not network/GPU timings.",
+  "results": [
+    {
+      "size": {
+        "width": 1280,
+        "height": 720
+      },
+      "cases": [
+        {
+          "query": "Aves",
+          "selectionMs": 11.281800000000004,
+          "depth": 0,
+          "stats": {
+            "requests": 5,
+            "transferredBytes": 542415,
+            "cacheBytes": 2169660,
+            "cacheEntries": 5,
+            "cacheHits": 276,
+            "evictions": 0,
+            "visited": 92,
+            "queryMs": 1.334600000000009,
+            "limited": false
+          },
+          "warmP95Ms": 15.978700000000003
+        },
+        {
+          "query": "Camarhynchus psittacula",
+          "selectionMs": 3.921700000000044,
+          "depth": 60,
+          "stats": {
+            "requests": 8,
+            "transferredBytes": 803434,
+            "cacheBytes": 3213736,
+            "cacheEntries": 8,
+            "cacheHits": 19414,
+            "evictions": 0,
+            "visited": 12,
+            "queryMs": 0.09840000000002647,
+            "limited": false
+          },
+          "warmP95Ms": 0.06619999999998072
+        },
+        {
+          "query": "Passeriformes",
+          "selectionMs": 11.620400000000018,
+          "depth": 9,
+          "stats": {
+            "requests": 16,
+            "transferredBytes": 1827003,
+            "cacheBytes": 7308012,
+            "cacheEntries": 16,
+            "cacheHits": 24064,
+            "evictions": 0,
+            "visited": 151,
+            "queryMs": 10.14670000000001,
+            "limited": false
+          },
+          "warmP95Ms": 16.12110000000007
+        }
+      ],
+      "totalRequests": 17,
+      "payloadBytes": 1969362
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "cases": [
+        {
+          "query": "Aves",
+          "selectionMs": 5.81230000000005,
+          "depth": 0,
+          "stats": {
+            "requests": 5,
+            "transferredBytes": 542415,
+            "cacheBytes": 2169660,
+            "cacheEntries": 5,
+            "cacheHits": 201,
+            "evictions": 0,
+            "visited": 67,
+            "queryMs": 0.8104000000000724,
+            "limited": false
+          },
+          "warmP95Ms": 0.4052999999998974
+        },
+        {
+          "query": "Camarhynchus psittacula",
+          "selectionMs": 3.7135000000000673,
+          "depth": 60,
+          "stats": {
+            "requests": 9,
+            "transferredBytes": 946920,
+            "cacheBytes": 3787680,
+            "cacheEntries": 9,
+            "cacheHits": 20919,
+            "evictions": 0,
+            "visited": 12,
+            "queryMs": 0.03870000000006257,
+            "limited": false
+          },
+          "warmP95Ms": 0.029699999999820648
+        },
+        {
+          "query": "Passeriformes",
+          "selectionMs": 6.695599999999786,
+          "depth": 9,
+          "stats": {
+            "requests": 15,
+            "transferredBytes": 1683648,
+            "cacheBytes": 6734592,
+            "cacheEntries": 15,
+            "cacheHits": 25667,
+            "evictions": 0,
+            "visited": 183,
+            "queryMs": 5.467000000000098,
+            "limited": false
+          },
+          "warmP95Ms": 16.116399999999885
+        }
+      ],
+      "totalRequests": 20,
+      "payloadBytes": 2399401
+    }
+  ]
+}

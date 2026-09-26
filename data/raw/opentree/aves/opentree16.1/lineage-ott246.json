@@ -1,0 +1,3320 @@
+{
+  "lineage": [
+    {
+      "node_id": "mrcaott246ott3599111",
+      "num_tips": 6,
+      "resolves": {
+        "ot_2770@tree1": "node2883"
+      },
+      "supported_by": {
+        "ot_1286@tree1": "node66",
+        "ot_2748@tree4": "node208",
+        "ot_2879@tree1": "node12927"
+      }
+    },
+    {
+      "node_id": "ott443268",
+      "num_tips": 49,
+      "partial_path_of": {
+        "ot_521@tree1": "node4476",
+        "ot_809@tree2": "node20017"
+      },
+      "supported_by": {
+        "ot_1286@tree1": "node2",
+        "ot_2748@tree4": "node188",
+        "ot_2770@tree1": "node2883",
+        "ot_2879@tree1": "node12926",
+        "ott3.7draft3": "ott443268"
+      },
+      "taxon": {
+        "name": "Polioptila",
+        "ott_id": 443268,
+        "rank": "genus",
+        "tax_sources": [
+          "ncbi:66705",
+          "gbif:2487581",
+          "irmng:1331849"
+        ],
+        "unique_name": "Polioptila"
+      },
+      "terminal": {
+        "ot_111@tree1": "ott7068190",
+        "ot_1195@tree1": "ott7068203",
+        "ot_2013@tree8": "ott7068190",
+        "ot_2146@tree1": "ott7068190",
+        "ot_2312@tree1": "ott7068190",
+        "ot_2765@tree1": "ott7068190",
+        "ot_290@tree1": "ott7068190",
+        "ot_3077@tree1": "ott7068190",
+        "ot_854@tree1": "ott7068201",
+        "pg_2404@tree5068": "ott7068190",
+        "pg_2404@tree6388": "ott7068190"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "mrcaott246ott7068177",
+      "num_tips": 65,
+      "supported_by": {
+        "ot_2748@tree4": "node180",
+        "ot_2770@tree1": "node2882",
+        "ot_2879@tree1": "node12918",
+        "ot_290@tree1": "node1382",
+        "ot_521@tree1": "node4475",
+        "ot_809@tree2": "node20016"
+      },
+      "terminal": {
+        "ot_111@tree1": "ott7068190",
+        "ot_1195@tree1": "ott7068203",
+        "ot_2013@tree8": "ott7068190",
+        "ot_2146@tree1": "ott7068190",
+        "ot_2312@tree1": "ott7068190",
+        "ot_2765@tree1": "ott7068190",
+        "ot_3077@tree1": "ott7068190",
+        "ot_854@tree1": "ott7068201",
+        "pg_2404@tree5068": "ott7068190",
+        "pg_2404@tree6388": "ott7068190"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott18313",
+      "num_tips": 226,
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_111@tree1": "node127",
+        "ot_1195@tree1": "node513",
+        "ot_2013@tree8": "node368",
+        "ot_2312@tree1": "node159",
+        "ot_2748@tree4": "node8",
+        "ot_2765@tree1": "node32",
+        "ot_2879@tree1": "node12917",
+        "ot_290@tree1": "node1381",
+        "ot_3077@tree1": "node3984",
+        "ot_521@tree1": "node4351",
+        "ot_809@tree2": "node19900",
+        "ot_854@tree1": "node103",
+        "pg_2404@tree5068": "node878501",
+        "pg_2404@tree6388": "node1112501"
+      },
+      "terminal": {
+        "ot_2146@tree1": "ott7068190",
+        "ot_412@Tr77157": "ott662164",
+        "ot_531@tree1": "node293",
+        "ot_532@tree1": "ott662164",
+        "ot_757@Tr70438": "Tn11106515",
+        "ot_782@Tr48736": "Tn8171815",
+        "ot_783@tree1": "ott5560979",
+        "ot_841@tree1": "ott5560979",
+        "pg_2015@tree4152": "node772126",
+        "pg_2913@tree6742": "ott5560979"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_290@tree1": [
+          "node1374",
+          "node1377",
+          "node1378"
+        ],
+        "ot_521@tree1": [
+          "node4349",
+          "node4350",
+          "node4490"
+        ],
+        "ot_782@Tr48736": [
+          "Tn8171801"
+        ],
+        "ot_809@tree2": [
+          "node20033",
+          "node20051"
+        ],
+        "ot_854@tree1": [
+          "node102",
+          "node106"
+        ],
+        "pg_2404@tree5068": [
+          "node878498"
+        ],
+        "pg_2404@tree6388": [
+          "node1112498"
+        ]
+      },
+      "node_id": "mrcaott246ott157232",
+      "num_tips": 260,
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_111@tree1": "node125",
+        "ot_1195@tree1": "node512",
+        "ot_2013@tree8": "node367",
+        "ot_2312@tree1": "node158",
+        "ot_2748@tree4": "node7",
+        "ot_2765@tree1": "node31",
+        "ot_2879@tree1": "node12895",
+        "ot_3077@tree1": "node3980",
+        "ot_531@tree1": "node291",
+        "ot_783@tree1": "node123",
+        "ot_841@tree1": "node78",
+        "pg_2913@tree6742": "node1171885"
+      },
+      "terminal": {
+        "ot_2146@tree1": "ott7068190",
+        "ot_412@Tr77157": "ott662164",
+        "ot_532@tree1": "ott662164",
+        "ot_757@Tr70438": "Tn11106515",
+        "pg_2015@tree4152": "node772126"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2765@tree1": [
+          "node38"
+        ],
+        "ot_2879@tree1": [
+          "node12840"
+        ],
+        "ot_290@tree1": [
+          "node1377",
+          "node1378"
+        ],
+        "ot_521@tree1": [
+          "node4349",
+          "node4350",
+          "node4490"
+        ],
+        "ot_809@tree2": [
+          "node19899",
+          "node20033",
+          "node20051"
+        ],
+        "pg_2913@tree6742": [
+          "node1171872"
+        ]
+      },
+      "node_id": "mrcaott246ott25638",
+      "num_tips": 307,
+      "partial_path_of": {
+        "ot_111@tree1": "node121",
+        "ot_1195@tree1": "node511",
+        "ot_412@Tr77157": "Tn12024213",
+        "ot_531@tree1": "node289",
+        "ot_757@Tr70438": "Tn11106531",
+        "ot_782@Tr48736": "Tn8171823",
+        "ot_783@tree1": "node121",
+        "ot_841@tree1": "node76",
+        "ot_854@tree1": "node100",
+        "pg_2015@tree4152": "node772124",
+        "pg_2404@tree5068": "node878497",
+        "pg_2404@tree6388": "node1112497"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_2013@tree8": "node365",
+        "ot_2312@tree1": "node156",
+        "ot_2748@tree4": "node6",
+        "ot_3077@tree1": "node3979"
+      },
+      "terminal": {
+        "ot_2146@tree1": "ott7068190",
+        "ot_532@tree1": "ott662164"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott452744",
+      "num_tips": 308,
+      "partial_path_of": {
+        "ot_111@tree1": "node121",
+        "ot_1195@tree1": "node511",
+        "ot_412@Tr77157": "Tn12024213",
+        "ot_531@tree1": "node289",
+        "ot_757@Tr70438": "Tn11106531",
+        "ot_782@Tr48736": "Tn8171823",
+        "ot_783@tree1": "node121",
+        "ot_841@tree1": "node76",
+        "ot_854@tree1": "node100",
+        "pg_2015@tree4152": "node772124",
+        "pg_2404@tree5068": "node878497",
+        "pg_2404@tree6388": "node1112497"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_2013@tree8": "node363",
+        "ot_2312@tree1": "node154",
+        "ot_2765@tree1": "node30",
+        "ot_2879@tree1": "node12839",
+        "ot_290@tree1": "node1373",
+        "ot_3077@tree1": "node3978",
+        "ot_521@tree1": "node4348",
+        "ot_809@tree2": "node19898",
+        "pg_2913@tree6742": "node1171871"
+      },
+      "terminal": {
+        "ot_2146@tree1": "ott7068190",
+        "ot_532@tree1": "ott662164"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_111@tree1": [
+          "node103"
+        ],
+        "ot_2013@tree8": [
+          "node359"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20",
+          "node21",
+          "node22",
+          "node23",
+          "node24",
+          "node25",
+          "node26",
+          "node27",
+          "node28"
+        ],
+        "ot_2879@tree1": [
+          "node11708",
+          "node11710",
+          "node12835",
+          "node12836"
+        ],
+        "ot_3077@tree1": [
+          "node3989",
+          "node3990",
+          "node3991",
+          "node3993",
+          "node3994"
+        ],
+        "ot_521@tree1": [
+          "node3311",
+          "node3312",
+          "node3313",
+          "node3783",
+          "node3784",
+          "node3794"
+        ],
+        "ot_531@tree1": [
+          "node278",
+          "node279",
+          "node281",
+          "node283"
+        ],
+        "ot_532@tree1": [
+          "node110",
+          "node122",
+          "node124",
+          "node126",
+          "node127"
+        ],
+        "ot_757@Tr70438": [
+          "Tn11106542"
+        ],
+        "ot_782@Tr48736": [
+          "Tn8171730",
+          "Tn8171848"
+        ],
+        "ot_783@tree1": [
+          "node119"
+        ],
+        "ot_841@tree1": [
+          "node28",
+          "node72",
+          "node74"
+        ],
+        "pg_2404@tree5068": [
+          "node878504",
+          "node878508"
+        ],
+        "pg_2404@tree6388": [
+          "node1112478",
+          "node1112479"
+        ]
+      },
+      "node_id": "mrcaott246ott1566",
+      "num_tips": 1518,
+      "partial_path_of": {
+        "ot_1055@tree1": "node451",
+        "ot_1174@tree3": "node46",
+        "ot_2018@tree8": "node722",
+        "ot_2018@tree9": "node2025",
+        "ot_2079@tree1": "node264",
+        "ot_2307@tree3": "node342"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2",
+        "ot_854@tree1": "node3"
+      },
+      "supported_by": {
+        "ot_1195@tree1": "node379",
+        "ot_2312@tree1": "node153",
+        "ot_290@tree1": "node1372",
+        "ot_412@Tr77157": "Tn12024337",
+        "ot_809@tree2": "node19897",
+        "pg_2015@tree4152": "node772123",
+        "pg_2913@tree6742": "node1171679"
+      },
+      "terminal": {
+        "ot_2146@tree1": "ott7068190",
+        "ot_500@tree1": "node77",
+        "ot_855@tree1": "node71"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_1055@tree1": [
+          "node454"
+        ],
+        "ot_111@tree1": [
+          "node101",
+          "node102",
+          "node103"
+        ],
+        "ot_1195@tree1": [
+          "node378"
+        ],
+        "ot_2018@tree8": [
+          "node737"
+        ],
+        "ot_2018@tree9": [
+          "node2040"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20",
+          "node21",
+          "node22",
+          "node23",
+          "node24",
+          "node25",
+          "node26",
+          "node27",
+          "node28"
+        ],
+        "ot_2879@tree1": [
+          "node11708",
+          "node11710",
+          "node12835",
+          "node12836"
+        ],
+        "ot_290@tree1": [
+          "node1353",
+          "node1354"
+        ],
+        "ot_3077@tree1": [
+          "node3977",
+          "node3989",
+          "node3990",
+          "node3991",
+          "node3993",
+          "node3994",
+          "node4034"
+        ],
+        "ot_412@Tr77157": [
+          "Tn12024357",
+          "Tn12024360"
+        ],
+        "ot_521@tree1": [
+          "node3310",
+          "node3311",
+          "node3312",
+          "node3313",
+          "node3783",
+          "node3784",
+          "node3794",
+          "node4533"
+        ],
+        "ot_531@tree1": [
+          "node252",
+          "node253",
+          "node255",
+          "node277",
+          "node278",
+          "node279",
+          "node281",
+          "node283"
+        ],
+        "ot_532@tree1": [
+          "node110",
+          "node122",
+          "node124",
+          "node126",
+          "node127"
+        ],
+        "ot_757@Tr70438": [
+          "Tn11106542"
+        ],
+        "ot_782@Tr48736": [
+          "Tn8171848"
+        ],
+        "ot_809@tree2": [
+          "node19896"
+        ],
+        "ot_841@tree1": [
+          "node28",
+          "node72",
+          "node74"
+        ],
+        "ot_854@tree1": [
+          "node109",
+          "node3"
+        ],
+        "pg_2404@tree5068": [
+          "node878504",
+          "node878508"
+        ],
+        "pg_2404@tree6388": [
+          "node1112478",
+          "node1112479"
+        ],
+        "pg_2913@tree6742": [
+          "node1171678"
+        ],
+        "pg_420@tree522": [
+          "node208501",
+          "node208504"
+        ]
+      },
+      "node_id": "mrcaott246ott3599436",
+      "num_tips": 1535,
+      "partial_path_of": {
+        "ot_1174@tree3": "node46",
+        "ot_2079@tree1": "node264",
+        "ot_2146@tree1": "node45",
+        "ot_2307@tree3": "node342",
+        "ot_500@tree1": "node76",
+        "pg_2015@tree4152": "node772121"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_2013@tree8": "node345",
+        "ot_2312@tree1": "node151",
+        "ot_783@tree1": "node113"
+      },
+      "terminal": {
+        "ot_855@tree1": "node71"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_111@tree1": [
+          "node101"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20",
+          "node21",
+          "node22",
+          "node23",
+          "node24",
+          "node25",
+          "node26",
+          "node27",
+          "node28",
+          "node64"
+        ],
+        "ot_2879@tree1": [
+          "node12835",
+          "node12836"
+        ],
+        "ot_290@tree1": [
+          "node1353"
+        ],
+        "ot_3077@tree1": [
+          "node3977",
+          "node3989",
+          "node3990",
+          "node3991",
+          "node3993",
+          "node3994"
+        ],
+        "ot_412@Tr77157": [
+          "Tn12024360"
+        ],
+        "ot_521@tree1": [
+          "node3310",
+          "node3311",
+          "node3312",
+          "node3313",
+          "node3783",
+          "node3784",
+          "node3794"
+        ],
+        "ot_531@tree1": [
+          "node252",
+          "node253",
+          "node277",
+          "node278",
+          "node279",
+          "node281",
+          "node283"
+        ],
+        "ot_532@tree1": [
+          "node110",
+          "node122",
+          "node124",
+          "node126",
+          "node127"
+        ],
+        "ot_757@Tr70438": [
+          "Tn11106542"
+        ],
+        "ot_841@tree1": [
+          "node28"
+        ],
+        "ot_854@tree1": [
+          "node109",
+          "node3",
+          "node4"
+        ],
+        "pg_2913@tree6742": [
+          "node1171678"
+        ],
+        "pg_420@tree522": [
+          "node208504"
+        ]
+      },
+      "node_id": "mrcaott246ott5934",
+      "num_tips": 1551,
+      "partial_path_of": {
+        "ot_1174@tree3": "node46",
+        "ot_2079@tree1": "node264",
+        "ot_2146@tree1": "node45",
+        "ot_2307@tree3": "node342",
+        "ot_500@tree1": "node76",
+        "pg_2015@tree4152": "node772121"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node450",
+        "ot_1195@tree1": "node377",
+        "ot_2013@tree8": "node333",
+        "ot_2018@tree8": "node721",
+        "ot_2018@tree9": "node2024",
+        "ot_2312@tree1": "node147",
+        "ot_782@Tr48736": "Tn8171873",
+        "ot_783@tree1": "node109",
+        "ot_809@tree2": "node19895",
+        "pg_2404@tree5068": "node878496",
+        "pg_2404@tree6388": "node1112477"
+      },
+      "terminal": {
+        "ot_855@tree1": "node71"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_111@tree1": [
+          "node101",
+          "node97"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20",
+          "node21",
+          "node22",
+          "node23",
+          "node24",
+          "node25",
+          "node26"
+        ],
+        "ot_2879@tree1": [
+          "node12835",
+          "node12836"
+        ],
+        "ot_521@tree1": [
+          "node3309",
+          "node3310",
+          "node3311",
+          "node3312",
+          "node3313",
+          "node3783",
+          "node3784",
+          "node3794"
+        ],
+        "ot_531@tree1": [
+          "node250"
+        ],
+        "ot_532@tree1": [
+          "node108",
+          "node110",
+          "node122",
+          "node124",
+          "node126",
+          "node127"
+        ],
+        "ot_782@Tr48736": [
+          "Tn8171795"
+        ],
+        "ot_809@tree2": [
+          "node18443",
+          "node18553",
+          "node18635",
+          "node18657",
+          "node18997",
+          "node19187",
+          "node19188",
+          "node19189",
+          "node19341",
+          "node19342",
+          "node19346",
+          "node19347",
+          "node19348",
+          "node19696"
+        ],
+        "ot_854@tree1": [
+          "node109",
+          "node2",
+          "node3",
+          "node4"
+        ],
+        "pg_2015@tree4152": [
+          "node772105"
+        ],
+        "pg_2913@tree6742": [
+          "node1171678",
+          "node1171894"
+        ],
+        "pg_420@tree522": [
+          "node208500",
+          "node208504"
+        ]
+      },
+      "node_id": "mrcaott246ott3364",
+      "num_tips": 4320,
+      "partial_path_of": {
+        "ot_1055@tree1": "node449",
+        "ot_1174@tree3": "node45",
+        "ot_1195@tree1": "node5",
+        "ot_2018@tree8": "node557",
+        "ot_2018@tree9": "node1860",
+        "ot_2079@tree1": "node263",
+        "ot_2146@tree1": "node45",
+        "ot_214@tree1": "node74",
+        "ot_2307@tree3": "node322",
+        "ot_2312@tree1": "node65",
+        "ot_500@tree1": "node75",
+        "ot_534@tree1": "node16",
+        "ot_841@tree1": "node27",
+        "ot_855@tree1": "node69",
+        "pg_2913@tree6741": "node1171634"
+      },
+      "resolves": {
+        "ot_2019@tree35": "node76450",
+        "ot_2770@tree1": "node2",
+        "ot_757@Tr70438": "Tn11106583"
+      },
+      "supported_by": {
+        "ot_2013@tree8": "node332",
+        "ot_290@tree1": "node1351",
+        "ot_3077@tree1": "node3975",
+        "ot_412@Tr77157": "Tn12024377",
+        "ot_783@tree1": "node108",
+        "pg_2404@tree5068": "node878495",
+        "pg_2404@tree6388": "node1112443"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_111@tree1": [
+          "node101",
+          "node163",
+          "node164",
+          "node170",
+          "node97"
+        ],
+        "ot_2013@tree8": [
+          "node247"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20",
+          "node21",
+          "node22",
+          "node23",
+          "node24",
+          "node25",
+          "node26"
+        ],
+        "ot_2879@tree1": [
+          "node12835",
+          "node12836",
+          "node13084",
+          "node13085"
+        ],
+        "ot_290@tree1": [
+          "node1008",
+          "node1016",
+          "node1017"
+        ],
+        "ot_3077@tree1": [
+          "node4320"
+        ],
+        "ot_412@Tr77157": [
+          "Tn12024176"
+        ],
+        "ot_521@tree1": [
+          "node1795",
+          "node3197",
+          "node3308",
+          "node3309",
+          "node3310",
+          "node3311",
+          "node3312",
+          "node3313",
+          "node3783",
+          "node3784",
+          "node3794"
+        ],
+        "ot_531@tree1": [
+          "node250",
+          "node294",
+          "node316"
+        ],
+        "ot_532@tree1": [
+          "node108",
+          "node110",
+          "node122",
+          "node124",
+          "node126",
+          "node127"
+        ],
+        "ot_782@Tr48736": [
+          "Tn8171795",
+          "Tn8171855",
+          "Tn8171878"
+        ],
+        "ot_783@tree1": [
+          "node151"
+        ],
+        "ot_809@tree2": [
+          "node18443",
+          "node18444",
+          "node18553",
+          "node18635",
+          "node18657",
+          "node18997",
+          "node19187",
+          "node19188",
+          "node19189",
+          "node19341",
+          "node19342",
+          "node19346",
+          "node19347",
+          "node19348",
+          "node19696"
+        ],
+        "ot_854@tree1": [
+          "node109",
+          "node2",
+          "node3",
+          "node4"
+        ],
+        "pg_2015@tree4152": [
+          "node772105"
+        ],
+        "pg_2404@tree5068": [
+          "node878468",
+          "node878469"
+        ],
+        "pg_2404@tree6388": [
+          "node1112504",
+          "node1112522"
+        ],
+        "pg_2913@tree6742": [
+          "node1171678",
+          "node1171894",
+          "node1171895",
+          "node1172271"
+        ],
+        "pg_420@tree522": [
+          "node208500",
+          "node208504"
+        ]
+      },
+      "node_id": "mrcaott246ott72472",
+      "num_tips": 4336,
+      "partial_path_of": {
+        "ot_1055@tree1": "node449",
+        "ot_1174@tree3": "node45",
+        "ot_1195@tree1": "node5",
+        "ot_2018@tree8": "node557",
+        "ot_2018@tree9": "node1860",
+        "ot_2079@tree1": "node263",
+        "ot_214@tree1": "node74",
+        "ot_2307@tree3": "node322",
+        "ot_2312@tree1": "node65",
+        "ot_500@tree1": "node75",
+        "ot_534@tree1": "node16",
+        "ot_841@tree1": "node27",
+        "ot_855@tree1": "node69",
+        "pg_2913@tree6741": "node1171634"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_2146@tree1": "node43"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2757@tree1": [
+          "node15",
+          "node23",
+          "node284"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20",
+          "node21",
+          "node22",
+          "node23",
+          "node24",
+          "node25"
+        ],
+        "ot_290@tree1": [
+          "node1008",
+          "node1016",
+          "node1038",
+          "node1066",
+          "node1148",
+          "node1210",
+          "node1212",
+          "node1254",
+          "node1274",
+          "node1275"
+        ]
+      },
+      "node_id": "mrcaott246ott1488",
+      "num_tips": 6821,
+      "partial_path_of": {
+        "ot_1174@tree3": "node43",
+        "ot_214@tree1": "node74",
+        "ot_2307@tree3": "node321",
+        "ot_500@tree1": "node74",
+        "ot_534@tree1": "node14",
+        "ot_855@tree1": "node69",
+        "pg_2913@tree6741": "node1171634",
+        "pg_2913@tree6742": "node1171677"
+      },
+      "resolves": {
+        "ot_2019@tree35": "node76450",
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node445",
+        "ot_111@tree1": "node31",
+        "ot_1195@tree1": "node4",
+        "ot_2013@tree8": "node246",
+        "ot_2018@tree8": "node556",
+        "ot_2018@tree9": "node1859",
+        "ot_2079@tree1": "node262",
+        "ot_2146@tree1": "node42",
+        "ot_2312@tree1": "node64",
+        "ot_2879@tree1": "node11707",
+        "ot_3077@tree1": "node3974",
+        "ot_412@Tr77157": "Tn12024231",
+        "ot_521@tree1": "node1794",
+        "ot_531@tree1": "node249",
+        "ot_532@tree1": "node61",
+        "ot_757@Tr70438": "Tn11106583",
+        "ot_782@Tr48736": "Tn8171756",
+        "ot_783@tree1": "node107",
+        "ot_809@tree2": "node18442",
+        "ot_841@tree1": "node26",
+        "pg_2015@tree4152": "node772089",
+        "pg_2404@tree5068": "node878467",
+        "pg_2404@tree6388": "node1112442",
+        "pg_420@tree522": "node208499"
+      },
+      "terminal": {
+        "ot_847@tree1": "ott5925731",
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2757@tree1": [
+          "node15",
+          "node23",
+          "node284"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20",
+          "node21",
+          "node22",
+          "node23",
+          "node24"
+        ],
+        "ot_290@tree1": [
+          "node1001",
+          "node1007",
+          "node1008",
+          "node1016",
+          "node1038",
+          "node1066",
+          "node1148",
+          "node1210",
+          "node1212",
+          "node1254",
+          "node1274",
+          "node1275"
+        ],
+        "ot_412@Tr77157": [
+          "Tn12024209"
+        ],
+        "ot_521@tree1": [
+          "node6807",
+          "node6808",
+          "node6809",
+          "node6810",
+          "node6811",
+          "node6981",
+          "node7301",
+          "node7337",
+          "node7338",
+          "node7339",
+          "node7340",
+          "node7341",
+          "node7427",
+          "node7428"
+        ],
+        "ot_531@tree1": [
+          "node322"
+        ]
+      },
+      "node_id": "mrcaott246ott10351",
+      "num_tips": 6939,
+      "partial_path_of": {
+        "ot_1055@tree1": "node443",
+        "ot_111@tree1": "node29",
+        "ot_1174@tree3": "node43",
+        "ot_1195@tree1": "node3",
+        "ot_2018@tree8": "node555",
+        "ot_2018@tree9": "node1858",
+        "ot_2079@tree1": "node210",
+        "ot_214@tree1": "node74",
+        "ot_2307@tree3": "node321",
+        "ot_500@tree1": "node74",
+        "ot_534@tree1": "node14",
+        "ot_841@tree1": "node25",
+        "ot_855@tree1": "node61",
+        "pg_2015@tree4152": "node772085",
+        "pg_2913@tree6741": "node1171634",
+        "pg_2913@tree6742": "node1171677",
+        "pg_420@tree522": "node208498"
+      },
+      "resolves": {
+        "ot_2019@tree35": "node76450",
+        "ot_2770@tree1": "node2",
+        "ot_757@Tr70438": "Tn11106561"
+      },
+      "supported_by": {
+        "ot_2013@tree8": "node236",
+        "ot_2146@tree1": "node37",
+        "ot_2312@tree1": "node63",
+        "ot_2879@tree1": "node11615",
+        "ot_3077@tree1": "node3973",
+        "ot_532@tree1": "node49",
+        "ot_782@Tr48736": "Tn8171851",
+        "ot_783@tree1": "node97",
+        "ot_809@tree2": "node18368",
+        "pg_2404@tree5068": "node878451",
+        "pg_2404@tree6388": "node1112440"
+      },
+      "terminal": {
+        "ot_847@tree1": "ott5925731",
+        "ot_869@tree1": "ott329397",
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2757@tree1": [
+          "node15",
+          "node23",
+          "node284"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20",
+          "node21",
+          "node213",
+          "node22",
+          "node23",
+          "node24"
+        ],
+        "ot_2879@tree1": [
+          "node10156",
+          "node10157"
+        ],
+        "ot_290@tree1": [
+          "node1001",
+          "node1007",
+          "node1008",
+          "node1016",
+          "node1038",
+          "node1066",
+          "node1148",
+          "node1210",
+          "node1212",
+          "node1254",
+          "node1274",
+          "node1275",
+          "node966",
+          "node977"
+        ],
+        "ot_521@tree1": [
+          "node6807",
+          "node6808",
+          "node6809",
+          "node6810",
+          "node6811",
+          "node6981",
+          "node7301",
+          "node7337",
+          "node7338",
+          "node7339",
+          "node7340",
+          "node7341",
+          "node7427",
+          "node7428",
+          "node7781"
+        ],
+        "ot_531@tree1": [
+          "node322",
+          "node323"
+        ],
+        "ot_782@Tr48736": [
+          "Tn8171754",
+          "Tn8171818"
+        ],
+        "ot_809@tree2": [
+          "node17369",
+          "node17370"
+        ],
+        "pg_2404@tree5068": [
+          "node878556",
+          "node878557",
+          "node878558"
+        ],
+        "pg_2404@tree6388": [
+          "node1112326",
+          "node1112427",
+          "node1112435"
+        ]
+      },
+      "node_id": "mrcaott246ott22325",
+      "num_tips": 6949,
+      "partial_path_of": {
+        "ot_1055@tree1": "node443",
+        "ot_111@tree1": "node29",
+        "ot_1174@tree3": "node43",
+        "ot_1195@tree1": "node3",
+        "ot_2018@tree8": "node555",
+        "ot_2018@tree9": "node1858",
+        "ot_2079@tree1": "node210",
+        "ot_214@tree1": "node74",
+        "ot_2307@tree3": "node321",
+        "ot_500@tree1": "node74",
+        "ot_532@tree1": "node45",
+        "ot_534@tree1": "node14",
+        "ot_757@Tr70438": "Tn11106561",
+        "ot_841@tree1": "node25",
+        "ot_855@tree1": "node61",
+        "pg_2015@tree4152": "node772085",
+        "pg_2913@tree6741": "node1171634",
+        "pg_2913@tree6742": "node1171677",
+        "pg_420@tree522": "node208498"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_2013@tree8": "node232",
+        "ot_2146@tree1": "node27",
+        "ot_2312@tree1": "node62",
+        "ot_3077@tree1": "node3972",
+        "ot_412@Tr77157": "Tn12024346",
+        "ot_783@tree1": "node95"
+      },
+      "terminal": {
+        "ot_847@tree1": "ott5925731",
+        "ot_869@tree1": "ott329397",
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2146@tree1": [
+          "node62"
+        ],
+        "ot_2757@tree1": [
+          "node15",
+          "node23",
+          "node284"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20",
+          "node21",
+          "node213",
+          "node22",
+          "node23"
+        ],
+        "ot_2879@tree1": [
+          "node10156",
+          "node10157",
+          "node10162"
+        ],
+        "ot_290@tree1": [
+          "node1001",
+          "node1007",
+          "node1008",
+          "node1016",
+          "node1038",
+          "node1066",
+          "node1148",
+          "node1210",
+          "node1212",
+          "node1254",
+          "node1274",
+          "node1275",
+          "node965",
+          "node966",
+          "node977"
+        ],
+        "ot_521@tree1": [
+          "node6807",
+          "node6808",
+          "node6809",
+          "node6810",
+          "node6811",
+          "node6981",
+          "node7301",
+          "node7337",
+          "node7338",
+          "node7339",
+          "node7340",
+          "node7341",
+          "node7427",
+          "node7428",
+          "node7781"
+        ],
+        "ot_531@tree1": [
+          "node322",
+          "node323",
+          "node324",
+          "node325"
+        ],
+        "ot_782@Tr48736": [
+          "Tn8171754",
+          "Tn8171818",
+          "Tn8171856"
+        ],
+        "ot_809@tree2": [
+          "node17369",
+          "node17370",
+          "node17376"
+        ],
+        "pg_2015@tree4152": [
+          "node772059",
+          "node772061"
+        ],
+        "pg_2404@tree5068": [
+          "node878556",
+          "node878557",
+          "node878558"
+        ],
+        "pg_2404@tree6388": [
+          "node1112326",
+          "node1112427",
+          "node1112435"
+        ]
+      },
+      "node_id": "mrcaott246ott176461",
+      "num_tips": 6962,
+      "partial_path_of": {
+        "ot_1055@tree1": "node443",
+        "ot_111@tree1": "node29",
+        "ot_1174@tree3": "node43",
+        "ot_1195@tree1": "node3",
+        "ot_2018@tree8": "node555",
+        "ot_2018@tree9": "node1858",
+        "ot_214@tree1": "node74",
+        "ot_2307@tree3": "node321",
+        "ot_412@Tr77157": "Tn12024294",
+        "ot_500@tree1": "node74",
+        "ot_532@tree1": "node45",
+        "ot_534@tree1": "node14",
+        "ot_757@Tr70438": "Tn11106561",
+        "ot_841@tree1": "node25",
+        "ot_855@tree1": "node61",
+        "pg_2913@tree6741": "node1171634",
+        "pg_2913@tree6742": "node1171677",
+        "pg_420@tree522": "node208498"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_2013@tree8": "node226",
+        "ot_2079@tree1": "node188",
+        "ot_2312@tree1": "node60",
+        "ot_3077@tree1": "node3971",
+        "ot_783@tree1": "node89"
+      },
+      "terminal": {
+        "ot_847@tree1": "ott5925731",
+        "ot_869@tree1": "ott329397",
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2757@tree1": [
+          "node15",
+          "node23",
+          "node284"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20",
+          "node21",
+          "node22"
+        ],
+        "ot_2879@tree1": [
+          "node10156",
+          "node10162"
+        ],
+        "ot_290@tree1": [
+          "node1001",
+          "node1007",
+          "node1008",
+          "node1016",
+          "node1038",
+          "node1066",
+          "node1148",
+          "node1210",
+          "node1212",
+          "node1254",
+          "node1274",
+          "node1275",
+          "node965",
+          "node977"
+        ],
+        "ot_521@tree1": [
+          "node6807",
+          "node6808",
+          "node6809",
+          "node6810",
+          "node6811",
+          "node6981",
+          "node7301",
+          "node7337",
+          "node7338",
+          "node7339",
+          "node7340",
+          "node7341",
+          "node7427",
+          "node7428"
+        ],
+        "ot_531@tree1": [
+          "node322",
+          "node323",
+          "node324",
+          "node325"
+        ],
+        "ot_782@Tr48736": [
+          "Tn8171818",
+          "Tn8171856"
+        ],
+        "ot_809@tree2": [
+          "node17369"
+        ],
+        "pg_2015@tree4152": [
+          "node772059",
+          "node772061"
+        ],
+        "pg_2404@tree5068": [
+          "node878556"
+        ],
+        "pg_2404@tree6388": [
+          "node1112326"
+        ]
+      },
+      "node_id": "mrcaott246ott310390",
+      "num_tips": 6965,
+      "partial_path_of": {
+        "ot_1055@tree1": "node443",
+        "ot_111@tree1": "node29",
+        "ot_1174@tree3": "node43",
+        "ot_1195@tree1": "node3",
+        "ot_2018@tree8": "node555",
+        "ot_2018@tree9": "node1858",
+        "ot_214@tree1": "node74",
+        "ot_2307@tree3": "node321",
+        "ot_412@Tr77157": "Tn12024294",
+        "ot_500@tree1": "node74",
+        "ot_532@tree1": "node45",
+        "ot_534@tree1": "node14",
+        "ot_757@Tr70438": "Tn11106561",
+        "ot_841@tree1": "node25",
+        "ot_855@tree1": "node61",
+        "pg_2913@tree6741": "node1171634",
+        "pg_2913@tree6742": "node1171677",
+        "pg_420@tree522": "node208498"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_2013@tree8": "node222",
+        "ot_2079@tree1": "node182",
+        "ot_2146@tree1": "node26",
+        "ot_2312@tree1": "node58",
+        "ot_3077@tree1": "node3970",
+        "ot_783@tree1": "node85"
+      },
+      "terminal": {
+        "ot_836@tree1": "node3",
+        "ot_847@tree1": "ott5925731",
+        "ot_869@tree1": "ott329397",
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2757@tree1": [
+          "node15",
+          "node23",
+          "node284"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20",
+          "node21"
+        ],
+        "ot_521@tree1": [
+          "node1789",
+          "node1790",
+          "node8154",
+          "node8155"
+        ],
+        "ot_809@tree2": [
+          "node17369",
+          "node17393",
+          "node17394",
+          "node17395",
+          "node17399"
+        ]
+      },
+      "node_id": "mrcaott246ott4820",
+      "num_tips": 8633,
+      "partial_path_of": {
+        "ot_1055@tree1": "node437",
+        "ot_1174@tree3": "node39",
+        "ot_1195@tree1": "node2",
+        "ot_2018@tree8": "node554",
+        "ot_2018@tree9": "node1857",
+        "ot_214@tree1": "node72",
+        "ot_2307@tree3": "node320",
+        "ot_412@Tr77157": "Tn12024335",
+        "ot_500@tree1": "node73",
+        "ot_532@tree1": "node19",
+        "ot_534@tree1": "node13",
+        "ot_841@tree1": "node24",
+        "ot_855@tree1": "node12",
+        "pg_2913@tree6741": "node1171633",
+        "pg_420@tree522": "node208497"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2",
+        "ot_314@tree1": "node36",
+        "ot_836@tree1": "node1"
+      },
+      "supported_by": {
+        "ot_111@tree1": "node7",
+        "ot_2013@tree8": "node132",
+        "ot_2079@tree1": "node181",
+        "ot_2146@tree1": "node25",
+        "ot_2312@tree1": "node57",
+        "ot_2879@tree1": "node10155",
+        "ot_290@tree1": "node705",
+        "ot_3077@tree1": "node3969",
+        "ot_531@tree1": "node246",
+        "ot_757@Tr70438": "Tn11106543",
+        "ot_782@Tr48736": "Tn8171821",
+        "ot_783@tree1": "node31",
+        "pg_2015@tree4152": "node772058",
+        "pg_2404@tree5068": "node878450",
+        "pg_2404@tree6388": "node1112325"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2757@tree1": [
+          "node15",
+          "node23",
+          "node284"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19",
+          "node20"
+        ],
+        "ot_521@tree1": [
+          "node1789",
+          "node8154",
+          "node8155"
+        ],
+        "ot_809@tree2": [
+          "node17368",
+          "node17369",
+          "node17393",
+          "node17394",
+          "node17395",
+          "node17399"
+        ]
+      },
+      "node_id": "mrcaott246ott96288",
+      "num_tips": 8644,
+      "partial_path_of": {
+        "ot_1055@tree1": "node437",
+        "ot_1174@tree3": "node39",
+        "ot_1195@tree1": "node2",
+        "ot_2018@tree8": "node554",
+        "ot_2018@tree9": "node1857",
+        "ot_214@tree1": "node72",
+        "ot_2307@tree3": "node320",
+        "ot_412@Tr77157": "Tn12024335",
+        "ot_500@tree1": "node73",
+        "ot_532@tree1": "node19",
+        "ot_534@tree1": "node13",
+        "ot_841@tree1": "node24",
+        "ot_855@tree1": "node12",
+        "pg_2913@tree6741": "node1171633",
+        "pg_420@tree522": "node208497"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_2013@tree8": "node128",
+        "ot_2079@tree1": "node180",
+        "ot_2146@tree1": "node24",
+        "ot_2312@tree1": "node56",
+        "ot_2879@tree1": "node10141",
+        "ot_290@tree1": "node701",
+        "ot_3077@tree1": "node3968",
+        "ot_531@tree1": "node245",
+        "ot_757@Tr70438": "Tn11106600",
+        "ot_782@Tr48736": "Tn8171733",
+        "ot_783@tree1": "node27",
+        "pg_2015@tree4152": "node772054",
+        "pg_2404@tree5068": "node878442",
+        "pg_2404@tree6388": "node1112323"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2757@tree1": [
+          "node15",
+          "node23",
+          "node284"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17",
+          "node19"
+        ],
+        "ot_521@tree1": [
+          "node8154",
+          "node8155"
+        ]
+      },
+      "node_id": "mrcaott246ott5929",
+      "num_tips": 9074,
+      "partial_path_of": {
+        "ot_1174@tree3": "node39",
+        "ot_1195@tree1": "node2",
+        "ot_214@tree1": "node72",
+        "ot_412@Tr77157": "Tn12024270",
+        "ot_532@tree1": "node11",
+        "ot_534@tree1": "node13",
+        "ot_841@tree1": "node22",
+        "pg_2913@tree6741": "node1171633"
+      },
+      "resolves": {
+        "ot_2019@tree35": "node76450",
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node435",
+        "ot_2013@tree8": "node114",
+        "ot_2018@tree8": "node553",
+        "ot_2018@tree9": "node1856",
+        "ot_2079@tree1": "node6",
+        "ot_2146@tree1": "node14",
+        "ot_2307@tree3": "node318",
+        "ot_2312@tree1": "node55",
+        "ot_2879@tree1": "node9569",
+        "ot_290@tree1": "node595",
+        "ot_3077@tree1": "node3967",
+        "ot_500@tree1": "node72",
+        "ot_531@tree1": "node239",
+        "ot_757@Tr70438": "Tn11106521",
+        "ot_782@Tr48736": "Tn8171802",
+        "ot_783@tree1": "node15",
+        "ot_809@tree2": "node17040",
+        "ot_855@tree1": "node10",
+        "pg_2015@tree4152": "node772048",
+        "pg_2404@tree5068": "node878432",
+        "pg_2404@tree6388": "node1112322",
+        "pg_420@tree522": "node208496"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2757@tree1": [
+          "node15",
+          "node23",
+          "node284"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16",
+          "node17"
+        ]
+      },
+      "node_id": "mrcaott246ott44866",
+      "num_tips": 9122,
+      "partial_path_of": {
+        "ot_1174@tree3": "node39",
+        "ot_1195@tree1": "node2",
+        "ot_214@tree1": "node72",
+        "ot_412@Tr77157": "Tn12024270",
+        "ot_532@tree1": "node11",
+        "ot_534@tree1": "node13",
+        "ot_841@tree1": "node22",
+        "pg_2913@tree6741": "node1171633"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node433",
+        "ot_2013@tree8": "node106",
+        "ot_2018@tree8": "node552",
+        "ot_2018@tree9": "node1855",
+        "ot_2146@tree1": "node13",
+        "ot_2307@tree3": "node316",
+        "ot_2312@tree1": "node54",
+        "ot_2879@tree1": "node9503",
+        "ot_290@tree1": "node585",
+        "ot_3077@tree1": "node3966",
+        "ot_500@tree1": "node71",
+        "ot_521@tree1": "node1788",
+        "ot_531@tree1": "node235",
+        "ot_757@Tr70438": "Tn11106540",
+        "ot_782@Tr48736": "Tn8171776",
+        "ot_783@tree1": "node7",
+        "ot_809@tree2": "node16998",
+        "ot_855@tree1": "node8",
+        "pg_2015@tree4152": "node772044",
+        "pg_2404@tree5068": "node878422",
+        "pg_2404@tree6388": "node1112321",
+        "pg_420@tree522": "node208495"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2757@tree1": [
+          "node15",
+          "node23",
+          "node284"
+        ],
+        "ot_2765@tree1": [
+          "node15",
+          "node16"
+        ]
+      },
+      "node_id": "mrcaott246ott428578",
+      "num_tips": 9129,
+      "partial_path_of": {
+        "ot_1174@tree3": "node39",
+        "ot_1195@tree1": "node2",
+        "ot_214@tree1": "node72",
+        "ot_841@tree1": "node22",
+        "pg_2913@tree6741": "node1171633"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node2"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node431",
+        "ot_2013@tree8": "node102",
+        "ot_2018@tree8": "node551",
+        "ot_2018@tree9": "node1854",
+        "ot_2146@tree1": "node12",
+        "ot_2307@tree3": "node314",
+        "ot_2312@tree1": "node53",
+        "ot_2879@tree1": "node9499",
+        "ot_290@tree1": "node581",
+        "ot_3077@tree1": "node3965",
+        "ot_412@Tr77157": "Tn12024264",
+        "ot_500@tree1": "node70",
+        "ot_521@tree1": "node1787",
+        "ot_531@tree1": "node231",
+        "ot_532@tree1": "node9",
+        "ot_534@tree1": "node12",
+        "ot_757@Tr70438": "Tn11106553",
+        "ot_782@Tr48736": "Tn8171906",
+        "ot_809@tree2": "node16994",
+        "pg_2015@tree4152": "node772042",
+        "pg_2404@tree5068": "node878420",
+        "pg_2404@tree6388": "node1112320",
+        "pg_420@tree522": "node208494"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_2757@tree1": [
+          "node15",
+          "node23",
+          "node284"
+        ],
+        "ot_2765@tree1": [
+          "node15"
+        ]
+      },
+      "node_id": "mrcaott246ott3212",
+      "num_tips": 11160,
+      "partial_path_of": {
+        "ot_1174@tree3": "node39"
+      },
+      "resolves": {
+        "ot_2019@tree35": "node76450",
+        "ot_2770@tree1": "node2",
+        "ot_314@tree1": "node36"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node409",
+        "ot_2013@tree8": "node36",
+        "ot_2018@tree8": "node550",
+        "ot_2018@tree9": "node1853",
+        "ot_2146@tree1": "node11",
+        "ot_214@tree1": "node70",
+        "ot_2307@tree3": "node298",
+        "ot_2312@tree1": "node52",
+        "ot_2879@tree1": "node6923",
+        "ot_290@tree1": "node13",
+        "ot_3077@tree1": "node1407",
+        "ot_412@Tr77157": "Tn12024395",
+        "ot_500@tree1": "node14",
+        "ot_521@tree1": "node11",
+        "ot_531@tree1": "node185",
+        "ot_532@tree1": "node3",
+        "ot_534@tree1": "node11",
+        "ot_757@Tr70438": "Tn11106605",
+        "ot_782@Tr48736": "Tn8171761",
+        "ot_809@tree2": "node15232",
+        "pg_2015@tree4152": "node772026",
+        "pg_2404@tree5068": "node878386",
+        "pg_2404@tree6388": "node1112319",
+        "pg_2913@tree6741": "node1171631",
+        "pg_420@tree522": "node208493"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "node_id": "ott1041547",
+      "num_tips": 11215,
+      "partial_path_of": {
+        "ot_1174@tree3": "node39"
+      },
+      "resolves": {
+        "ot_2765@tree1": "node13"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node407",
+        "ot_2018@tree8": "node548",
+        "ot_2018@tree9": "node1851",
+        "ot_214@tree1": "node68",
+        "ot_2307@tree3": "node296",
+        "ot_2312@tree1": "node50",
+        "ot_2770@tree1": "node2",
+        "ot_2879@tree1": "node6921",
+        "ot_3077@tree1": "node1406",
+        "ot_314@tree1": "node36",
+        "ot_500@tree1": "node13",
+        "ot_521@tree1": "node10",
+        "ot_531@tree1": "node183",
+        "ot_534@tree1": "node9",
+        "ot_809@tree2": "node15228",
+        "ott3.7draft3": "ott1041547",
+        "pg_2913@tree6741": "node1171629",
+        "pg_420@tree522": "node208491"
+      },
+      "taxon": {
+        "name": "Passeriformes",
+        "ott_id": 1041547,
+        "rank": "order",
+        "tax_sources": [
+          "ncbi:9126",
+          "worms:159384",
+          "gbif:729",
+          "irmng:11290"
+        ],
+        "unique_name": "Passeriformes"
+      },
+      "terminal": {
+        "ot_2083@tree1": "ott4947806",
+        "pg_2573@tree5959": "node1011375"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "mrcaott246ott7113",
+      "num_tips": 11939,
+      "partial_path_of": {
+        "ot_1174@tree3": "node39",
+        "ot_2083@tree1": "node76"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node1"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node385",
+        "ot_2018@tree8": "node547",
+        "ot_2018@tree9": "node1850",
+        "ot_214@tree1": "node64",
+        "ot_2307@tree3": "node288",
+        "ot_2312@tree1": "node49",
+        "ot_2765@tree1": "node13",
+        "ot_2879@tree1": "node6157",
+        "ot_3077@tree1": "node1405",
+        "ot_314@tree1": "node32",
+        "ot_500@tree1": "node12",
+        "ot_521@tree1": "node9",
+        "ot_531@tree1": "node173",
+        "ot_534@tree1": "node8",
+        "ot_809@tree2": "node14734",
+        "pg_2913@tree6741": "node1171628",
+        "pg_420@tree522": "node208490"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott47588",
+      "num_tips": 12126,
+      "partial_path_of": {
+        "ot_1174@tree3": "node39",
+        "ot_2083@tree1": "node76",
+        "ot_534@tree1": "node7",
+        "pg_2913@tree6741": "node1171627"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node1"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node373",
+        "ot_2018@tree8": "node527",
+        "ot_2018@tree9": "node1830",
+        "ot_214@tree1": "node62",
+        "ot_2307@tree3": "node284",
+        "ot_2312@tree1": "node48",
+        "ot_2765@tree1": "node12",
+        "ot_2879@tree1": "node6027",
+        "ot_3077@tree1": "node1389",
+        "ot_314@tree1": "node30",
+        "ot_500@tree1": "node11",
+        "ot_521@tree1": "node8",
+        "ot_531@tree1": "node167",
+        "ot_809@tree2": "node14642",
+        "pg_420@tree522": "node208489"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott3600042",
+      "num_tips": 12129,
+      "partial_path_of": {
+        "ot_1174@tree3": "node39",
+        "ot_2083@tree1": "node76",
+        "ot_534@tree1": "node7",
+        "pg_2913@tree6741": "node1171627"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node1"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node369",
+        "ot_2018@tree8": "node526",
+        "ot_2018@tree9": "node1829",
+        "ot_214@tree1": "node60",
+        "ot_2307@tree3": "node282",
+        "ot_2312@tree1": "node47",
+        "ot_2765@tree1": "node11",
+        "ot_2879@tree1": "node6025",
+        "ot_3077@tree1": "node1385",
+        "ot_314@tree1": "node28",
+        "ot_500@tree1": "node10",
+        "ot_521@tree1": "node7",
+        "ot_531@tree1": "node165",
+        "ot_809@tree2": "node14638",
+        "pg_420@tree522": "node208488"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott1858",
+      "num_tips": 14437,
+      "partial_path_of": {
+        "ot_2083@tree1": "node76"
+      },
+      "resolves": {
+        "ot_2019@tree35": "node76450",
+        "ot_2770@tree1": "node1"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node269",
+        "ot_1174@tree3": "node27",
+        "ot_2018@tree8": "node344",
+        "ot_2018@tree9": "node1647",
+        "ot_214@tree1": "node59",
+        "ot_2307@tree3": "node280",
+        "ot_2312@tree1": "node46",
+        "ot_2765@tree1": "node9",
+        "ot_2879@tree1": "node4079",
+        "ot_3077@tree1": "node647",
+        "ot_314@tree1": "node8",
+        "ot_500@tree1": "node8",
+        "ot_521@tree1": "node6",
+        "ot_531@tree1": "node95",
+        "ot_534@tree1": "node6",
+        "ot_809@tree2": "node14636",
+        "pg_2913@tree6741": "node1171473",
+        "pg_420@tree522": "node208487"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_1055@tree1": [
+          "node114",
+          "node130",
+          "node92"
+        ],
+        "ot_2018@tree8": [
+          "node1173"
+        ],
+        "ot_2018@tree9": [
+          "node2476"
+        ],
+        "ot_214@tree1": [
+          "node22"
+        ],
+        "ot_2307@tree3": [
+          "node277",
+          "node278",
+          "node475"
+        ],
+        "ot_2765@tree1": [
+          "node440",
+          "node441",
+          "node5",
+          "node6",
+          "node7"
+        ],
+        "ot_2879@tree1": [
+          "node1346",
+          "node1580"
+        ],
+        "ot_500@tree1": [
+          "node190",
+          "node240",
+          "node4",
+          "node5",
+          "node6"
+        ],
+        "ot_521@tree1": [
+          "node10756",
+          "node10757",
+          "node11055",
+          "node11056",
+          "node11825",
+          "node11826",
+          "node11827",
+          "node12402",
+          "node4"
+        ],
+        "ot_531@tree1": [
+          "node421"
+        ],
+        "ot_534@tree1": [
+          "node4",
+          "node58",
+          "node86",
+          "node87",
+          "node97"
+        ],
+        "ot_809@tree2": [
+          "node14079",
+          "node24695",
+          "node24701",
+          "node24702",
+          "node24703",
+          "node24975",
+          "node25025",
+          "node25026",
+          "node25539"
+        ],
+        "pg_2913@tree6741": [
+          "node1171326",
+          "node1171376"
+        ],
+        "pg_420@tree522": [
+          "node208485",
+          "node208643",
+          "node208644",
+          "node208645",
+          "node208684",
+          "node208685",
+          "node208716",
+          "node208746",
+          "node208747"
+        ]
+      },
+      "node_id": "mrcaott246ott5272",
+      "num_tips": 17048,
+      "partial_path_of": {
+        "ot_1345@Tr109614": "Tn17248117",
+        "ot_2083@tree1": "node58"
+      },
+      "resolves": {
+        "ot_2019@tree35": "node76450",
+        "ot_2770@tree1": "node1"
+      },
+      "supported_by": {
+        "ot_1174@tree3": "node19",
+        "ot_2312@tree1": "node45",
+        "ot_3077@tree1": "node395",
+        "ot_314@tree1": "node6"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_1055@tree1": [
+          "node64",
+          "node74"
+        ],
+        "ot_2018@tree8": [
+          "node1269"
+        ],
+        "ot_2018@tree9": [
+          "node2572"
+        ],
+        "ot_214@tree1": [
+          "node12"
+        ],
+        "ot_2307@tree3": [
+          "node277",
+          "node278",
+          "node475",
+          "node476"
+        ],
+        "ot_2765@tree1": [
+          "node440",
+          "node441",
+          "node5",
+          "node6",
+          "node7"
+        ],
+        "ot_2879@tree1": [
+          "node1345",
+          "node1346",
+          "node1580"
+        ],
+        "ot_314@tree1": [
+          "node4"
+        ],
+        "ot_500@tree1": [
+          "node190",
+          "node240",
+          "node4",
+          "node5",
+          "node6"
+        ],
+        "ot_521@tree1": [
+          "node10756",
+          "node10757",
+          "node11055",
+          "node11056",
+          "node4"
+        ],
+        "ot_531@tree1": [
+          "node42"
+        ],
+        "ot_534@tree1": [
+          "node107",
+          "node97"
+        ],
+        "ot_809@tree2": [
+          "node14079",
+          "node24695",
+          "node24701",
+          "node24702"
+        ],
+        "pg_420@tree522": [
+          "node208716",
+          "node208746"
+        ]
+      },
+      "node_id": "mrcaott246ott5021",
+      "num_tips": 17929,
+      "partial_path_of": {
+        "ot_1174@tree3": "node17",
+        "ot_1345@Tr109614": "Tn17248117",
+        "ot_2083@tree1": "node58",
+        "pg_2913@tree6741": "node1171325"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node1"
+      },
+      "supported_by": {
+        "ot_2312@tree1": "node44",
+        "ot_3077@tree1": "node333"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott92263",
+      "num_tips": 17979,
+      "partial_path_of": {
+        "ot_1174@tree3": "node17",
+        "ot_1345@Tr109614": "Tn17248117",
+        "ot_2083@tree1": "node58",
+        "pg_2913@tree6741": "node1171325"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node1"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node63",
+        "ot_2018@tree8": "node340",
+        "ot_2018@tree9": "node1643",
+        "ot_214@tree1": "node11",
+        "ot_2307@tree3": "node279",
+        "ot_2312@tree1": "node38",
+        "ot_2765@tree1": "node4",
+        "ot_2879@tree1": "node897",
+        "ot_3077@tree1": "node325",
+        "ot_500@tree1": "node3",
+        "ot_521@tree1": "node3",
+        "ot_531@tree1": "node41",
+        "ot_534@tree1": "node3",
+        "ot_809@tree2": "node14078",
+        "pg_420@tree522": "node208484"
+      },
+      "terminal": {
+        "pg_2573@tree5959": "node1011375"
+      }
+    },
+    {
+      "node_id": "ott241846",
+      "num_tips": 18867,
+      "partial_path_of": {
+        "ot_1449@Tr55330": "Tn9093153",
+        "ot_1516@Tr55113": "Tn9060578",
+        "ot_2371@tree2": "node80",
+        "pg_2573@tree5959": "node1011373"
+      },
+      "resolves": {
+        "ot_2770@tree1": "node1"
+      },
+      "supported_by": {
+        "ot_1055@tree1": "node23",
+        "ot_1345@Tr109614": "Tn17248108",
+        "ot_2018@tree8": "node56",
+        "ot_2018@tree9": "node1359",
+        "ot_2083@tree1": "node46",
+        "ot_214@tree1": "node5",
+        "ot_2307@tree3": "node395",
+        "ot_2765@tree1": "node3",
+        "ot_2879@tree1": "node83",
+        "ot_3077@tree1": "node47",
+        "ot_500@tree1": "node2",
+        "ot_521@tree1": "node2",
+        "ot_531@tree1": "node15",
+        "ot_534@tree1": "node2",
+        "ot_809@tree2": "node13392",
+        "ott3.7draft3": "ott241846",
+        "pg_2913@tree6741": "node1171324",
+        "pg_420@tree522": "node208483"
+      },
+      "taxon": {
+        "name": "Neognathae",
+        "ott_id": 241846,
+        "rank": "infraclass",
+        "tax_sources": [
+          "ncbi:8825"
+        ],
+        "unique_name": "Neognathae"
+      },
+      "terminal": {
+        "ot_1490@tree1": "ott696268",
+        "ot_508@tree2": "ott696268",
+        "pg_1217@tree2455": "ott696268",
+        "pg_2822@tree6569": "ott696268"
+      }
+    },
+    {
+      "node_id": "ott81461",
+      "num_tips": 18988,
+      "partial_path_of": {
+        "ot_1449@Tr55330": "Tn9093153",
+        "pg_2573@tree5959": "node1011373"
+      },
+      "supported_by": {
+        "ot_1516@Tr55113": "Tn9060602",
+        "ott3.7draft3": "ott81461"
+      },
+      "taxon": {
+        "name": "Aves",
+        "ott_id": 81461,
+        "rank": "class",
+        "tax_sources": [
+          "ncbi:8782",
+          "worms:1836",
+          "gbif:212",
+          "irmng:1142"
+        ],
+        "unique_name": "Aves"
+      },
+      "terminal": {
+        "ot_1490@tree1": "ott696268",
+        "ot_508@tree2": "ott696268",
+        "pg_1217@tree2455": "ott696268",
+        "pg_2822@tree6569": "ott696268"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott4132107",
+      "num_tips": 18989,
+      "partial_path_of": {
+        "ot_1449@Tr55330": "Tn9093153",
+        "pg_2573@tree5959": "node1011373"
+      },
+      "supported_by": {
+        "ot_1516@Tr55113": "Tn9060576"
+      },
+      "terminal": {
+        "ot_1490@tree1": "ott696268",
+        "ot_508@tree2": "ott696268",
+        "pg_1217@tree2455": "ott696268",
+        "pg_2822@tree6569": "ott696268"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott3600976",
+      "num_tips": 18998,
+      "partial_path_of": {
+        "pg_2573@tree5959": "node1011373"
+      },
+      "resolves": {
+        "ot_1516@Tr55113": "Tn9060557"
+      },
+      "supported_by": {
+        "ot_1449@Tr55330": "Tn9093141"
+      },
+      "terminal": {
+        "ot_1431@Tr55921": "Tn9172767",
+        "ot_1490@tree1": "ott696268",
+        "ot_1513@Tr55903": "Tn9171363",
+        "ot_508@tree2": "ott696268",
+        "pg_1217@tree2455": "ott696268",
+        "pg_2822@tree6569": "ott696268"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott4143599",
+      "num_tips": 18999,
+      "partial_path_of": {
+        "pg_2573@tree5959": "node1011373"
+      },
+      "supported_by": {
+        "ot_1449@Tr55330": "Tn9093168",
+        "ot_1516@Tr55113": "Tn9060557"
+      },
+      "terminal": {
+        "ot_1431@Tr55921": "Tn9172767",
+        "ot_1490@tree1": "ott696268",
+        "ot_1513@Tr55903": "Tn9171363",
+        "ot_508@tree2": "ott696268",
+        "pg_1217@tree2455": "ott696268",
+        "pg_2822@tree6569": "ott696268"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott3602822",
+      "num_tips": 19005,
+      "partial_path_of": {
+        "pg_2573@tree5959": "node1011373"
+      },
+      "supported_by": {
+        "ot_1449@Tr55330": "Tn9093182",
+        "ot_1516@Tr55113": "Tn9060560"
+      },
+      "terminal": {
+        "ot_1431@Tr55921": "Tn9172767",
+        "ot_1490@tree1": "ott696268",
+        "ot_1513@Tr55903": "Tn9171363",
+        "ot_508@tree2": "ott696268",
+        "pg_1217@tree2455": "ott696268",
+        "pg_2822@tree6569": "ott696268"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott31216",
+      "num_tips": 19045,
+      "partial_path_of": {
+        "ot_1513@Tr55903": "Tn9171458"
+      },
+      "supported_by": {
+        "ot_1431@Tr55921": "Tn9172768",
+        "ot_1490@tree1": "node9",
+        "pg_2573@tree5959": "node1011369"
+      },
+      "terminal": {
+        "ot_508@tree2": "ott696268",
+        "pg_1217@tree2455": "ott696268",
+        "pg_2822@tree6569": "ott696268"
+      }
+    },
+    {
+      "node_id": "mrcaott246ott2982",
+      "num_tips": 19935,
+      "partial_path_of": {
+        "ot_1513@Tr55903": "Tn9171458"
+      },
+      "supported_by": {
+        "ot_1431@Tr55921": "Tn9172735",
+        "pg_2573@tree5959": "node1011365"
+      },
+      "terminal": {
+        "ot_508@tree2": "ott696268",
+        "pg_1217@tree2455": "ott696268",
+        "pg_2822@tree6569": "ott696268"
+      }
+    },
+    {
+      "node_id": "ott329823",
+      "num_tips": 32042,
+      "supported_by": {
+        "ot_1517@Tr60095": "Tn9704256",
+        "ott3.7draft3": "ott329823"
+      },
+      "taxon": {
+        "name": "Sauria",
+        "ott_id": 329823,
+        "rank": "order",
+        "tax_sources": [
+          "ncbi:32561",
+          "worms:342632"
+        ],
+        "unique_name": "Sauria"
+      },
+      "terminal": {
+        "ot_508@tree2": "ott696268",
+        "pg_1217@tree2455": "ott696268",
+        "pg_2822@tree6569": "ott696268"
+      }
+    },
+    {
+      "node_id": "ott639642",
+      "num_tips": 32043,
+      "supported_by": {
+        "ott3.7draft3": "ott639642"
+      },
+      "taxon": {
+        "name": "Sauropsida",
+        "ott_id": 639642,
+        "rank": "no rank",
+        "tax_sources": [
+          "ncbi:8457"
+        ],
+        "unique_name": "Sauropsida"
+      },
+      "terminal": {
+        "ot_508@tree2": "ott696268",
+        "pg_1217@tree2455": "ott696268",
+        "pg_2822@tree6569": "ott696268"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "ott229560",
+      "num_tips": 41371,
+      "partial_path_of": {
+        "pg_2822@tree6569": "node1142002"
+      },
+      "supported_by": {
+        "ot_508@tree2": "node31",
+        "ott3.7draft3": "ott229560",
+        "pg_1217@tree2455": "node566202"
+      },
+      "taxon": {
+        "name": "Amniota",
+        "ott_id": 229560,
+        "rank": "no rank",
+        "tax_sources": [
+          "ncbi:32524"
+        ],
+        "unique_name": "Amniota"
+      },
+      "terminal": {
+        "ot_766@Tr85440": "ott83926"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "ott229562",
+      "num_tips": 51389,
+      "partial_path_of": {
+        "ot_508@tree2": "node30",
+        "pg_1217@tree2455": "node566198",
+        "pg_2822@tree6569": "node1142002"
+      },
+      "supported_by": {
+        "ott3.7draft3": "ott229562"
+      },
+      "taxon": {
+        "name": "Tetrapoda",
+        "ott_id": 229562,
+        "rank": "superclass",
+        "tax_sources": [
+          "ncbi:32523",
+          "worms:1831"
+        ],
+        "unique_name": "Tetrapoda"
+      },
+      "terminal": {
+        "ot_766@Tr85440": "ott83926"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "ott4940726",
+      "num_tips": 51400,
+      "partial_path_of": {
+        "ot_508@tree2": "node30",
+        "pg_1217@tree2455": "node566198",
+        "pg_2822@tree6569": "node1142002"
+      },
+      "supported_by": {
+        "ott3.7draft3": "ott4940726"
+      },
+      "taxon": {
+        "name": "Dipnotetrapodomorpha",
+        "ott_id": 4940726,
+        "rank": "no rank",
+        "tax_sources": [
+          "ncbi:1338369"
+        ],
+        "unique_name": "Dipnotetrapodomorpha"
+      },
+      "terminal": {
+        "ot_3067@tree1": "node33",
+        "ot_766@Tr85440": "ott83926"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "ott458402",
+      "num_tips": 51412,
+      "partial_path_of": {
+        "ot_508@tree2": "node30",
+        "pg_1217@tree2455": "node566198",
+        "pg_2822@tree6569": "node1142002"
+      },
+      "supported_by": {
+        "ott3.7draft3": "ott458402"
+      },
+      "taxon": {
+        "name": "Sarcopterygii",
+        "ott_id": 458402,
+        "rank": "superclass",
+        "tax_sources": [
+          "ncbi:8287",
+          "worms:163509",
+          "gbif:238",
+          "irmng:1531"
+        ],
+        "unique_name": "Sarcopterygii"
+      },
+      "terminal": {
+        "ot_1253@tree1": "node201",
+        "ot_3067@tree1": "node33",
+        "ot_766@Tr85440": "ott83926"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "ott114654",
+      "num_tips": 89145,
+      "partial_path_of": {
+        "pg_2822@tree6569": "node1142002"
+      },
+      "supported_by": {
+        "ot_508@tree2": "node28",
+        "ott3.7draft3": "ott114654",
+        "pg_1217@tree2455": "node566194"
+      },
+      "taxon": {
+        "name": "Euteleostomi",
+        "ott_id": 114654,
+        "rank": "no rank",
+        "tax_sources": [
+          "ncbi:117571"
+        ],
+        "unique_name": "Euteleostomi"
+      },
+      "terminal": {
+        "ot_766@Tr85440": "ott83926"
+      }
+    },
+    {
+      "node_id": "ott114656",
+      "num_tips": 89145,
+      "partial_path_of": {
+        "pg_2822@tree6569": "node1142002"
+      },
+      "supported_by": {
+        "ot_508@tree2": "node28",
+        "ott3.7draft3": "ott114656",
+        "pg_1217@tree2455": "node566194"
+      },
+      "taxon": {
+        "name": "Teleostomi",
+        "ott_id": 114656,
+        "rank": "no rank",
+        "tax_sources": [
+          "ncbi:117570"
+        ],
+        "unique_name": "Teleostomi"
+      },
+      "terminal": {
+        "ot_766@Tr85440": "ott83926"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "ott278114",
+      "num_tips": 90802,
+      "partial_path_of": {
+        "pg_2822@tree6569": "node1142002"
+      },
+      "supported_by": {
+        "ot_508@tree2": "node27",
+        "ott3.7draft3": "ott278114",
+        "pg_1217@tree2455": "node566190"
+      },
+      "taxon": {
+        "name": "Gnathostomata",
+        "ott_id": 278114,
+        "rank": "superclass",
+        "tax_sources": [
+          "ncbi:7776",
+          "worms:1828"
+        ],
+        "unique_name": "Gnathostomata (superclass in phylum Chordata)"
+      },
+      "terminal": {
+        "ot_766@Tr85440": "ott83926"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "ott801601",
+      "num_tips": 90938,
+      "partial_path_of": {
+        "pg_2822@tree6569": "node1142002"
+      },
+      "supported_by": {
+        "ot_508@tree2": "node26",
+        "ott3.7draft3": "ott801601",
+        "pg_1217@tree2455": "node566186",
+        "pg_2710@tree6291": "node1094053"
+      },
+      "taxon": {
+        "name": "Vertebrata",
+        "ott_id": 801601,
+        "rank": "subphylum",
+        "tax_sources": [
+          "ncbi:7742",
+          "worms:146419"
+        ],
+        "unique_name": "Vertebrata (subphylum in Deuterostomia)"
+      },
+      "terminal": {
+        "ot_766@Tr85440": "ott83926"
+      }
+    },
+    {
+      "node_id": "ott947318",
+      "num_tips": 90938,
+      "partial_path_of": {
+        "pg_2822@tree6569": "node1142002"
+      },
+      "supported_by": {
+        "ot_508@tree2": "node26",
+        "ott3.7draft3": "ott947318",
+        "pg_1217@tree2455": "node566186",
+        "pg_2710@tree6291": "node1094053"
+      },
+      "taxon": {
+        "name": "Craniata",
+        "ott_id": 947318,
+        "rank": "subphylum",
+        "tax_sources": [
+          "ncbi:89593"
+        ],
+        "unique_name": "Craniata (subphylum in Deuterostomia)"
+      },
+      "terminal": {
+        "ot_766@Tr85440": "ott83926"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "mrcaott42ott658",
+      "num_tips": 94248,
+      "partial_path_of": {
+        "pg_2822@tree6569": "node1142002"
+      },
+      "supported_by": {
+        "ot_508@tree2": "node22",
+        "pg_1217@tree2455": "node566174",
+        "pg_2710@tree6291": "node1094052"
+      },
+      "terminal": {
+        "ot_766@Tr85440": "ott83926"
+      }
+    },
+    {
+      "node_id": "ott125642",
+      "num_tips": 94282,
+      "partial_path_of": {
+        "pg_2822@tree6569": "node1142001"
+      },
+      "supported_by": {
+        "ot_508@tree2": "node20",
+        "ott3.7draft3": "ott125642",
+        "pg_1217@tree2455": "node566172",
+        "pg_2710@tree6291": "node1094050"
+      },
+      "taxon": {
+        "name": "Chordata",
+        "ott_id": 125642,
+        "rank": "phylum",
+        "tax_sources": [
+          "ncbi:7711",
+          "worms:1821",
+          "gbif:44",
+          "irmng:148"
+        ],
+        "unique_name": "Chordata"
+      },
+      "terminal": {
+        "ot_766@Tr85440": "ott83926"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "conflicts_with": {
+        "ot_508@tree2": [
+          "node43"
+        ],
+        "pg_1217@tree2455": [
+          "node566207"
+        ]
+      },
+      "node_id": "ott147604",
+      "num_tips": 103155,
+      "partial_path_of": {
+        "pg_2822@tree6569": "node1142001"
+      },
+      "supported_by": {
+        "ott3.7draft3": "ott147604",
+        "pg_2710@tree6291": "node1094042"
+      },
+      "taxon": {
+        "name": "Deuterostomia",
+        "ott_id": 147604,
+        "rank": "no rank",
+        "tax_sources": [
+          "ncbi:33511"
+        ],
+        "unique_name": "Deuterostomia"
+      },
+      "terminal": {
+        "ot_766@Tr85440": "ott83926"
+      }
+    },
+    {
+      "conflicts_with": {
+        "ot_508@tree2": [
+          "node19",
+          "node43"
+        ]
+      },
+      "node_id": "mrcaott42ott49",
+      "num_tips": 1463849,
+      "partial_path_of": {
+        "ot_766@Tr85440": "Tn12578816",
+        "pg_2822@tree6569": "node1141989"
+      },
+      "supported_by": {
+        "pg_2710@tree6291": "node1094041"
+      }
+    },
+    {
+      "node_id": "ott117569",
+      "num_tips": 1464294,
+      "partial_path_of": {
+        "ot_766@Tr85440": "Tn12578816",
+        "pg_2822@tree6569": "node1141989"
+      },
+      "supported_by": {
+        "ot_508@tree2": "node18",
+        "ott3.7draft3": "ott117569",
+        "pg_2710@tree6291": "node1094029"
+      },
+      "taxon": {
+        "name": "Bilateria",
+        "ott_id": 117569,
+        "rank": "no rank",
+        "tax_sources": [
+          "ncbi:33213"
+        ],
+        "unique_name": "Bilateria"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "conflicts_with": {
+        "pg_2822@tree6569": [
+          "node1142006"
+        ]
+      },
+      "node_id": "mrcaott42ott150",
+      "num_tips": 1479745,
+      "partial_path_of": {
+        "ot_766@Tr85440": "Tn12578822"
+      },
+      "supported_by": {
+        "ot_508@tree2": "node8",
+        "pg_2710@tree6291": "node1094003"
+      }
+    },
+    {
+      "conflicts_with": {
+        "pg_2822@tree6569": [
+          "node1142006"
+        ]
+      },
+      "node_id": "mrcaott42ott570365",
+      "num_tips": 1479749,
+      "partial_path_of": {
+        "ot_766@Tr85440": "Tn12578822"
+      },
+      "supported_by": {
+        "ot_508@tree2": "node6",
+        "pg_2710@tree6291": "node1094001"
+      }
+    },
+    {
+      "conflicts_with": {
+        "pg_2822@tree6569": [
+          "node1142006",
+          "node1142007"
+        ]
+      },
+      "node_id": "mrcaott42ott3989",
+      "num_tips": 1489886,
+      "partial_path_of": {
+        "ot_766@Tr85440": "Tn12578812"
+      },
+      "supported_by": {
+        "pg_2710@tree6291": "node1093981"
+      }
+    },
+    {
+      "node_id": "ott691846",
+      "num_tips": 1490245,
+      "partial_path_of": {
+        "ot_766@Tr85440": "Tn12578812"
+      },
+      "supported_by": {
+        "ott3.7draft3": "ott691846",
+        "pg_2822@tree6569": "node1141988"
+      },
+      "taxon": {
+        "name": "Metazoa",
+        "ott_id": 691846,
+        "rank": "kingdom",
+        "tax_sources": [
+          "silva:D14357/#4",
+          "ncbi:33208",
+          "worms:2",
+          "gbif:1",
+          "irmng:11"
+        ],
+        "unique_name": "Metazoa"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "mrcaott42ott34294",
+      "num_tips": 1490519,
+      "supported_by": {
+        "ot_766@Tr85440": "Tn12578742",
+        "pg_2822@tree6569": "node1141987"
+      }
+    },
+    {
+      "node_id": "ott5246131",
+      "num_tips": 1490663,
+      "supported_by": {
+        "ot_766@Tr85440": "Tn12578730",
+        "ott3.7draft3": "ott5246131",
+        "pg_2822@tree6569": "node1141986"
+      },
+      "taxon": {
+        "name": "Holozoa",
+        "ott_id": 5246131,
+        "rank": "no rank",
+        "tax_sources": [
+          "silva:D14357/#3"
+        ],
+        "unique_name": "Holozoa"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "ott332573",
+      "num_tips": 1767051,
+      "partial_path_of": {
+        "ot_2037@tree13": "node763",
+        "pg_2822@tree6569": "node1141985"
+      },
+      "supported_by": {
+        "ot_766@Tr85440": "Tn12578778",
+        "ott3.7draft3": "ott332573"
+      },
+      "taxon": {
+        "name": "Opisthokonta",
+        "ott_id": 332573,
+        "rank": "no rank",
+        "tax_sources": [
+          "silva:D11377/#2",
+          "ncbi:33154",
+          "irmng:183"
+        ],
+        "unique_name": "Opisthokonta"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "mrcaott42ott240665",
+      "num_tips": 1767073,
+      "partial_path_of": {
+        "ot_2037@tree13": "node763",
+        "pg_2822@tree6569": "node1141985"
+      },
+      "supported_by": {
+        "ot_766@Tr85440": "Tn12578821"
+      }
+    },
+    {
+      "node_id": "ott304358",
+      "num_tips": 2267368,
+      "resolves": {
+        "ot_766@Tr85440": "_Tr85440 ROOT "
+      },
+      "supported_by": {
+        "ott3.7draft3": "ott304358"
+      },
+      "taxon": {
+        "name": "Eukaryota",
+        "ott_id": 304358,
+        "rank": "domain",
+        "tax_sources": [
+          "silva:D11377/#1",
+          "ncbi:2759"
+        ],
+        "unique_name": "Eukaryota"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    },
+    {
+      "node_id": "ott93302",
+      "num_tips": 2385875,
+      "supported_by": {
+        "ott3.7draft3": "ott93302"
+      },
+      "taxon": {
+        "name": "cellular organisms",
+        "ott_id": 93302,
+        "rank": "no rank",
+        "tax_sources": [
+          "ncbi:131567"
+        ],
+        "unique_name": "cellular organisms"
+      },
+      "was_constrained": true,
+      "was_uncontested": true
+    }
+  ],
+  "node_id": "ott246",
+  "num_tips": 0,
+  "query": "ott246",
+  "source_id_map": {
+    "ot_1055@tree1": {
+      "git_sha": "",
+      "study_id": "ot_1055",
+      "tree_id": "tree1"
+    },
+    "ot_111@tree1": {
+      "git_sha": "",
+      "study_id": "ot_111",
+      "tree_id": "tree1"
+    },
+    "ot_1174@tree3": {
+      "git_sha": "",
+      "study_id": "ot_1174",
+      "tree_id": "tree3"
+    },
+    "ot_1195@tree1": {
+      "git_sha": "",
+      "study_id": "ot_1195",
+      "tree_id": "tree1"
+    },
+    "ot_1253@tree1": {
+      "git_sha": "",
+      "study_id": "ot_1253",
+      "tree_id": "tree1"
+    },
+    "ot_1286@tree1": {
+      "git_sha": "",
+      "study_id": "ot_1286",
+      "tree_id": "tree1"
+    },
+    "ot_1345@Tr109614": {
+      "git_sha": "",
+      "study_id": "ot_1345",
+      "tree_id": "Tr109614"
+    },
+    "ot_1431@Tr55921": {
+      "git_sha": "",
+      "study_id": "ot_1431",
+      "tree_id": "Tr55921"
+    },
+    "ot_1449@Tr55330": {
+      "git_sha": "",
+      "study_id": "ot_1449",
+      "tree_id": "Tr55330"
+    },
+    "ot_1490@tree1": {
+      "git_sha": "",
+      "study_id": "ot_1490",
+      "tree_id": "tree1"
+    },
+    "ot_1513@Tr55903": {
+      "git_sha": "",
+      "study_id": "ot_1513",
+      "tree_id": "Tr55903"
+    },
+    "ot_1516@Tr55113": {
+      "git_sha": "",
+      "study_id": "ot_1516",
+      "tree_id": "Tr55113"
+    },
+    "ot_1517@Tr60095": {
+      "git_sha": "",
+      "study_id": "ot_1517",
+      "tree_id": "Tr60095"
+    },
+    "ot_2013@tree8": {
+      "git_sha": "",
+      "study_id": "ot_2013",
+      "tree_id": "tree8"
+    },
+    "ot_2018@tree8": {
+      "git_sha": "",
+      "study_id": "ot_2018",
+      "tree_id": "tree8"
+    },
+    "ot_2018@tree9": {
+      "git_sha": "",
+      "study_id": "ot_2018",
+      "tree_id": "tree9"
+    },
+    "ot_2019@tree35": {
+      "git_sha": "",
+      "study_id": "ot_2019",
+      "tree_id": "tree35"
+    },
+    "ot_2037@tree13": {
+      "git_sha": "",
+      "study_id": "ot_2037",
+      "tree_id": "tree13"
+    },
+    "ot_2079@tree1": {
+      "git_sha": "",
+      "study_id": "ot_2079",
+      "tree_id": "tree1"
+    },
+    "ot_2083@tree1": {
+      "git_sha": "",
+      "study_id": "ot_2083",
+      "tree_id": "tree1"
+    },
+    "ot_2146@tree1": {
+      "git_sha": "",
+      "study_id": "ot_2146",
+      "tree_id": "tree1"
+    },
+    "ot_214@tree1": {
+      "git_sha": "",
+      "study_id": "ot_214",
+      "tree_id": "tree1"
+    },
+    "ot_2307@tree3": {
+      "git_sha": "",
+      "study_id": "ot_2307",
+      "tree_id": "tree3"
+    },
+    "ot_2312@tree1": {
+      "git_sha": "",
+      "study_id": "ot_2312",
+      "tree_id": "tree1"
+    },
+    "ot_2371@tree2": {
+      "git_sha": "",
+      "study_id": "ot_2371",
+      "tree_id": "tree2"
+    },
+    "ot_2748@tree4": {
+      "git_sha": "",
+      "study_id": "ot_2748",
+      "tree_id": "tree4"
+    },
+    "ot_2757@tree1": {
+      "git_sha": "",
+      "study_id": "ot_2757",
+      "tree_id": "tree1"
+    },
+    "ot_2765@tree1": {
+      "git_sha": "",
+      "study_id": "ot_2765",
+      "tree_id": "tree1"
+    },
+    "ot_2770@tree1": {
+      "git_sha": "",
+      "study_id": "ot_2770",
+      "tree_id": "tree1"
+    },
+    "ot_2879@tree1": {
+      "git_sha": "",
+      "study_id": "ot_2879",
+      "tree_id": "tree1"
+    },
+    "ot_290@tree1": {
+      "git_sha": "",
+      "study_id": "ot_290",
+      "tree_id": "tree1"
+    },
+    "ot_3067@tree1": {
+      "git_sha": "",
+      "study_id": "ot_3067",
+      "tree_id": "tree1"
+    },
+    "ot_3077@tree1": {
+      "git_sha": "",
+      "study_id": "ot_3077",
+      "tree_id": "tree1"
+    },
+    "ot_314@tree1": {
+      "git_sha": "",
+      "study_id": "ot_314",
+      "tree_id": "tree1"
+    },
+    "ot_412@Tr77157": {
+      "git_sha": "",
+      "study_id": "ot_412",
+      "tree_id": "Tr77157"
+    },
+    "ot_500@tree1": {
+      "git_sha": "",
+      "study_id": "ot_500",
+      "tree_id": "tree1"
+    },
+    "ot_508@tree2": {
+      "git_sha": "",
+      "study_id": "ot_508",
+      "tree_id": "tree2"
+    },
+    "ot_521@tree1": {
+      "git_sha": "",
+      "study_id": "ot_521",
+      "tree_id": "tree1"
+    },
+    "ot_531@tree1": {
+      "git_sha": "",
+      "study_id": "ot_531",
+      "tree_id": "tree1"
+    },
+    "ot_532@tree1": {
+      "git_sha": "",
+      "study_id": "ot_532",
+      "tree_id": "tree1"
+    },
+    "ot_534@tree1": {
+      "git_sha": "",
+      "study_id": "ot_534",
+      "tree_id": "tree1"
+    },
+    "ot_757@Tr70438": {
+      "git_sha": "",
+      "study_id": "ot_757",
+      "tree_id": "Tr70438"
+    },
+    "ot_766@Tr85440": {
+      "git_sha": "",
+      "study_id": "ot_766",
+      "tree_id": "Tr85440"
+    },
+    "ot_782@Tr48736": {
+      "git_sha": "",
+      "study_id": "ot_782",
+      "tree_id": "Tr48736"
+    },
+    "ot_783@tree1": {
+      "git_sha": "",
+      "study_id": "ot_783",
+      "tree_id": "tree1"
+    },
+    "ot_809@tree2": {
+      "git_sha": "",
+      "study_id": "ot_809",
+      "tree_id": "tree2"
+    },
+    "ot_836@tree1": {
+      "git_sha": "",
+      "study_id": "ot_836",
+      "tree_id": "tree1"
+    },
+    "ot_841@tree1": {
+      "git_sha": "",
+      "study_id": "ot_841",
+      "tree_id": "tree1"
+    },
+    "ot_847@tree1": {
+      "git_sha": "",
+      "study_id": "ot_847",
+      "tree_id": "tree1"
+    },
+    "ot_854@tree1": {
+      "git_sha": "",
+      "study_id": "ot_854",
+      "tree_id": "tree1"
+    },
+    "ot_855@tree1": {
+      "git_sha": "",
+      "study_id": "ot_855",
+      "tree_id": "tree1"
+    },
+    "ot_869@tree1": {
+      "git_sha": "",
+      "study_id": "ot_869",
+      "tree_id": "tree1"
+    },
+    "ott3.7draft3": {
+      "taxonomy": "ott3.7draft3"
+    },
+    "pg_1217@tree2455": {
+      "git_sha": "",
+      "study_id": "pg_1217",
+      "tree_id": "tree2455"
+    },
+    "pg_2015@tree4152": {
+      "git_sha": "",
+      "study_id": "pg_2015",
+      "tree_id": "tree4152"
+    },
+    "pg_2404@tree5068": {
+      "git_sha": "",
+      "study_id": "pg_2404",
+      "tree_id": "tree5068"
+    },
+    "pg_2404@tree6388": {
+      "git_sha": "",
+      "study_id": "pg_2404",
+      "tree_id": "tree6388"
+    },
+    "pg_2573@tree5959": {
+      "git_sha": "",
+      "study_id": "pg_2573",
+      "tree_id": "tree5959"
+    },
+    "pg_2710@tree6291": {
+      "git_sha": "",
+      "study_id": "pg_2710",
+      "tree_id": "tree6291"
+    },
+    "pg_2822@tree6569": {
+      "git_sha": "",
+      "study_id": "pg_2822",
+      "tree_id": "tree6569"
+    },
+    "pg_2913@tree6741": {
+      "git_sha": "",
+      "study_id": "pg_2913",
+      "tree_id": "tree6741"
+    },
+    "pg_2913@tree6742": {
+      "git_sha": "",
+      "study_id": "pg_2913",
+      "tree_id": "tree6742"
+    },
+    "pg_420@tree522": {
+      "git_sha": "",
+      "study_id": "pg_420",
+      "tree_id": "tree522"
+    }
+  },
+  "supported_by": {
+    "ott3.7draft3": "ott246"
+  },
+  "synth_id": "opentree16.1",
+  "taxon": {
+    "name": "Polioptila guianensis",
+    "ott_id": 246,
+    "rank": "species",
+    "tax_sources": [
+      "ncbi:1109095",
+      "gbif:2487584",
+      "irmng:10217711"
+    ],
+    "unique_name": "Polioptila guianensis"
+  },
+  "terminal": {
+    "ot_1286@tree1": "node74",
+    "ot_2748@tree4": "node218",
+    "ot_2770@tree1": "node2900",
+    "ot_2879@tree1": "node12928"
+  }
+}

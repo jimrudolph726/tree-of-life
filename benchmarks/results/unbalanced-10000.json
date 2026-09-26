@@ -1,0 +1,42 @@
+{
+  "dataset": "unbalanced-10000",
+  "generated": true,
+  "timestamp": "2026-09-24T23:12:40.833Z",
+  "environment": {
+    "node": "v24.15.0",
+    "os": "win32 10.0.26200",
+    "cpu": "Intel(R) Core(TM) i5-10500 CPU @ 3.10GHz",
+    "memoryGiB": 31.921833038330078
+  },
+  "nodeCount": 10000,
+  "maxDepth": 263,
+  "buildMs": 103.4281,
+  "artifactBytes": 2558806,
+  "peakProcessRssMB": 83.4375,
+  "initial": {
+    "queryMs": 3.626899999999978,
+    "payloadBytes": 84999,
+    "requests": 1,
+    "visited": 17,
+    "renderedNodes": 7,
+    "branches": 15,
+    "limited": false
+  },
+  "searchFocusMs": 6.443200000000019,
+  "selectedDepth": 263,
+  "focusFrame": 548,
+  "warmQueryP50Ms": 0.07079999999999131,
+  "warmQueryP95Ms": 0.11089999999998668,
+  "final": {
+    "requests": 7,
+    "transferredBytes": 389480,
+    "cacheBytes": 1557920,
+    "cacheEntries": 7,
+    "cacheHits": 1094,
+    "evictions": 0,
+    "visited": 16,
+    "queryMs": 0.069500000000005,
+    "limited": false
+  },
+  "notes": "Filesystem-backed TreeStore measurements, not network latency or GPU frame time. Cache bytes are conservative accounting, not measured worker heap. RSS is the build-process peak."
+}

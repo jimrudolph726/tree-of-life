@@ -1,0 +1,90 @@
+{
+  "provider": "Open Tree of Life",
+  "sourceUrl": "https://files.opentreeoflife.org/synthesis/opentree16.1/opentree16.1_tree.tgz",
+  "synthId": "opentree16.1",
+  "taxonomyVersion": "3.7draft3",
+  "synthesisCreated": "2025-12-20 01:09:33",
+  "rootOttId": 93302,
+  "title": "Tree of Life",
+  "fetchedAt": "2026-09-25T00:38:14.025422+00:00",
+  "snapshotPath": ".opentree/opentree16.1",
+  "newickSha256": "6a75d773256aa3c335eadc4854b3516272463343ca407d307b760bcd0b4284b8",
+  "nodesSha256": "16cd734da622cf2960368fd76b204492985bbadbabbee5c02a31f78ba5136f2d",
+  "supportingStudies": [],
+  "sourceHashes": {
+    "opentree16.1_tree.tgz": "c447c83e49f0cf61fa96d9a02c6135b809abf315ad384fdb26b88359a28da12c",
+    "labelled_supertree.tre": "81f424eb42a0c78e98d2f9f2c61bdabf25e7946a5e2fd104772cb7ee3e18629b",
+    "labelled_supertree_ottnames.tre": "6a75d773256aa3c335eadc4854b3516272463343ca407d307b760bcd0b4284b8",
+    "config.json": "72262e45e7a96084043cc8b5aece4675d969587fa3bebbf52a4eb9d1f3fba001",
+    "input_output_stats.json": "e110f49ac936338d2a7ca800a2e81e316814f05a88019fc6f3d8818a4e220f13"
+  },
+  "artifactHashes": {
+    "parents.i32": "16cd734da622cf2960368fd76b204492985bbadbabbee5c02a31f78ba5136f2d",
+    "labels.u32": "e1d6b1d57230fd76abb5f5dd10d79a1519de268ae7cc1ef336de253adb7727ce",
+    "labels.utf8": "ec568a347773dc6246a886c0b7024fb5c9f0557cb70b8c580918c60a580954f2"
+  },
+  "counts": {
+    "nodes": 2725682,
+    "tips": 2385875,
+    "named": 2599664,
+    "maxDepth": 111
+  },
+  "landmarks": {
+    "Homo sapiens": {
+      "index": 594485,
+      "id": "ott770315",
+      "depth": 59
+    },
+    "Aves": {
+      "index": 603117,
+      "id": "ott81461",
+      "depth": 32
+    },
+    "Archaea": {
+      "index": 2723087,
+      "id": "ott996421",
+      "depth": 1
+    },
+    "Metazoa": {
+      "index": 588409,
+      "id": "ott691846",
+      "depth": 6
+    },
+    "Fungi": {
+      "index": 2306368,
+      "id": "ott352914",
+      "depth": 5
+    },
+    "Opisthokonta": {
+      "index": 588406,
+      "id": "ott332573",
+      "depth": 3
+    },
+    "Eukaryota": {
+      "index": 1,
+      "id": "ott304358",
+      "depth": 1
+    },
+    "Proteobacteria": {
+      "index": 2638321,
+      "id": "ott5252432",
+      "depth": 21
+    },
+    "Actinobacteria": {
+      "index": 2658529,
+      "id": "ott5246105",
+      "depth": 10
+    },
+    "Cyanobacteria": {
+      "index": 2679595,
+      "id": "ott225495",
+      "depth": 8
+    },
+    "Bacteria": {
+      "index": 2594172,
+      "id": "ott844192",
+      "depth": 1
+    }
+  },
+  "validation": "Every source ID, label and parent edge matched between both official Newick representations; source tip count matched."
+}

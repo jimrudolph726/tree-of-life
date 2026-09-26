@@ -1,0 +1,72 @@
+{
+  "node_id": "ott81461",
+  "num_tips": 18988,
+  "partial_path_of": {
+    "ot_1449@Tr55330": "Tn9093153",
+    "pg_2573@tree5959": "node1011373"
+  },
+  "query": "ott81461",
+  "source_id_map": {
+    "ot_1449@Tr55330": {
+      "git_sha": "",
+      "study_id": "ot_1449",
+      "tree_id": "Tr55330"
+    },
+    "ot_1490@tree1": {
+      "git_sha": "",
+      "study_id": "ot_1490",
+      "tree_id": "tree1"
+    },
+    "ot_1516@Tr55113": {
+      "git_sha": "",
+      "study_id": "ot_1516",
+      "tree_id": "Tr55113"
+    },
+    "ot_508@tree2": {
+      "git_sha": "",
+      "study_id": "ot_508",
+      "tree_id": "tree2"
+    },
+    "ott3.7draft3": {
+      "taxonomy": "ott3.7draft3"
+    },
+    "pg_1217@tree2455": {
+      "git_sha": "",
+      "study_id": "pg_1217",
+      "tree_id": "tree2455"
+    },
+    "pg_2573@tree5959": {
+      "git_sha": "",
+      "study_id": "pg_2573",
+      "tree_id": "tree5959"
+    },
+    "pg_2822@tree6569": {
+      "git_sha": "",
+      "study_id": "pg_2822",
+      "tree_id": "tree6569"
+    }
+  },
+  "supported_by": {
+    "ot_1516@Tr55113": "Tn9060602",
+    "ott3.7draft3": "ott81461"
+  },
+  "synth_id": "opentree16.1",
+  "taxon": {
+    "name": "Aves",
+    "ott_id": 81461,
+    "rank": "class",
+    "tax_sources": [
+      "ncbi:8782",
+      "worms:1836",
+      "gbif:212",
+      "irmng:1142"
+    ],
+    "unique_name": "Aves"
+  },
+  "terminal": {
+    "ot_1490@tree1": "ott696268",
+    "ot_508@tree2": "ott696268",
+    "pg_1217@tree2455": "ott696268",
+    "pg_2822@tree6569": "ott696268"
+  }
+}

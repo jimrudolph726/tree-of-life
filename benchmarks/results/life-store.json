@@ -1,0 +1,267 @@
+{
+  "version": "0735fe894f146d1b",
+  "measuredAt": "2026-09-25T01:26:24.085Z",
+  "node": "v24.15.0",
+  "cacheBudgetMiB": 64,
+  "methodology": "Filesystem-backed shared worker store. 600 camera queries, two viewports, five cross-domain selections. Timings exclude network and GPU.",
+  "overviewBytes": 194465,
+  "overviewGzipBytes": 79900,
+  "results": [
+    {
+      "size": {
+        "width": 1280,
+        "height": 720
+      },
+      "overview": {
+        "requests": 1,
+        "transferredBytes": 194465,
+        "cacheBytes": 777860,
+        "cacheEntries": 1,
+        "cacheHits": 0,
+        "evictions": 0,
+        "visited": 3470,
+        "queryMs": 3.7797999999999945,
+        "limited": false
+      },
+      "homeLabels": [
+        "Archaea",
+        "Bacteria",
+        "Eukaryota",
+        "Opisthokonta",
+        "Fungi",
+        "Chloroplastida",
+        "Actinobacteria",
+        "Thermoprotei",
+        "Methanobacteria",
+        "Cyanobacteria",
+        "SAR",
+        "Methanosarcinales"
+      ],
+      "cases": [
+        {
+          "query": "Bacteria",
+          "depth": 1,
+          "selectionMs": 13.24369999999999,
+          "selectionRequests": 8,
+          "first": {
+            "requests": 9,
+            "transferredBytes": 886672,
+            "cacheBytes": 3546688,
+            "cacheEntries": 9,
+            "cacheHits": 11,
+            "evictions": 0,
+            "visited": 3470,
+            "queryMs": 0.04400000000001114,
+            "limited": false
+          },
+          "limitedViews": 0,
+          "warmP95Ms": 95.06029999999987
+        },
+        {
+          "query": "Fungi",
+          "depth": 5,
+          "selectionMs": 43.01729999999998,
+          "selectionRequests": 47,
+          "first": {
+            "requests": 383,
+            "transferredBytes": 19530641,
+            "cacheBytes": 67038104,
+            "cacheEntries": 324,
+            "cacheHits": 31770,
+            "evictions": 59,
+            "visited": 247,
+            "queryMs": 29.671400000000176,
+            "limited": false
+          },
+          "limitedViews": 0,
+          "warmP95Ms": 48.51319999999987
+        },
+        {
+          "query": "Homo sapiens",
+          "depth": 59,
+          "selectionMs": 10.790400000000773,
+          "selectionRequests": 10,
+          "first": {
+            "requests": 437,
+            "transferredBytes": 22318181,
+            "cacheBytes": 67041448,
+            "cacheEntries": 286,
+            "cacheHits": 67863,
+            "evictions": 151,
+            "visited": 11,
+            "queryMs": 4.389900000000125,
+            "limited": false
+          },
+          "limitedViews": 0,
+          "warmP95Ms": 0.06080000000019936
+        },
+        {
+          "query": "Chloroplastida",
+          "depth": 8,
+          "selectionMs": 86.38159999999971,
+          "selectionRequests": 71,
+          "first": {
+            "requests": 508,
+            "transferredBytes": 26623550,
+            "cacheBytes": 66701572,
+            "cacheEntries": 258,
+            "cacheHits": 69975,
+            "evictions": 250,
+            "visited": 454,
+            "queryMs": 79.95020000000022,
+            "limited": false
+          },
+          "limitedViews": 0,
+          "warmP95Ms": 49.11799999999948
+        },
+        {
+          "query": "Methanobacteria",
+          "depth": 5,
+          "selectionMs": 18.222399999999652,
+          "selectionRequests": 12,
+          "first": {
+            "requests": 546,
+            "transferredBytes": 29047852,
+            "cacheBytes": 66955832,
+            "cacheEntries": 246,
+            "cacheHits": 108431,
+            "evictions": 300,
+            "visited": 198,
+            "queryMs": 11.71810000000005,
+            "limited": false
+          },
+          "limitedViews": 0,
+          "warmP95Ms": 16.15430000000015
+        }
+      ],
+      "requests": 547,
+      "decodedBytes": 29189316
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "overview": {
+        "requests": 1,
+        "transferredBytes": 194465,
+        "cacheBytes": 777860,
+        "cacheEntries": 1,
+        "cacheHits": 0,
+        "evictions": 0,
+        "visited": 3470,
+        "queryMs": 1.9587000000001353,
+        "limited": false
+      },
+      "homeLabels": [
+        "Archaea",
+        "Bacteria",
+        "Eukaryota",
+        "Opisthokonta",
+        "Chloroplastida",
+        "Actinobacteria",
+        "Methanobacteria",
+        "Cyanobacteria"
+      ],
+      "cases": [
+        {
+          "query": "Bacteria",
+          "depth": 1,
+          "selectionMs": 6.835399999999936,
+          "selectionRequests": 8,
+          "first": {
+            "requests": 9,
+            "transferredBytes": 886672,
+            "cacheBytes": 3546688,
+            "cacheEntries": 9,
+            "cacheHits": 11,
+            "evictions": 0,
+            "visited": 3470,
+            "queryMs": 0.01929999999993015,
+            "limited": false
+          },
+          "limitedViews": 0,
+          "warmP95Ms": 64.0547000000006
+        },
+        {
+          "query": "Fungi",
+          "depth": 5,
+          "selectionMs": 49.2541999999994,
+          "selectionRequests": 47,
+          "first": {
+            "requests": 363,
+            "transferredBytes": 18346602,
+            "cacheBytes": 66600956,
+            "cacheEntries": 341,
+            "cacheHits": 32923,
+            "evictions": 22,
+            "visited": 184,
+            "queryMs": 35.11059999999998,
+            "limited": false
+          },
+          "limitedViews": 0,
+          "warmP95Ms": 47.35289999999986
+        },
+        {
+          "query": "Homo sapiens",
+          "depth": 59,
+          "selectionMs": 11.256999999999607,
+          "selectionRequests": 10,
+          "first": {
+            "requests": 392,
+            "transferredBytes": 20765400,
+            "cacheBytes": 67101176,
+            "cacheEntries": 317,
+            "cacheHits": 57076,
+            "evictions": 75,
+            "visited": 11,
+            "queryMs": 4.969700000001467,
+            "limited": false
+          },
+          "limitedViews": 0,
+          "warmP95Ms": 0.03659999999945285
+        },
+        {
+          "query": "Chloroplastida",
+          "depth": 8,
+          "selectionMs": 125.97680000000037,
+          "selectionRequests": 96,
+          "first": {
+            "requests": 488,
+            "transferredBytes": 26167314,
+            "cacheBytes": 66715788,
+            "cacheEntries": 249,
+            "cacheHits": 59112,
+            "evictions": 239,
+            "visited": 419,
+            "queryMs": 120.06730000000061,
+            "limited": false
+          },
+          "limitedViews": 0,
+          "warmP95Ms": 46.942300000000614
+        },
+        {
+          "query": "Methanobacteria",
+          "depth": 5,
+          "selectionMs": 16.86750000000029,
+          "selectionRequests": 13,
+          "first": {
+            "requests": 534,
+            "transferredBytes": 29139277,
+            "cacheBytes": 66697560,
+            "cacheEntries": 236,
+            "cacheHits": 88143,
+            "evictions": 298,
+            "visited": 190,
+            "queryMs": 8.789499999998952,
+            "limited": false
+          },
+          "limitedViews": 0,
+          "warmP95Ms": 16.037600000001476
+        }
+      ],
+      "requests": 535,
+      "decodedBytes": 29280741
+    }
+  ]
+}

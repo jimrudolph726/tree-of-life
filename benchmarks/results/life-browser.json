@@ -1,0 +1,62 @@
+{
+  "version": "0735fe894f146d1b",
+  "measuredDate": "2026-09-25",
+  "environment": "Windows desktop, Codex Chromium in-app browser, local production build",
+  "methodology": "Manual browser UI checks. Fresh navigation, 30-second motion sequence, then Homo sapiens search and selection. Narrow viewport is desktop hardware, not phone CPU/GPU emulation. First-map timing includes app bootstrap; search includes 160 ms debounce. Frame intervals are requestAnimationFrame cadence, not GPU timings. Main-thread heap excludes worker memory.",
+  "desktop": {
+    "viewport": [1280, 720],
+    "network": "Unshaped localhost; browser cache may contain previously visited app assets",
+    "firstMapMs": 603.1,
+    "motionDurationMs": 30005.8,
+    "frameP95Ms": 8.4,
+    "frameP50Ms": 8.3,
+    "sampledFrames": 3593,
+    "longTasks": 0,
+    "longestTaskMs": 0,
+    "mainHeapMB": 35.24,
+    "searchMs": 192.7,
+    "selectionPaintMs": 55.6,
+    "selectedTaxon": "Homo sapiens",
+    "sourceDepth": 59,
+    "consoleWarningsOrErrors": []
+  },
+  "narrowSlowNetwork": {
+    "viewport": [390, 844],
+    "network": "Shared 1600 kbps, 150 ms added response latency, gzip, Cache-Control no-store",
+    "firstMapMs": 4461.9,
+    "homoSapiens": {
+      "searchMs": 1902.5,
+      "selectionPaintMs": 2079,
+      "sourceDepth": 59,
+      "backAndForwardVerified": true
+    },
+    "fungi": {
+      "searchMs": 4010.6,
+      "selectionPaintMs": 8278.2,
+      "terminalTaxa": 276345,
+      "note": "First selection of this detailed clade after the Homo sapiens check. Existing map remains displayed during preparation."
+    },
+    "fungiMotion": {
+      "motionDurationMs": 30003.5,
+      "frameP95Ms": 8.4,
+      "frameP50Ms": 8.3,
+      "sampledFrames": 3600,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "mainHeapMB": 47.38,
+      "finalCacheChargeMiB": 59.7,
+      "additionalRequestsDuringMotion": 9
+    },
+    "consoleWarningsOrErrors": [],
+    "overviewMotion": {
+      "motionDurationMs": 30002.4,
+      "frameP95Ms": 8.4,
+      "frameP50Ms": 8.3,
+      "sampledFrames": 3601,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "mainHeapMB": 28.70,
+      "note": "At this viewport the overview sequence stays within the prefetched opening packet; detailed-clade motion is measured separately."
+    }
+  }
+}

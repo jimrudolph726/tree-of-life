@@ -1,0 +1,20 @@
+TREE OF LIFE EXPLORER - DATA SOURCES
+
+Full cellular-life map: Open Tree of Life synthetic tree opentree16.1,
+taxonomy 3.7draft3. Source identifiers, topology, labels and checksums are
+recorded in /data/life/manifest.json and its versioned manifest.
+Release download: https://files.opentreeoflife.org/synthesis/opentree16.1/
+Birds: OpenTree 16.1 Aves API snapshot, with versioned source provenance.
+Primates: earlier OpenTree snapshot; its synthesis version is unverified.
+
+OpenTree et al., Open Tree of Life Synthetic Tree:
+https://doi.org/10.5281/zenodo.3937741
+OpenTree et al., Open Tree of Life Taxonomy:
+https://doi.org/10.5281/zenodo.3937750
+Project data-rights statement (CC0 where not limited by pre-existing terms):
+https://tree.opentreeoflife.org/opentree/about/licenses
+
+Layout inspired by de Vienne (2016), Lifemap: Exploring the Entire Tree of
+Life. https://doi.org/10.1371/journal.pbio.2001624
+This is an independent implementation; no Lifemap imagery or tiles are used.
+Display distances and areas do not represent evolutionary time or abundance.

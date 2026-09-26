@@ -1,0 +1,77 @@
+{
+  "dataset": "Aves",
+  "version": "c55fd05c37ffd490",
+  "measuredOnLocalDate": "2026-09-24",
+  "timezone": "America/Chicago",
+  "browser": "Codex in-app Chromium",
+  "methodology": "Production build; metrics read from visible diagnostics. Times rounded to 0.1 ms. Desktop hardware for both viewports. Motion runs are 30 seconds. Search includes 160 ms debounce; selection ends at first scene paint containing the selected node. Payload is decoded bytes, excluding manifests; heap is main-thread only.",
+  "desktop": {
+    "viewport": { "width": 1280, "height": 720 },
+    "delivery": "Normal localhost Vite preview; no network shaping",
+    "firstMapMs": 601.5,
+    "overviewMotion": {
+      "durationMs": 30001.7,
+      "frameP95Ms": 8.4,
+      "frameP50Ms": 8.3,
+      "sampledFrames": 3598,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "mainHeapMB": 25.76
+    },
+    "deepTarget": {
+      "name": "Camarhynchus psittacula",
+      "depth": 60,
+      "searchMs": 178.4,
+      "selectionPaintMs": 64,
+      "cumulativeDataRequests": 5,
+      "cumulativeDecodedKiB": 400,
+      "cacheChargeMiB": 1.6,
+      "sceneVisits": 12
+    },
+    "consoleWarningsOrErrors": []
+  },
+  "narrowSlowConnection": {
+    "viewport": { "width": 390, "height": 844 },
+    "delivery": { "sharedKbps": 1600, "responseLatencyMs": 150, "gzip": true, "httpCache": false },
+    "firstMapMs": 4440.5,
+    "overviewMotion": {
+      "durationMs": 30004.2,
+      "frameP95Ms": 8.4,
+      "frameP50Ms": 8.3,
+      "sampledFrames": 3600,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "mainHeapMB": 45.80
+    },
+    "deepTarget": {
+      "name": "Camarhynchus psittacula",
+      "depth": 60,
+      "searchMs": 915.8,
+      "selectionPaintMs": 419.1,
+      "cumulativeDataRequests": 5,
+      "cumulativeDecodedKiB": 400,
+      "cacheChargeMiB": 1.6,
+      "sceneVisits": 12
+    },
+    "deepMotion": {
+      "durationMs": 30006.1,
+      "frameP95Ms": 8.4,
+      "frameP50Ms": 8.3,
+      "sampledFrames": 3601,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "mainHeapMB": 34.86,
+      "additionalDataRequests": 0
+    },
+    "ancestorNavigation": {
+      "name": "Passeriformes",
+      "selectionPaintMs": 3261.8,
+      "cumulativeDataRequests": 13,
+      "cumulativeDecodedKiB": 1595,
+      "cacheChargeMiB": 6.2,
+      "sceneVisits": 185,
+      "returnedHome": true
+    },
+    "consoleWarningsOrErrors": []
+  }
+}

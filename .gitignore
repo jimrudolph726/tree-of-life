@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Reproducible large local fixtures (never part of a frontend deployment)
+.benchmarks/
+# Temporary data-builder staging directories from interrupted older builds
+public/data/primates/.building-*/
+__pycache__/
+# Full OpenTree release and reproducible multi-gigabyte publication
+.opentree/
+public/data/life/
+.deploy/

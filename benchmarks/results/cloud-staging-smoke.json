@@ -1,0 +1,219 @@
+{
+  "url": "https://dgilsep5ai167.cloudfront.net/",
+  "measuredAt": "2026-09-25T21:21:04.043Z",
+  "results": [
+    {
+      "dataset": "life",
+      "version": "0735fe894f146d1b",
+      "query": "Homo sapiens",
+      "depth": 59,
+      "requests": 11
+    },
+    {
+      "dataset": "aves",
+      "version": "c55fd05c37ffd490",
+      "query": "Camarhynchus psittacula",
+      "depth": 60,
+      "requests": 4
+    },
+    {
+      "dataset": "primates",
+      "version": "6587fbe9d6823e17",
+      "query": "Homo sapiens",
+      "depth": 25,
+      "requests": 5
+    }
+  ],
+  "samples": [
+    {
+      "path": "",
+      "ms": 263.03000000000003,
+      "bytes": 997,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "/assets/index-bpBvKyxJ.js",
+      "ms": 182.60769999999997,
+      "bytes": 1009018,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/manifest.json",
+      "ms": 57.07179999999994,
+      "bytes": 3784,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/search-top.json",
+      "ms": 134.79009999999994,
+      "bytes": 3440,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/search-directory-18.json",
+      "ms": 121.0358,
+      "bytes": 20639,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/search/4803.json",
+      "ms": 136.64099999999996,
+      "bytes": 30381,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/pages/4565.bin",
+      "ms": 117.78730000000007,
+      "bytes": 133599,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/pages/4648.bin",
+      "ms": 127.07780000000002,
+      "bytes": 133830,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/ancestry/4565.json",
+      "ms": 122.79160000000002,
+      "bytes": 221450,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/details/4565.json",
+      "ms": 159.2772,
+      "bytes": 33804,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/pages/4226.bin",
+      "ms": 152.29809999999998,
+      "bytes": 134925,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/pages/4318.bin",
+      "ms": 146.36899999999991,
+      "bytes": 134187,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/pages/4404.bin",
+      "ms": 175.39430000000016,
+      "bytes": 134615,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/pages/4490.bin",
+      "ms": 180.95280000000025,
+      "bytes": 135228,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/overview.json",
+      "ms": 146.67339999999967,
+      "bytes": 194465,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/life/0735fe894f146d1b/overview.json",
+      "ms": 31.646100000000388,
+      "bytes": 194465,
+      "encoding": "gzip",
+      "cache": "Hit from cloudfront"
+    },
+    {
+      "path": "data/aves/manifest.json",
+      "ms": 150.98960000000034,
+      "bytes": 9324,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/aves/c55fd05c37ffd490/search.json",
+      "ms": 111.68269999999984,
+      "bytes": 6601,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/aves/c55fd05c37ffd490/search/29.json",
+      "ms": 99.11349999999993,
+      "bytes": 27821,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/aves/c55fd05c37ffd490/pages/62.bin",
+      "ms": 240.5215000000003,
+      "bytes": 88142,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/aves/c55fd05c37ffd490/ancestry/62.json",
+      "ms": 119.95130000000017,
+      "bytes": 145056,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/primates/manifest.json",
+      "ms": 167.5016999999998,
+      "bytes": 754,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/primates/6587fbe9d6823e17/search.json",
+      "ms": 121.91820000000007,
+      "bytes": 345,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/primates/6587fbe9d6823e17/search/1.json",
+      "ms": 105.81989999999996,
+      "bytes": 24954,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/primates/6587fbe9d6823e17/pages/2.bin",
+      "ms": 118.47170000000006,
+      "bytes": 74551,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/primates/6587fbe9d6823e17/pages/1.bin",
+      "ms": 112.1858000000002,
+      "bytes": 122098,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    },
+    {
+      "path": "data/primates/6587fbe9d6823e17/pages/0.bin",
+      "ms": 144.4608000000003,
+      "bytes": 120900,
+      "encoding": "gzip",
+      "cache": "Miss from cloudfront"
+    }
+  ],
+  "limits": "HTTP/shared-store smoke check, not a browser, GPU, physical phone or bandwidth-throttled test."
+}

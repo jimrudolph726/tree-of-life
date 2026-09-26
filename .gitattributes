@@ -1,0 +1,5 @@
+# Scientific checksums must remain reproducible across Windows and Linux.
+data/raw/opentree/aves/** text eol=lf
+data/processed/opentree/aves/** text eol=lf
+public/data/**/*.json text eol=lf
+*.bin binary

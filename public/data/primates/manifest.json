@@ -1,0 +1,35 @@
+{
+  "format": 2,
+  "version": "6587fbe9d6823e17",
+  "title": "Primates",
+  "source": "Open Tree of Life — local Primates snapshot",
+  "synthetic": false,
+  "nodeCount": 1333,
+  "namedCount": 1007,
+  "leafCount": 748,
+  "pageSize": 512,
+  "pageCount": 3,
+  "maxDepth": 26,
+  "root": {
+    "id": "ott913935",
+    "parentId": null,
+    "scientificName": "Primates",
+    "ottId": 913935,
+    "depth": 0,
+    "isTerminal": false,
+    "isSyntheticNode": false,
+    "index": 0,
+    "leafCount": 748
+  },
+  "rootBounds": [
+    -0.5666916370391846,
+    -0.9158129096031189,
+    0.45898717641830444,
+    0.9344015717506409
+  ],
+  "builtAt": "2026-09-24T23:55:55.840Z",
+  "maxChildren": 16,
+  "fanoutEntries": 0,
+  "ancestryPages": false,
+  "detailPages": false
+}

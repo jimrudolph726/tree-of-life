@@ -1,0 +1,15 @@
+{
+  "version": "0735fe894f146d1b",
+  "synthId": "opentree16.1",
+  "nodeCount": 2725682,
+  "edgeCount": 2725681,
+  "tips": 2385875,
+  "named": 2599664,
+  "maxDepth": 111,
+  "everySourceIdNameLabelAndParentMatched": true,
+  "everyChildLinkAndTerminalCountMatched": true,
+  "allGeometryFinite": true,
+  "routedEdges": 813520,
+  "displayRoutingPreservesSourceAncestry": true,
+  "everyRoutingSnapshotMatched": true
+}

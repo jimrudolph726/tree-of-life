@@ -1,0 +1,71 @@
+name: Deploy or roll back staging
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Existing release ID to roll back to; leave blank to build and deploy this revision
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: tree-of-life-staging
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: us-east-1
+      STAGING_BUCKET: ${{ vars.STAGING_BUCKET }}
+      STAGING_DISTRIBUTION: ${{ vars.STAGING_DISTRIBUTION }}
+      STAGING_URL: ${{ vars.STAGING_URL }}
+      ROLLBACK_RELEASE: ${{ inputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: npm ci
+      - run: python -m pip install -r pipeline/requirements.txt -r pipeline/requirements-cloud.txt cfn-lint
+      - run: cfn-lint infra/staging.yaml
+      - run: npm run data:test
+      - if: inputs.release == ''
+        run: |
+          npm run data:life
+          npm run data:life:validate
+          npm run data:build
+          npm test
+          npm run lint
+          npm run build
+          python pipeline/deploy_cloud.py preflight
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.STAGING_ROLE_ARN }}
+          aws-region: us-east-1
+      - name: Record previous release
+        run: python pipeline/deploy_cloud.py status --distribution "$STAGING_DISTRIBUTION" > staging-before.json
+      - name: Publish and activate
+        if: inputs.release == ''
+        run: python pipeline/deploy_cloud.py deploy --bucket "$STAGING_BUCKET" --distribution "$STAGING_DISTRIBUTION"
+      - name: Activate retained release
+        if: inputs.release != ''
+        run: python pipeline/deploy_cloud.py activate --bucket "$STAGING_BUCKET" --distribution "$STAGING_DISTRIBUTION" --release "$ROLLBACK_RELEASE"
+      - name: Verify hosted app and all datasets
+        run: node pipeline/cloud-smoke.ts "$STAGING_URL" staging-smoke.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: staging-deployment-results
+          path: |
+            staging-before.json
+            staging-smoke.json
+            benchmarks/results/life-validation.json

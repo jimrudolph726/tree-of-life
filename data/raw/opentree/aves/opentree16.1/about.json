@@ -1,0 +1,33 @@
+{
+  "date_created": "2025-12-20 00:55:58",
+  "filtered_flags": [
+    "barren",
+    "environmental",
+    "hidden",
+    "hybrid",
+    "inconsistent",
+    "major_rank_conflict",
+    "major_rank_conflict_inherited",
+    "merged",
+    "not_otu",
+    "viral",
+    "was_container"
+  ],
+  "num_source_studies": 1931,
+  "num_source_trees": 2064,
+  "root": {
+    "node_id": "ott93302",
+    "num_tips": 2385875,
+    "taxon": {
+      "name": "cellular organisms",
+      "ott_id": 93302,
+      "rank": "no rank",
+      "tax_sources": [
+        "ncbi:131567"
+      ],
+      "unique_name": "cellular organisms"
+    }
+  },
+  "synth_id": "opentree16.1",
+  "taxonomy_version": "3.7draft3"
+}

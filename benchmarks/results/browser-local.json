@@ -1,0 +1,72 @@
+{
+  "measuredOn": "2026-09-24",
+  "environment": "Codex in-app Chromium, localhost Vite development server, Windows 11, Intel i5-10500, 32 GiB RAM",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "durationSeconds": 5,
+  "notes": "Single runs with reused browser session/module cache and no CPU/network throttling. requestAnimationFrame intervals, not GPU duration. Main heap excludes worker. First-map time includes navigation and page startup. Long tasks cover the motion interval only. Unbalanced-100000 repeated because a code change reloaded its first run.",
+  "results": [
+    {
+      "dataset": "balanced-10000",
+      "firstMapMs": 383.79999999981374,
+      "frameP95Ms": 8.400000000000546,
+      "frameP50Ms": 8.300000000000182,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "sampledFrames": 596,
+      "mainHeapMB": 61.72539138793945
+    },
+    {
+      "dataset": "unbalanced-10000",
+      "firstMapMs": 366.5,
+      "frameP95Ms": 8.400000000000546,
+      "frameP50Ms": 8.300000000000182,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "sampledFrames": 595,
+      "mainHeapMB": 48.61513900756836
+    },
+    {
+      "dataset": "balanced-100000",
+      "firstMapMs": 371.10000000009313,
+      "frameP95Ms": 8.400000000000546,
+      "frameP50Ms": 8.300000000000182,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "sampledFrames": 597,
+      "mainHeapMB": 54.449721336364746
+    },
+    {
+      "dataset": "unbalanced-100000",
+      "firstMapMs": 399.1999999997206,
+      "frameP95Ms": 8.400000000000546,
+      "frameP50Ms": 8.300000000000182,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "sampledFrames": 593,
+      "mainHeapMB": 43.61890983581543
+    },
+    {
+      "dataset": "balanced-1000000",
+      "firstMapMs": 299.5,
+      "frameP95Ms": 8.400000000000546,
+      "frameP50Ms": 8.300000000000182,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "sampledFrames": 595,
+      "mainHeapMB": 54.42501258850098
+    },
+    {
+      "dataset": "unbalanced-1000000",
+      "firstMapMs": 290,
+      "frameP95Ms": 8.400000000000546,
+      "frameP50Ms": 8.300000000000182,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "sampledFrames": 597,
+      "mainHeapMB": 52.54151439666748
+    }
+  ]
+}
