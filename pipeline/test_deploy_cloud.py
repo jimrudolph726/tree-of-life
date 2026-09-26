@@ -53,6 +53,74 @@ class DeploymentTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'missing geometry'):
             cloud.prepare(self.root)
 
+    def test_app_release_reuses_remote_dataset_pointers_without_local_data(self):
+        self.write('index.html', '<script src="/assets/app-123.js"></script>')
+        self.write('assets/app-123.js', 'console.log("app")')
+        pointers = {f'data/{dataset}/manifest.json':
+                    json.dumps({'version': '0123456789abcdef', 'pageCount': 1}).encode()
+                    for dataset in cloud.DATASETS}
+        release, versions, files, blobs = cloud.prepare_app(self.root, pointers)
+        self.assertEqual(versions, {dataset: '0123456789abcdef' for dataset in cloud.DATASETS})
+        self.assertIn('assets/app-123.js', [key for _, key, _ in files])
+        self.assertEqual({key for _, key, _ in blobs},
+                         {f'releases/{release}/data/{dataset}/manifest.json' for dataset in cloud.DATASETS})
+        pointers['data/life/manifest.json'] = json.dumps(
+            {'version': 'fedcba9876543210', 'pageCount': 1}).encode()
+        self.assertNotEqual(cloud.prepare_app(self.root, pointers)[0], release)
+
+    def test_full_and_app_only_paths_produce_the_same_release_identity(self):
+        self.fixture()
+        pointers = {f'data/{dataset}/manifest.json':
+                    (self.root / f'data/{dataset}/manifest.json').read_bytes()
+                    for dataset in cloud.DATASETS}
+        self.assertEqual(cloud.prepare(self.root)[0], cloud.prepare_app(self.root, pointers)[0])
+
+    def test_app_release_inherits_only_verified_active_dataset_objects(self):
+        versions = {dataset: '0123456789abcdef' for dataset in cloud.DATASETS}
+        data = {f'data/{dataset}/0123456789abcdef/manifest.json': {'etag': dataset, 'size': 1}
+                for dataset in cloud.DATASETS}
+        record = {'datasets': versions, 'objects': {
+            **data, 'assets/old.js': {'etag': 'old', 'size': 1},
+            'releases/old/index.html': {'etag': 'old', 'size': 1}}}
+        self.assertEqual(cloud.inherited_data_inventory(record, versions), data)
+        record['datasets'] = {**versions, 'life': 'fedcba9876543210'}
+        with self.assertRaisesRegex(ValueError, 'does not match'):
+            cloud.inherited_data_inventory(record, versions)
+
+    def test_app_deploy_publishes_small_release_and_keeps_data_inventory(self):
+        self.write('index.html', '<script src="/assets/app-123.js"></script>')
+        self.write('assets/app-123.js', 'console.log("app")')
+        versions = {dataset: '0123456789abcdef' for dataset in cloud.DATASETS}
+        data = {f'data/{dataset}/0123456789abcdef/manifest.json': {'etag': dataset, 'size': 1}
+                for dataset in cloud.DATASETS}
+        record = {'release': 'active', 'datasets': versions, 'objects': data}
+        pointers = {f'releases/active/data/{dataset}/manifest.json':
+                    json.dumps({'version': versions[dataset], 'pageCount': 1}).encode()
+                    for dataset in cloud.DATASETS}
+        s3, cf = MagicMock(), MagicMock()
+        cf.get_distribution.return_value = {'Distribution': {
+            'Status': 'Deployed', 'DistributionConfig': {'Origins': {'Items': [
+                {'Id': 'AppOrigin', 'OriginPath': '/releases/active'}]}}}}
+
+        def get_object(**kwargs):
+            key = kwargs['Key']
+            raw = json.dumps(record).encode() if key.endswith('/release.json') else pointers[key]
+            return {'Body': io.BytesIO(gzip.compress(raw)), 'ContentEncoding': 'gzip'}
+
+        s3.get_object.side_effect = get_object
+        with patch.object(cloud, 'listing', return_value={}), \
+                patch.object(cloud, 'verify_inventory'), patch.object(cloud, 'activate') as activate:
+            cloud.deploy_app(s3, cf, 'bucket', 'distribution', self.root)
+        activate.assert_called_once()
+        release = activate.call_args.args[-1]
+        release_put = next(call for call in s3.put_object.call_args_list
+                           if call.kwargs['Key'] == f'releases/{release}/release.json')
+        published = json.loads(gzip.decompress(release_put.kwargs['Body']))
+        self.assertEqual(published['datasets'], versions)
+        self.assertTrue(set(data).issubset(published['objects']))
+        self.assertIn('assets/app-123.js', published['objects'])
+        self.assertIn(f'releases/{release}/index.html', published['objects'])
+
     def test_compression_and_cache_headers(self):
         file = self.write('page.bin', 'geometry bytes')
         body, headers = cloud.encode(file, 'data/life/version/pages/0.bin')
@@ -60,6 +128,9 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(headers['ContentType'], 'application/octet-stream')
         self.assertIn('immutable', headers['CacheControl'])
         self.assertEqual(cloud.encode(file, 'releases/id/manifest.json')[1]['CacheControl'], cloud.FRESH)
+        blob, options = cloud.encode_bytes(b'{}', '.json', 'releases/id/data/life/manifest.json')
+        self.assertEqual(gzip.decompress(blob), b'{}')
+        self.assertEqual(options['CacheControl'], cloud.FRESH)
 
     def test_identical_upload_is_reused_and_changed_data_refused(self):
         file = self.write('page.bin', 'geometry')

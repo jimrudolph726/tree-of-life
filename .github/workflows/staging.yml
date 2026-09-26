@@ -1,11 +1,11 @@
-name: Deploy or roll back staging
+name: Deploy app or roll back staging
 on:
   push:
     branches: [main]
   workflow_dispatch:
     inputs:
       release:
-        description: Existing release ID to roll back to; leave blank to build and deploy this revision
+        description: Existing app release ID to roll back to; leave blank to deploy this revision with the active datasets
         required: false
         type: string
 permissions:
@@ -29,7 +29,7 @@ jobs:
       ROLLBACK_RELEASE: ${{ inputs.release }}
     steps:
       - uses: actions/checkout@v4
-      # Fail authentication before downloading or rebuilding millions of nodes.
+      # Fail authentication before installing or building anything.
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.STAGING_ROLE_ARN }}
@@ -43,24 +43,18 @@ jobs:
         with:
           python-version: '3.13'
       - run: npm ci
-      - run: python -m pip install -r pipeline/requirements.txt -r pipeline/requirements-cloud.txt cfn-lint
-      - run: cfn-lint infra/staging.yaml
-      - run: npm run data:test
-      - run: npm run data:validate
+        if: inputs.release == ''
+      - run: python -m pip install -r pipeline/requirements-cloud.txt
       - if: inputs.release == ''
         run: |
-          npm run data:life
-          npm run data:life:validate
-          npm run data:build
           npm test
           npm run lint
-          npm run build
-          python pipeline/deploy_cloud.py preflight
+          npm run build:app
       - name: Record previous release
         run: python pipeline/deploy_cloud.py status --distribution "$STAGING_DISTRIBUTION" > staging-before.json
       - name: Publish and activate
         if: inputs.release == ''
-        run: python pipeline/deploy_cloud.py deploy --bucket "$STAGING_BUCKET" --distribution "$STAGING_DISTRIBUTION"
+        run: python pipeline/deploy_cloud.py deploy-app --bucket "$STAGING_BUCKET" --distribution "$STAGING_DISTRIBUTION"
       - name: Activate retained release
         if: inputs.release != ''
         run: python pipeline/deploy_cloud.py activate --bucket "$STAGING_BUCKET" --distribution "$STAGING_DISTRIBUTION" --release "$ROLLBACK_RELEASE"

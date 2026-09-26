@@ -1,14 +1,32 @@
-name: Validate complete OpenTree release
+name: Publish complete OpenTree dataset
 on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: tree-of-life-staging
+  cancel-in-progress: false
 jobs:
   release:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: us-east-1
+      STAGING_BUCKET: ${{ vars.STAGING_BUCKET }}
+      STAGING_DISTRIBUTION: ${{ vars.STAGING_DISTRIBUTION }}
+      STAGING_URL: ${{ vars.STAGING_URL }}
     steps:
       - uses: actions/checkout@v4
+      # Authenticate before spending time rebuilding the complete publication.
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.STAGING_ROLE_ARN }}
+          aws-region: us-east-1
+          retry-max-attempts: 3
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -17,7 +35,7 @@ jobs:
         with:
           python-version: '3.13'
       - run: npm ci
-      - run: python -m pip install -r pipeline/requirements.txt
+      - run: python -m pip install -r pipeline/requirements.txt -r pipeline/requirements-cloud.txt
       - run: npm run data:life
       - run: npm run data:life:validate
       - run: npm run benchmark:life
@@ -26,7 +44,18 @@ jobs:
       - run: npm run data:test
       - run: npm run lint
       - run: npm run build
+      - run: python pipeline/deploy_cloud.py preflight
+      - name: Record previous release
+        run: python pipeline/deploy_cloud.py status --distribution "$STAGING_DISTRIBUTION" > staging-before.json
+      - name: Publish datasets and activate the matching app release
+        run: python pipeline/deploy_cloud.py deploy --bucket "$STAGING_BUCKET" --distribution "$STAGING_DISTRIBUTION"
+      - name: Verify hosted app and all datasets
+        run: node pipeline/cloud-smoke.ts "$STAGING_URL" staging-smoke.json
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: full-tree-validation
-          path: benchmarks/results/life-*.json
+          name: full-tree-publication-results
+          path: |
+            staging-before.json
+            staging-smoke.json
+            benchmarks/results/life-*.json

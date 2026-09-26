@@ -1,7 +1,9 @@
 """Publish immutable files first, then promote a complete app release. No deletes.
 
 Local preflight needs no AWS credentials. Deploy/status/activate use the normal
-boto3 credential chain (including an explicitly selected AWS profile).
+boto3 credential chain (including an explicitly selected AWS profile). A full
+deploy publishes locally built datasets; deploy-app reuses the active immutable
+datasets and uploads only the newly built application.
 """
 import argparse
 import base64
@@ -47,11 +49,10 @@ def comparable_manifest(value):
     return value
 
 
-def prepare(folder):
+def app_sources(folder):
     root = Path(folder).resolve()
     if not (root / 'index.html').is_file():
-        raise ValueError('Missing dist/index.html. Run npm run build first.')
-    versions, files = {}, []
+        raise ValueError('Missing dist/index.html. Run npm run build:app first.')
     app_files = [root / 'index.html']
     for optional in ('DATA_SOURCES.txt',):
         if (root / optional).is_file():
@@ -59,6 +60,21 @@ def prepare(folder):
     assets = sorted((root / 'assets').glob('*'))
     if not assets:
         raise ValueError('Missing built application assets')
+    return root, app_files, assets
+
+
+def release_identity(root, app_files, assets, pointers):
+    identity = hashlib.sha256()
+    local = {path.relative_to(root).as_posix(): content(path) for path in app_files + assets if path.is_file()}
+    for key, raw in sorted({**local, **pointers}.items()):
+        identity.update(key.encode())
+        identity.update(raw)
+    return identity.hexdigest()[:24]
+
+
+def prepare(folder):
+    root, app_files, assets = app_sources(folder)
+    versions, files, pointers = {}, [], {}
     for path in assets:
         if path.is_file() and path.suffix in TYPES:
             files.append((path, path.relative_to(root).as_posix(), False))
@@ -90,26 +106,46 @@ def prepare(folder):
                     raise ValueError(f'Unexpected dataset file: {path}')
                 files.append((path, path.relative_to(root).as_posix(), path == folder / 'manifest.json'))
         app_files.append(pointer)
-    identity = hashlib.sha256()
-    for path in sorted(app_files + assets):
-        if path.is_file():
-            identity.update(path.relative_to(root).as_posix().encode())
-            identity.update(content(path))
-    release = identity.hexdigest()[:24]
+        pointers[pointer.relative_to(root).as_posix()] = content(pointer)
+    release = release_identity(root, app_files, assets, pointers)
     for path in app_files:
         files.append((path, f'releases/{release}/{path.relative_to(root).as_posix()}', False))
     return release, versions, files
 
 
-def encode(path, key, canonical=False):
-    raw = content(path, canonical)
+def prepare_app(folder, pointers):
+    root, app_files, assets = app_sources(folder)
+    expected = {f'data/{dataset}/manifest.json' for dataset in DATASETS}
+    if set(pointers) != expected:
+        raise ValueError('Active release does not contain every dataset pointer')
+    versions = {}
+    for dataset in DATASETS:
+        manifest = json.loads(pointers[f'data/{dataset}/manifest.json'])
+        version = manifest.get('version', '')
+        if not re.fullmatch(r'[0-9a-f]{16}', version):
+            raise ValueError(f'{dataset}: invalid active dataset version')
+        versions[dataset] = version
+    release = release_identity(root, app_files, assets, pointers)
+    files = [(path, path.relative_to(root).as_posix(), False) for path in assets
+             if path.is_file() and path.suffix in TYPES]
+    files.extend((path, f'releases/{release}/{path.relative_to(root).as_posix()}', False)
+                 for path in app_files)
+    blobs = [(raw, f'releases/{release}/{key}', Path(key).suffix) for key, raw in pointers.items()]
+    return release, versions, files, blobs
+
+
+def encode_bytes(raw, suffix, key):
     body = gzip.compress(raw, compresslevel=6, mtime=0)
     return body, {
-        'ContentType': TYPES[path.suffix], 'ContentEncoding': 'gzip',
+        'ContentType': TYPES[suffix], 'ContentEncoding': 'gzip',
         'CacheControl': FRESH if key.startswith('releases/') else IMMUTABLE,
         'Metadata': {'sha256': hashlib.sha256(raw).hexdigest()},
         'ContentMD5': base64.b64encode(hashlib.md5(body).digest()).decode(),
     }
+
+
+def encode(path, key, canonical=False):
+    return encode_bytes(content(path, canonical), path.suffix, key)
 
 
 def listing(s3, bucket, prefixes):
@@ -138,6 +174,22 @@ def upload_file(s3, bucket, entry, existing):
     return key, expected
 
 
+def upload_bytes(s3, bucket, entry, existing):
+    raw, key, suffix = entry
+    body, options = encode_bytes(raw, suffix, key)
+    expected = {'etag': hashlib.md5(body).hexdigest(), 'size': len(body)}
+    previous = existing.get(key)
+    if previous != expected:
+        if previous:
+            remote = s3.head_object(Bucket=bucket, Key=key)
+            if (remote.get('Metadata') != options['Metadata'] or
+                    any(remote.get(k) != options[k] for k in ('ContentType', 'ContentEncoding', 'CacheControl'))):
+                raise ValueError(f'Refusing to overwrite immutable object: {key}')
+            return key, previous
+        s3.put_object(Bucket=bucket, Key=key, Body=body, **options)
+    return key, expected
+
+
 def verify_inventory(expected, actual):
     for key, metadata in expected.items():
         if actual.get(key) != metadata:
@@ -146,6 +198,33 @@ def verify_inventory(expected, actual):
 
 def app_origin(config):
     return next(item for item in config['Origins']['Items'] if item['Id'] == 'AppOrigin')
+
+
+def read_json_object(s3, bucket, key):
+    response = s3.get_object(Bucket=bucket, Key=key)
+    raw = response['Body'].read()
+    if response.get('ContentEncoding') == 'gzip' or key.endswith('/release.json'):
+        raw = gzip.decompress(raw)
+    return json.loads(raw), raw
+
+
+def current_release(cf, distribution):
+    state = cf.get_distribution(Id=distribution)['Distribution']
+    if state['Status'] != 'Deployed':
+        raise ValueError('Another distribution update is in progress. Wait before publishing.')
+    release = app_origin(state['DistributionConfig']).get('OriginPath', '').removeprefix('/releases/')
+    valid_release(release)
+    return release
+
+
+def inherited_data_inventory(record, versions):
+    if record.get('datasets') != versions:
+        raise ValueError('Active release record does not match its dataset pointers')
+    expected = tuple(f'data/{dataset}/{version}/' for dataset, version in versions.items())
+    inherited = {key: value for key, value in record.get('objects', {}).items() if key.startswith(expected)}
+    if not all(any(key.startswith(prefix) for key in inherited) for prefix in expected):
+        raise ValueError('Active release has no verified immutable dataset inventory')
+    return inherited
 
 
 def wait_distribution(cf, distribution):
@@ -206,9 +285,31 @@ def deploy(s3, cf, bucket, distribution, folder):
     activate(s3, cf, bucket, distribution, release)
 
 
+def deploy_app(s3, cf, bucket, distribution, folder):
+    active = current_release(cf, distribution)
+    record, _ = read_json_object(s3, bucket, f'releases/{active}/release.json')
+    pointers = {}
+    for dataset in DATASETS:
+        key = f'data/{dataset}/manifest.json'
+        _, pointers[key] = read_json_object(s3, bucket, f'releases/{active}/{key}')
+    release, versions, files, blobs = prepare_app(folder, pointers)
+    inventory = inherited_data_inventory(record, versions)
+    existing = listing(s3, bucket, ['assets/', f'releases/{release}/'])
+    with ThreadPoolExecutor(max_workers=12) as executor:
+        inventory.update(executor.map(lambda entry: upload_file(s3, bucket, entry, existing), files))
+        inventory.update(executor.map(lambda entry: upload_bytes(s3, bucket, entry, existing), blobs))
+    app_inventory = {key: value for key, value in inventory.items() if not key.startswith('data/')}
+    verify_inventory(app_inventory, listing(s3, bucket, ['assets/', f'releases/{release}/']))
+    next_record = {'release': release, 'datasets': versions, 'objects': inventory}
+    s3.put_object(Bucket=bucket, Key=f'releases/{release}/release.json',
+                  Body=gzip.compress(json.dumps(next_record, sort_keys=True).encode(), mtime=0),
+                  ContentType='application/json', ContentEncoding='gzip', CacheControl=FRESH)
+    activate(s3, cf, bucket, distribution, release)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['preflight', 'deploy', 'activate', 'status'])
+    parser.add_argument('command', choices=['preflight', 'deploy', 'deploy-app', 'activate', 'status'])
     parser.add_argument('--dist', default='dist')
     parser.add_argument('--bucket')
     parser.add_argument('--distribution')
@@ -237,6 +338,8 @@ def main():
                           'release': app_origin(state['DistributionConfig']).get('OriginPath')}, indent=2))
     elif args.command == 'activate':
         activate(s3, cf, args.bucket, args.distribution, args.release)
+    elif args.command == 'deploy-app':
+        deploy_app(s3, cf, args.bucket, args.distribution, args.dist)
     else:
         deploy(s3, cf, args.bucket, args.distribution, args.dist)
 
