@@ -12,15 +12,17 @@ export interface BrowserMetrics {
   motionDurationMs: number;
   searchMs: number | null;
   selectionPaintMs: number | null;
+  selectionReadyMs: number | null;
 }
 export function useBrowserMetrics(enabled: boolean, camera: Camera, setCamera: (camera: Camera) => void) {
   const [metrics, setMetrics] = useState<BrowserMetrics>({ firstMapMs: null, frameP95Ms: null, frameP50Ms: null,
-    longTasks: 0, longestTaskMs: 0, sampledFrames: 0, mainHeapMB: null, motionDurationMs: 0, searchMs: null, selectionPaintMs: null });
+    longTasks: 0, longestTaskMs: 0, sampledFrames: 0, mainHeapMB: null, motionDurationMs: 0,
+    searchMs: null, selectionPaintMs: null, selectionReadyMs: null });
   const [running, setRunning] = useState(false);
   const painted = useRef(false);
   const tasks = useRef<number[]>([]);
   const raf = useRef(0);
-  const focus = useRef<{ index: number; started: number } | null>(null);
+  const focus = useRef<{ index: number; started: number; painted: boolean; ready: boolean } | null>(null);
   useEffect(() => {
     if (!enabled || !PerformanceObserver.supportedEntryTypes.includes('longtask')) return;
     const observer = new PerformanceObserver(list => { for (const entry of list.getEntries()) tasks.current.push(entry.duration); });
@@ -35,13 +37,24 @@ export function useBrowserMetrics(enabled: boolean, camera: Camera, setCamera: (
       recordRumEvent('tree_first_map', { duration });
       if (enabled) setMetrics(old => ({ ...old, firstMapMs: duration }));
     }
-    if (focus.current && focus.current.index === selectedIndex) {
-      const duration = performance.now() - focus.current.started; focus.current = null;
+    if (focus.current && focus.current.index === selectedIndex && !focus.current.painted) {
+      const duration = performance.now() - focus.current.started; focus.current.painted = true;
       recordRumEvent('tree_selection_paint', { duration });
       if (enabled) setMetrics(old => ({ ...old, selectionPaintMs: duration }));
+      if (focus.current.ready) focus.current = null;
     }
   }, [enabled]);
-  const startFocus = useCallback((index: number) => { focus.current = { index, started: performance.now() }; }, []);
+  const startFocus = useCallback((index: number) => {
+    focus.current = { index, started: performance.now(), painted: false, ready: false };
+  }, []);
+  const recordFocusReady = useCallback((index: number) => {
+    if (!focus.current || focus.current.index !== index) return;
+    const duration = performance.now() - focus.current.started;
+    focus.current.ready = true;
+    recordRumEvent('tree_selection_ready', { duration });
+    if (enabled) setMetrics(old => ({ ...old, selectionReadyMs: duration }));
+    if (focus.current.painted) focus.current = null;
+  }, [enabled]);
   const recordSearch = useCallback((duration: number) => {
     recordRumEvent('tree_search', { duration });
     if (enabled) setMetrics(old => ({ ...old, searchMs: duration }));
@@ -76,5 +89,5 @@ export function useBrowserMetrics(enabled: boolean, camera: Camera, setCamera: (
     };
     raf.current = requestAnimationFrame(frame);
   };
-  return { metrics, onPaint, run, running, startFocus, recordSearch };
+  return { metrics, onPaint, run, running, startFocus, recordFocusReady, recordSearch };
 }

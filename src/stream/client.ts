@@ -4,6 +4,8 @@ export class TreeClient {
   private worker: Worker;
   private serial = 0;
   private pending = new Map<number, { resolve: (value: unknown) => void; reject: (error: Error) => void }>();
+  private detailCache = new Map<number, Details>();
+  private detailRequests = new Map<number, Promise<Details>>();
   constructor() {
     this.worker = new Worker(new URL('./tree.worker.ts', import.meta.url), { type: 'module' });
     this.worker.onmessage = ({ data }) => {
@@ -36,10 +38,40 @@ export class TreeClient {
   init(url: string, signal?: AbortSignal) { return this.request<Manifest>('init', { url }, signal); }
   view(request: ViewRequest, signal?: AbortSignal) { return this.request<Scene>('view', request, signal); }
   search(query: string, signal?: AbortSignal) { return this.request<Summary[]>('search', { query }, signal); }
-  details(index: number, signal?: AbortSignal) { return this.request<Details>('details', { index }, signal); }
+  details(index: number, signal?: AbortSignal) {
+    const cached = this.detailCache.get(index);
+    if (cached) {
+      this.detailCache.delete(index); this.detailCache.set(index, cached);
+      return this.withSignal(Promise.resolve(cached), signal);
+    }
+    let request = this.detailRequests.get(index);
+    if (!request) {
+      request = this.request<Details>('details', { index }).then(value => {
+        this.detailRequests.delete(index);
+        this.detailCache.set(index, value);
+        while (this.detailCache.size > 96) this.detailCache.delete(this.detailCache.keys().next().value!);
+        return value;
+      }).catch(error => { this.detailRequests.delete(index); throw error; });
+      this.detailRequests.set(index, request);
+    }
+    return this.withSignal(request, signal);
+  }
+  prefetchDetails(index: number) { return this.details(index); }
+  private withSignal<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
+    if (!signal) return promise;
+    signal.throwIfAborted();
+    return new Promise<T>((resolve, reject) => {
+      const abort = () => reject(new DOMException('Request cancelled', 'AbortError'));
+      signal.addEventListener('abort', abort, { once: true });
+      promise.then(value => { signal.removeEventListener('abort', abort); resolve(value); }, error => {
+        signal.removeEventListener('abort', abort); reject(error);
+      });
+    });
+  }
   close() {
     this.worker.terminate();
     for (const pending of this.pending.values()) pending.reject(new DOMException('Worker closed', 'AbortError'));
     this.pending.clear();
+    this.detailCache.clear(); this.detailRequests.clear();
   }
 }

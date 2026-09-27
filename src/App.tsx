@@ -6,7 +6,7 @@ import type { MapTreeNode } from './tree/layoutTreeV3';
 import { fitBounds, focusBounds, labelOffset, labelSize, labelText, mapInsets, visibleLabels } from './tree/navigation';
 import type { Camera, Size } from './tree/navigation';
 import { TreeClient } from './stream/client';
-import type { Details, Manifest, StreamNode, Summary } from './stream/format';
+import type { Details, Manifest, Scene, StreamNode, Summary } from './stream/format';
 import { cacheBudget } from './stream/format';
 import { useScene } from './stream/useScene';
 import { cameraFromView, deckView } from './stream/reframe';
@@ -18,11 +18,28 @@ const PALETTE: [number, number, number, number][] = [[84, 143, 121, 24], [87, 12
 const DOMAIN_COLORS: [number, number, number, number][] = [[84, 143, 121, 18], [99, 140, 172, 32], [94, 153, 126, 32], [192, 137, 97, 32]];
 type CameraState = Camera & { transitionDuration?: number | 'auto'; transitionInterpolator?: TransitionInterpolator };
 type Visit = { camera: CameraState; anchor: number; details: Details | null; home: boolean };
+type FocusTarget = { details: Details; camera: Camera };
+type PreparedFocus = { target: Promise<FocusTarget>; ready: Promise<FocusTarget & { scene: Scene }> };
 const getSize = (): Size => ({ width: window.innerWidth, height: window.innerHeight });
 const animate = (camera: Camera): CameraState => ({ ...camera,
   transitionDuration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650, transitionInterpolator: TRANSITION });
 const EMPTY_NODES: StreamNode[] = [];
 const benchmarkMode = new URLSearchParams(window.location.search).has('bench');
+
+function waitForSignal<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
+  signal.throwIfAborted();
+  return new Promise<T>((resolve, reject) => {
+    const abort = () => reject(new DOMException('Request cancelled', 'AbortError'));
+    signal.addEventListener('abort', abort, { once: true });
+    promise.then(value => { signal.removeEventListener('abort', abort); resolve(value); }, error => {
+      signal.removeEventListener('abort', abort); reject(error);
+    });
+  });
+}
+
+function isPositioned(node: Summary): node is StreamNode {
+  return 'bounds' in node && 'position' in node && 'radius' in node;
+}
 
 function rootNode(manifest: Manifest): StreamNode {
   return { ...manifest.root, position: [0, 0], radius: 1000, heading: -Math.PI / 2, region: [],
@@ -47,14 +64,15 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
   const view = useMemo(() => new OrthographicView({ id: `tree-${anchor}`, flipY: true }), [anchor]);
   const interaction = useRef({ active: false, changedAt: 0 });
   const [details, setDetails] = useState<Details | null>(null);
+  const [pendingNode, setPendingNode] = useState<Summary | null>(null);
   const [pendingTaxon, setPendingTaxon] = useState<string | null>(null);
   const [past, setPast] = useState<Visit[]>([]);
   const [future, setFuture] = useState<Visit[]>([]);
-  const selected = details?.node ?? null;
+  const selected = pendingNode ?? details?.node ?? null;
   const [query, setQuery] = useState('');
   const [searchState, setSearchState] = useState<{ query: string; results: Summary[] }>({ query: '', results: [] });
   const searching = query.trim() !== searchState.query;
-  const results = searching ? [] : searchState.results;
+  const results = useMemo(() => searching ? [] : searchState.results, [searching, searchState.results]);
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeResult, setActiveResult] = useState(0);
   const [renderError, setRenderError] = useState<string | null>(null);
@@ -65,8 +83,10 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
     setAnchor(nextAnchor); setCamera({ ...nextCamera, transitionDuration: 0 });
   }, () => !interaction.current.active && performance.now() - interaction.current.changedAt > 300);
   const telemetry = useBrowserMetrics(benchmarkMode, camera, value => { atHome.current = false; setCamera({ ...value, transitionDuration: 0 }); });
-  const { startFocus, recordSearch } = telemetry;
+  const { startFocus, recordFocusReady, recordSearch } = telemetry;
   const namedNodes = scene?.nodes ?? EMPTY_NODES;
+  const preparedFocus = useRef(new Map<string, PreparedFocus>());
+  const hoverPrefetch = useRef<{ index: number; timer: number } | null>(null);
   useEffect(() => {
     const element = container.current;
     if (!element) return;
@@ -79,7 +99,10 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
     observer.observe(element);
     return () => observer.disconnect();
   }, [root, manifest]);
-  useEffect(() => () => focusRequest.current?.abort(), []);
+  useEffect(() => () => {
+    focusRequest.current?.abort();
+    if (hoverPrefetch.current) clearTimeout(hoverPrefetch.current.timer);
+  }, []);
   useEffect(() => {
     const controller = new AbortController();
     const started = performance.now();
@@ -92,34 +115,83 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
     }, 160);
     return () => { clearTimeout(timer); controller.abort(); };
   }, [client, query, recordSearch]);
+  const prepareFocus = useCallback((node: Summary): PreparedFocus => {
+    const key = `${node.index}:${Math.round(size.width)}x${Math.round(size.height)}`;
+    const cached = preparedFocus.current.get(key);
+    if (cached) {
+      preparedFocus.current.delete(key); preparedFocus.current.set(key, cached);
+      return cached;
+    }
+    const target = client.prefetchDetails(node.index).then(details => ({ details,
+      camera: fitBounds(focusBounds(details.focus), size, mapInsets(size, true)) }));
+    const ready = target.then(async value => ({ ...value,
+      scene: await client.view({ anchor: value.details.anchor, camera: value.camera, size }) }));
+    const prepared = { target, ready };
+    preparedFocus.current.set(key, prepared);
+    while (preparedFocus.current.size > 24) preparedFocus.current.delete(preparedFocus.current.keys().next().value!);
+    void ready.catch(() => { if (preparedFocus.current.get(key) === prepared) preparedFocus.current.delete(key); });
+    return prepared;
+  }, [client, size]);
+  const queuePrefetch = useCallback((node?: Summary) => {
+    if (!node) {
+      if (hoverPrefetch.current) clearTimeout(hoverPrefetch.current.timer);
+      hoverPrefetch.current = null; return;
+    }
+    if (hoverPrefetch.current?.index === node.index) return;
+    if (hoverPrefetch.current) clearTimeout(hoverPrefetch.current.timer);
+    hoverPrefetch.current = { index: node.index, timer: window.setTimeout(() => {
+      hoverPrefetch.current = null;
+      void client.prefetchDetails(node.index).catch(() => undefined);
+    }, 180) };
+  }, [client]);
+  const prefetchNow = useCallback((node: Summary) => {
+    if (hoverPrefetch.current) clearTimeout(hoverPrefetch.current.timer);
+    hoverPrefetch.current = null;
+    void prepareFocus(node).ready.catch(() => undefined);
+  }, [prepareFocus]);
+  useEffect(() => {
+    const active = searchOpen ? results[activeResult] : undefined;
+    if (active) queuePrefetch(active);
+    return () => queuePrefetch();
+  }, [searchOpen, results, activeResult, queuePrefetch]);
   const focusNode = useCallback((node: Summary) => {
     startFocus(node.index);
     focusRequest.current?.abort();
     const controller = new AbortController(); focusRequest.current = controller;
     const previous = { camera, anchor, details, home: atHome.current };
+    const prepared = prepareFocus(node);
+    if (isPositioned(node)) {
+      atHome.current = false;
+      setCamera(animate(fitBounds(focusBounds(node), size, mapInsets(size, true))));
+    }
+    setPendingNode(node); setDetails(null);
     setPendingTaxon(node.scientificName);
     setNavigationError(null); setSearchOpen(false); setQuery('');
-    void client.details(node.index, controller.signal).then(async result => {
-      const nextCamera = fitBounds(focusBounds(result.focus), size, mapInsets(size, true));
-      const ready = await client.view({ anchor: result.anchor, camera: nextCamera, size }, controller.signal);
+    void waitForSignal(prepared.target, controller.signal).then(async target => {
+      setPendingNode(null); setDetails(target.details);
+      const completed = await waitForSignal(prepared.ready, controller.signal);
       if (controller.signal.aborted) return;
       setPast(history => [...history.slice(-49), previous]); setFuture([]);
-      atHome.current = false; setPendingTaxon(null); prime(ready);
-      setDetails(result); setAnchor(result.anchor);
-      setCamera(result.anchor === anchor ? animate(nextCamera) : { ...nextCamera, transitionDuration: 0 });
-    }).catch(error => { if (!controller.signal.aborted) { setNavigationError(error.message); setPendingTaxon(null); } });
-  }, [client, size, anchor, camera, details, startFocus, prime]);
+      atHome.current = false; setPendingTaxon(null); prime(completed.scene);
+      setDetails(completed.details); setAnchor(completed.details.anchor);
+      setCamera(completed.details.anchor === anchor ? animate(completed.camera) : { ...completed.camera, transitionDuration: 0 });
+      recordFocusReady(node.index);
+    }).catch(error => { if (!controller.signal.aborted) {
+      atHome.current = previous.home; setNavigationError(error.message); setPendingTaxon(null); setPendingNode(null);
+      setDetails(previous.details); setCamera(animate(previous.camera));
+    } });
+  }, [size, anchor, camera, details, startFocus, recordFocusReady, prime, prepareFocus]);
   const goHome = () => {
     if (!atHome.current || details) { setPast(history => [...history.slice(-49), { camera, anchor, details, home: atHome.current }]); setFuture([]); }
     focusRequest.current?.abort(); atHome.current = true;
-    setPendingTaxon(null);
+    setPendingTaxon(null); setPendingNode(null);
     setDetails(null); setQuery(''); setSearchOpen(false); setNavigationError(null); setAnchor(0);
     setCamera(anchor === 0 ? animate(homeCamera) : { ...homeCamera, transitionDuration: 0 });
   };
   const revisit = (direction: 'back' | 'forward') => {
     const history = direction === 'back' ? past : future, visit = history.at(-1);
     if (!visit) return;
-    focusRequest.current?.abort(); setPendingTaxon(null); setNavigationError(null);
+    focusRequest.current?.abort(); setPendingTaxon(null); setPendingNode(null); setNavigationError(null);
     const current = { camera, anchor, details, home: atHome.current };
     if (direction === 'back') { setPast(history.slice(0, -1)); setFuture(values => [...values, current]); }
     else { setFuture(history.slice(0, -1)); setPast(values => [...values, current]); }
@@ -178,7 +250,7 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
     ];
   }, [regions, showRegions, lineData, highlightedLines, lineageIds, namedNodes, selected, labelNodes, camera, size]);
   return (
-    <main className="app" ref={container} data-tree-ready={Boolean(scene)}
+    <main className="app" ref={container} data-tree-ready={Boolean(scene)} data-pending-taxon={pendingTaxon ?? undefined}
       data-camera-zoom={camera.zoom.toFixed(4)} data-camera-target={camera.target.slice(0, 2).map(value => value.toFixed(3)).join(',')}>
       <DeckGL views={view} viewState={deckView(camera)} layers={layers}
         controller={{ dragPan: true, scrollZoom: { speed: 0.03, smooth: true }, doubleClickZoom: true, touchZoom: true, touchRotate: false, keyboard: true }}
@@ -194,9 +266,10 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
         }}
         getCursor={({ isDragging, isHovering }) => isDragging ? 'grabbing' : isHovering ? 'pointer' : 'grab'}
         getTooltip={({ object }) => object && 'scientificName' in object ? { text: object.scientificName } : null}
+        onHover={info => queuePrefetch(info.object && 'scientificName' in info.object ? info.object as StreamNode : undefined)}
         onClick={info => {
           if (info.object) focusNode(info.object as StreamNode);
-          else { focusRequest.current?.abort(); setPendingTaxon(null); setDetails(null); setSearchOpen(false); }
+          else { focusRequest.current?.abort(); setPendingTaxon(null); setPendingNode(null); setDetails(null); setSearchOpen(false); }
         }}
         onError={error => setRenderError(error.message)}
         onAfterRender={() => { if (scene) telemetry.onPaint(scene.nodes.some(n => n.index === selected?.index) ? selected?.index : undefined); }}
@@ -223,7 +296,8 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
           {query && <button className="search-clear" aria-label="Clear search" onClick={() => { setQuery(''); setActiveResult(0); }}>×</button>}
           {searchOpen && query.trim() && <div className="search-results" id="taxon-results" role="listbox" aria-label="Matching taxa">
             {results.length ? results.map((node, index) => <button type="button" role="option" aria-selected={index === activeResult}
-              id={`result-${node.id}`} key={node.id} onClick={() => focusNode(node)}>
+              id={`result-${node.id}`} key={node.id} onPointerEnter={() => queuePrefetch(node)} onPointerLeave={() => queuePrefetch()}
+              onPointerDown={() => prefetchNow(node)} onFocus={() => queuePrefetch(node)} onClick={() => focusNode(node)}>
               <span>{node.scientificName}</span><small>{node.isTerminal ? 'Terminal taxon' : `${node.leafCount} terminal taxa`}</small>
             </button>) : <p role="status">{searching ? 'Searching…' : 'No matching taxa in this dataset.'}</p>}
           </div>}
@@ -237,16 +311,17 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
         <button onClick={goHome} aria-label="Home — fit entire tree" title="Fit entire tree">⌂</button>
         <button className="region-toggle" onClick={() => setShowRegions(value => !value)} aria-label="Show clade regions" aria-pressed={showRegions} title="Toggle clade regions">◒</button>
       </nav>
-      {selected && <nav className="breadcrumbs" aria-label="Taxon lineage">
+      {selected && breadcrumbs.length > 0 && <nav className="breadcrumbs" aria-label="Taxon lineage">
         {breadcrumbs.map((node, index) => <span key={node.id}>{index > 0 && <span className="separator">{index === 1 && namedLineage.length > 8 ? '…' : '›'}</span>}
-          <button onClick={() => focusNode(node)} aria-current={node.id === selected.id ? 'location' : undefined}>{node.scientificName}</button>
+          <button onPointerEnter={() => queuePrefetch(node)} onPointerLeave={() => queuePrefetch()} onPointerDown={() => prefetchNow(node)}
+            onFocus={() => queuePrefetch(node)} onClick={() => focusNode(node)} aria-current={node.id === selected.id ? 'location' : undefined}>{node.scientificName}</button>
         </span>)}
       </nav>}
       <footer className="map-footer"><span><strong>{manifest.namedCount.toLocaleString()}</strong> named taxa · {root.leafCount} tips<span className="desktop-hint"> · Drag to pan · Scroll to zoom</span></span>
         <span className="attribution">{manifest.synthetic ? 'Generated benchmark data · ' : 'Data: Open Tree of Life · '}{manifest.provenance && <><a href={`${import.meta.env.BASE_URL}data/${manifest.presentation === 'life' ? 'life' : 'aves'}/${manifest.version}/manifest.json`} target="_blank" rel="noreferrer">{manifest.provenance.synthId}</a> · </>}<a href="https://lifemap.cnrs.fr/" target="_blank" rel="noreferrer">Inspired by Lifemap</a></span>
       </footer>
       {selected && <aside className="detail-panel" aria-label="Taxon details">
-        <button className="close-button" onClick={() => { focusRequest.current?.abort(); setPendingTaxon(null); setDetails(null); }} aria-label="Close details">×</button>
+        <button className="close-button" onClick={() => { focusRequest.current?.abort(); setPendingTaxon(null); setPendingNode(null); setDetails(null); }} aria-label="Close details">×</button>
         <div className="rank">{selected.rank ?? (selected.isTerminal ? 'Terminal taxon' : 'Clade')}</div>
         <h1>{selected.scientificName}</h1>
         {selected.commonName && <p className="common-name">{selected.commonName}</p>}
@@ -255,9 +330,13 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
         {manifest.provenance && <p className="data-note">Synthesis {manifest.provenance.synthId} · Taxonomy {manifest.provenance.taxonomyVersion}<br />Retrieved {manifest.provenance.fetchedAt.slice(0, 10)}</p>}
         {selected.ottId && <a className="source-link" href={`https://tree.opentreeoflife.org/taxonomy/browse?id=${selected.ottId}`} target="_blank" rel="noreferrer">OpenTree · OTT {selected.ottId} ↗</a>}
         {descendants.length > 0 && <section><h2>Explore this clade</h2><div className="descendant-list">{descendants.map(node =>
-          <button key={node.id} onClick={() => focusNode(node)}><span>{node.scientificName}</span><small>{node.leafCount} ›</small></button>)}</div></section>}
+          <button key={node.id} onPointerEnter={() => queuePrefetch(node)} onPointerLeave={() => queuePrefetch()}
+            onPointerDown={() => prefetchNow(node)} onFocus={() => queuePrefetch(node)} onClick={() => focusNode(node)}>
+            <span>{node.scientificName}</span><small>{node.leafCount} ›</small></button>)}</div></section>}
         <section><h2>Lineage</h2><div className="lineage">{namedLineage.map(node =>
-          <button key={node.id} onClick={() => focusNode(node)} aria-current={node.id === selected.id ? 'location' : undefined}>{node.scientificName}</button>)}</div></section>
+          <button key={node.id} onPointerEnter={() => queuePrefetch(node)} onPointerLeave={() => queuePrefetch()}
+            onPointerDown={() => prefetchNow(node)} onFocus={() => queuePrefetch(node)} onClick={() => focusNode(node)}
+            aria-current={node.id === selected.id ? 'location' : undefined}>{node.scientificName}</button>)}</div></section>
       </aside>}
       {(streamError || navigationError) && <div className="stream-notice" role="alert">{streamError || navigationError}</div>}
       {pendingTaxon && <div className="stream-notice" role="status">Opening {pendingTaxon}…</div>}
@@ -269,6 +348,7 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
         <strong>{manifest.title}</strong>
         <div>{manifest.nodeCount.toLocaleString()} total nodes · {scene?.nodes.length ?? 0} loaded for display</div>
         <div>First map: {telemetry.metrics.firstMapMs?.toFixed(0) ?? '…'} ms · Scene query: {scene?.stats.queryMs.toFixed(1) ?? '…'} ms</div>
+        <div>Selection paint: {telemetry.metrics.selectionPaintMs?.toFixed(0) ?? '…'} ms · Ready: {telemetry.metrics.selectionReadyMs?.toFixed(0) ?? '…'} ms</div>
         <div>Decoded payload: {((scene?.stats.transferredBytes ?? 0) / 1024).toFixed(0)} KiB · Cache charge: {((scene?.stats.cacheBytes ?? 0) / 1048576).toFixed(1)} / {cacheBudget(manifest) / 1048576} MiB</div>
         <div>Requests: {scene?.stats.requests ?? 0} · Visited: {scene?.stats.visited ?? 0} · Frame: {anchor}</div>
         <button onClick={telemetry.run} disabled={telemetry.running || !scene}>{telemetry.running ? 'Measuring…' : 'Run motion benchmark'}</button>

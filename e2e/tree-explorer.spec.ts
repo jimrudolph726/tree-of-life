@@ -32,6 +32,7 @@ test('search, deep focus, wheel zoom, pan, and home stay responsive', async ({ p
   await search.press('Enter');
   const details = page.getByRole('complementary', { name: 'Taxon details' });
   await expect(details.getByRole('heading', { name: taxon })).toBeVisible({ timeout: hosted ? 30_000 : 15_000 });
+  await expect(app).not.toHaveAttribute('data-pending-taxon', taxon, { timeout: hosted ? 30_000 : 15_000 });
 
   const beforeZoom = await app.getAttribute('data-camera-zoom');
   const canvas = page.locator('canvas').first();
@@ -54,4 +55,30 @@ test('search, deep focus, wheel zoom, pan, and home stay responsive', async ({ p
   await expect(page.locator('canvas')).toBeVisible();
   await expect(page.getByRole('alert')).toHaveCount(0);
   expect(browserErrors).toEqual([]);
+});
+
+test('selection responds before the focused scene finishes loading', async ({ page }) => {
+  let release = () => {};
+  const ancestryGate = new Promise<void>(resolve => { release = resolve; });
+  await page.route(/\/ancestry\/\d+\.json(?:\?.*)?$/, async route => {
+    await ancestryGate;
+    await route.continue();
+  });
+  try {
+    const { app, browserErrors } = await openTree(page);
+    const search = page.getByRole('combobox', { name: 'Search taxa' });
+    await search.fill(taxon);
+    await expect(page.getByRole('option').filter({ has: page.locator('span', { hasText: new RegExp(`^${taxon}$`) }) }))
+      .toHaveAttribute('aria-selected', 'true');
+    await search.press('Enter');
+
+    const details = page.getByRole('complementary', { name: 'Taxon details' });
+    await expect(details.getByRole('heading', { name: taxon })).toBeVisible({ timeout: 400 });
+    await expect(app).toHaveAttribute('data-pending-taxon', taxon);
+    await expect(page.locator('.stream-notice[role="status"]').filter({ hasText: `Opening ${taxon}` })).toBeVisible();
+    release();
+    await expect(app).not.toHaveAttribute('data-pending-taxon', taxon, { timeout: hosted ? 30_000 : 15_000 });
+    await expect(page.getByRole('alert')).toHaveCount(0);
+    expect(browserErrors).toEqual([]);
+  } finally { release(); }
 });
