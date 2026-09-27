@@ -282,7 +282,7 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
       <header className="top-bar">
         <div className="brand"><span className="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M16 27V17M16 17L7 10V5M16 17L25 10V5M16 17V6M7 10L3 7M25 10L29 7" /><circle cx="16" cy="5" r="2" /></svg></span><div>Tree of Life{manifest.synthetic ? <span className="brand-subtitle">GENERATED SCALE TEST</span> : <select className="brand-subtitle dataset-select" aria-label="Tree dataset" value={manifest.presentation === 'life' ? 'life' : manifest.root.ottId === 81461 ? 'aves' : 'primates'} onChange={event => {
           const url = new URL(window.location.href); url.searchParams.set('dataset', event.target.value); window.location.assign(url);
-        }}><option value="life">CELLULAR LIFE</option><option value="aves">BIRDS · AVES</option><option value="primates">PRIMATES</option></select>}</div></div>
+        }}><option value="life">ALL LIFE</option><option value="aves">BIRDS · AVES</option><option value="primates">PRIMATES</option></select>}</div></div>
         <div className="search-box" onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setSearchOpen(false); }}>
           <span className="search-icon" aria-hidden="true">⌕</span>
           <input aria-label="Search taxa" placeholder="Search a taxon or OpenTree ID…" value={query}
