@@ -7,7 +7,7 @@ No custom domain, backend or database is required. The CloudFront HTTPS hostname
 - S3 blocks public access, uses SSE-S3 encryption and bucket versioning, and is retained on stack deletion.
 - CloudFront signs S3 requests with Origin Access Control. Only GET/HEAD are allowed; HTTP redirects to HTTPS.
 - `/data/<dataset>/<version>/...` and hashed `/assets/...` are shared immutable objects. Unchanged data is reused across app releases.
-- HTML, attribution and the three `/data/<dataset>/manifest.json` pointers live under `/releases/<release-id>/` in S3. CloudFront's `AppOrigin.OriginPath` selects the active release. These responses disable caching. There is no HTML fallback for missing binary/JSON pages.
+- HTML, attribution, the three tree manifest pointers and `/data/profiles/manifest.json` live under `/releases/<release-id>/` in S3. CloudFront's `AppOrigin.OriginPath` selects the active release. Content-addressed profile shards are shared immutable objects under `/data/profiles/<version>/`; HTML and manifest pointers disable caching. There is no HTML fallback for missing binary/JSON pages.
 - Every file is gzip-compressed before upload, including binary geometry. Content-Type remains the original type and Content-Encoding is gzip. This avoids relying on CloudFront's automatic compression eligibility for `.bin` objects. Browsers transparently decode them.
 - The uploader checks uploaded object ETags/sizes, writes a complete release inventory only after verification, then changes the app origin with an ETag concurrency precondition. It never deletes retained releases or overwrites changed immutable content.
 - Hashed application assets are shared too, so an already-open older tab can still load its worker and lazy chunks after deployment.
@@ -75,10 +75,10 @@ python pipeline/deploy_cloud.py deploy-app --bucket BUCKET --distribution DISTRI
 node pipeline/cloud-smoke.ts https://DISTRIBUTION.cloudfront.net .deploy/staging-smoke.json
 ```
 
-`deploy-app` reads the three manifest pointers from the active release, verifies
+`deploy-app` reads the three tree manifest pointers from the active release, verifies
 that its release inventory contains those immutable dataset versions, and creates
-a new rollback-ready release containing only the new application and the reused
-pointers. It does not download, rebuild or re-upload the tree.
+a new rollback-ready release containing the new application, the compact profile
+publication and the reused tree pointers. It does not download, rebuild or re-upload the tree.
 
 When the OpenTree source, binary format, search index or layout geometry changes,
 prepare and publish a complete dataset release:

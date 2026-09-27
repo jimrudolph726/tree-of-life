@@ -5,6 +5,11 @@ import { resolve } from 'node:path';
 import { createGzip } from 'node:zlib';
 
 export default defineConfig({
+  server: {
+    // Generated publications contain hundreds of thousands of immutable files.
+    // They must be served locally, but watching them can stall the dev server.
+    watch: { ignored: ['**/public/data/**', '**/data/processed/**', '**/.benchmarks/**'] },
+  },
   plugins: [react(), {
     name: 'local-benchmark-datasets',
     // Generated fixtures stay outside public/ and are never shipped in a normal production build.

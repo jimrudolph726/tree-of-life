@@ -84,3 +84,26 @@ test('selection responds before the focused scene finishes loading', async ({ pa
     expect(browserErrors).toEqual([]);
   } finally { release(); }
 });
+
+test('scientific profiles stay off the initial path and load after selection', async ({ page }) => {
+  test.skip(hosted, 'The deployed profile version advances with this release.');
+  const profileRequests: string[] = [];
+  page.on('request', request => { if (request.url().includes('/data/profiles/')) profileRequests.push(request.url()); });
+  const { app, browserErrors } = await openTree(page);
+  expect(profileRequests).toEqual([]);
+
+  const search = page.getByRole('combobox', { name: 'Search taxa' });
+  await search.fill(taxon);
+  await expect(page.getByRole('option').filter({ has: page.locator('span', { hasText: new RegExp(`^${taxon}$`) }) }))
+    .toHaveAttribute('aria-selected', 'true');
+  await search.press('Enter');
+
+  await expect(app).toHaveAttribute('data-profile-status', 'ready');
+  const details = page.getByRole('complementary', { name: 'Taxon details' });
+  await expect(details.getByRole('heading', { name: 'About' })).toBeVisible();
+  await expect(details.getByRole('link', { name: /From Wikipedia/ })).toContainText('CC BY-SA 4.0');
+  await expect(details.getByRole('heading', { name: 'Sources' })).toBeVisible();
+  expect(profileRequests.filter(url => url.endsWith('/data/profiles/manifest.json'))).toHaveLength(1);
+  expect(profileRequests.filter(url => /\/data\/profiles\/[a-f0-9]{16}\/shards\/\d{2}\.json$/.test(url))).toHaveLength(1);
+  expect(browserErrors).toEqual([]);
+});

@@ -60,6 +60,32 @@ def app_sources(folder):
     assets = sorted((root / 'assets').glob('*'))
     if not assets:
         raise ValueError('Missing built application assets')
+    profile_pointer = root / 'data' / 'profiles' / 'manifest.json'
+    if not profile_pointer.is_file():
+        raise ValueError('Missing scientific-profile publication. Run npm run data:profiles.')
+    profile_manifest = json.loads(profile_pointer.read_text(encoding='utf-8'))
+    profile_version = profile_manifest.get('version', '')
+    shard_count = profile_manifest.get('shardCount', 0)
+    if (not re.fullmatch(r'[0-9a-f]{16}', profile_version) or
+            not isinstance(shard_count, int) or not 1 <= shard_count <= 256 or
+            profile_manifest.get('profileCount') != 1000 or
+            profile_manifest.get('maxCompressedShardBytes', 10**9) > 24 * 1024):
+        raise ValueError('Invalid scientific-profile manifest')
+    profile_folder = profile_pointer.parent / profile_version
+    published = json.loads((profile_folder / 'manifest.json').read_text(encoding='utf-8'))
+    if published != profile_manifest:
+        raise ValueError('Scientific-profile pointer does not match version manifest')
+    profile_files = [profile_folder / 'manifest.json']
+    for shard in range(shard_count):
+        path = profile_folder / 'shards' / f'{shard:02d}.json'
+        if not path.is_file():
+            raise ValueError(f'Missing scientific-profile shard {shard:02d}')
+        profile_files.append(path)
+    for path in profile_files:
+        if path.is_symlink() or not path.resolve().is_relative_to(root):
+            raise ValueError('Scientific-profile publication contains a symlink/outside file')
+    app_files.append(profile_pointer)
+    assets.extend(profile_files)
     return root, app_files, assets
 
 
@@ -138,7 +164,8 @@ def encode_bytes(raw, suffix, key):
     body = gzip.compress(raw, compresslevel=6, mtime=0)
     return body, {
         'ContentType': TYPES[suffix], 'ContentEncoding': 'gzip',
-        'CacheControl': FRESH if key.startswith('releases/') else IMMUTABLE,
+        'CacheControl': (IMMUTABLE if re.match(r'^releases/[^/]+/data/profiles/[0-9a-f]{16}/', key)
+                         else FRESH if key.startswith('releases/') else IMMUTABLE),
         'Metadata': {'sha256': hashlib.sha256(raw).hexdigest()},
         'ContentMD5': base64.b64encode(hashlib.md5(body).digest()).decode(),
     }
@@ -294,12 +321,13 @@ def deploy_app(s3, cf, bucket, distribution, folder):
         _, pointers[key] = read_json_object(s3, bucket, f'releases/{active}/{key}')
     release, versions, files, blobs = prepare_app(folder, pointers)
     inventory = inherited_data_inventory(record, versions)
-    existing = listing(s3, bucket, ['assets/', f'releases/{release}/'])
+    existing = listing(s3, bucket, ['assets/', 'data/profiles/', f'releases/{release}/'])
     with ThreadPoolExecutor(max_workers=12) as executor:
         inventory.update(executor.map(lambda entry: upload_file(s3, bucket, entry, existing), files))
         inventory.update(executor.map(lambda entry: upload_bytes(s3, bucket, entry, existing), blobs))
-    app_inventory = {key: value for key, value in inventory.items() if not key.startswith('data/')}
-    verify_inventory(app_inventory, listing(s3, bucket, ['assets/', f'releases/{release}/']))
+    tree_prefixes = tuple(f'data/{dataset}/' for dataset in DATASETS)
+    app_inventory = {key: value for key, value in inventory.items() if not key.startswith(tree_prefixes)}
+    verify_inventory(app_inventory, listing(s3, bucket, ['assets/', 'data/profiles/', f'releases/{release}/']))
     next_record = {'release': release, 'datasets': versions, 'objects': inventory}
     s3.put_object(Bucket=bucket, Key=f'releases/{release}/release.json',
                   Body=gzip.compress(json.dumps(next_record, sort_keys=True).encode(), mtime=0),

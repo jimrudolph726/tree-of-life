@@ -6,6 +6,7 @@ import { build } from 'vite';
 const port = 4173;
 const outputRoot = resolve('.e2e-dist');
 const avesRoot = resolve('public', 'data', 'aves');
+const profilesRoot = resolve('public', 'data', 'profiles');
 const contentTypes = new Map([
   ['.bin', 'application/octet-stream'], ['.css', 'text/css'], ['.html', 'text/html'],
   ['.js', 'text/javascript'], ['.json', 'application/json'], ['.map', 'application/json'],
@@ -15,8 +16,10 @@ await build({ configFile: 'vite.e2e.config.ts', build: { outDir: outputRoot, emp
 
 createServer((request, response) => {
   const pathname = decodeURIComponent(new URL(request.url ?? '/', `http://${request.headers.host}`).pathname);
-  const root = pathname.startsWith('/data/aves/') ? avesRoot : outputRoot;
-  const relative = pathname.startsWith('/data/aves/') ? pathname.slice('/data/aves/'.length) : pathname.slice(1);
+  const data = pathname.startsWith('/data/aves/') ? { root: avesRoot, prefix: '/data/aves/' }
+    : pathname.startsWith('/data/profiles/') ? { root: profilesRoot, prefix: '/data/profiles/' } : null;
+  const root = data?.root ?? outputRoot;
+  const relative = data ? pathname.slice(data.prefix.length) : pathname.slice(1);
   let file = resolve(root, relative || 'index.html');
   if (file !== root && !file.startsWith(`${root}${sep}`)) {
     response.writeHead(404).end(); return;

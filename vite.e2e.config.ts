@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 
 const publicRoot = resolve('public');
 const avesRoot = resolve(publicRoot, 'data', 'aves');
+const profilesRoot = resolve(publicRoot, 'data', 'profiles');
 
 export default defineConfig({
   publicDir: false,
@@ -14,9 +15,10 @@ export default defineConfig({
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
         const pathname = decodeURIComponent((request.url ?? '').split('?')[0]);
-        if (!pathname.startsWith('/data/aves/')) return next();
+        if (!pathname.startsWith('/data/aves/') && !pathname.startsWith('/data/profiles/')) return next();
         const file = resolve(publicRoot, pathname.slice(1));
-        if (file !== avesRoot && !file.startsWith(`${avesRoot}${sep}`)) {
+        const allowed = [avesRoot, profilesRoot].some(root => file === root || file.startsWith(`${root}${sep}`));
+        if (!allowed) {
           response.statusCode = 404; response.end(); return;
         }
         try {

@@ -3,6 +3,7 @@ import { writeFileSync } from 'node:fs';
 import { TreeStore } from '../src/stream/store.ts';
 import { validateManifest } from '../src/stream/format.ts';
 import { fitBounds, focusBounds, mapInsets } from '../src/tree/navigation.ts';
+import { validateProfileManifest, validateProfileShard } from '../src/profiles/types.ts';
 
 const address = process.argv[2];
 assert.ok(address, 'Usage: node pipeline/cloud-smoke.ts https://distribution.cloudfront.net [report.json]');
@@ -28,6 +29,9 @@ const html = new TextDecoder().decode(await read(''));
 const script = /<script[^>]*src="([^"]+\.js)"/.exec(html)?.[1];
 assert.ok(script, 'Missing built app script');
 await read(script, true);
+const profileManifest = validateProfileManifest(JSON.parse(new TextDecoder().decode(await read('data/profiles/manifest.json'))));
+const profileVersion = JSON.parse(new TextDecoder().decode(await read(`data/profiles/${profileManifest.version}/manifest.json`, true)));
+assert.deepEqual(profileVersion, profileManifest);
 const results = [];
 for (const [dataset, query] of [['life', 'Homo sapiens'], ['aves', 'Camarhynchus psittacula'], ['primates', 'Homo sapiens']]) {
   const manifest = validateManifest(JSON.parse(new TextDecoder().decode(await read(`data/${dataset}/manifest.json`))));
@@ -44,6 +48,13 @@ for (const [dataset, query] of [['life', 'Homo sapiens'], ['aves', 'Camarhynchus
     assert.ok(scene.lines.every(Number.isFinite));
   }
   if (dataset === 'life') {
+    assert.ok(match.ottId);
+    const shard = String(match.ottId % profileManifest.shardCount).padStart(2, '0');
+    const profiles = validateProfileShard(JSON.parse(new TextDecoder().decode(
+      await read(`data/profiles/${profileManifest.version}/shards/${shard}.json`, true))));
+    const profile = profiles.find(item => item.ottId === match.ottId);
+    assert.ok(profile?.wikipedia?.revisionId, 'Homo sapiens profile is missing its attributed description');
+    assert.ok(profile.commonNames.length, 'Homo sapiens profile is missing its common name');
     const overview = JSON.parse(new TextDecoder().decode(await read(`data/life/${manifest.version}/overview.json`, true)));
     for (const name of ['Eukaryota', 'Archaea', 'Bacteria', 'Fungi', 'Opisthokonta']) {
       assert.ok(overview.nodes.some((n: { scientificName: string }) => n.scientificName === name));

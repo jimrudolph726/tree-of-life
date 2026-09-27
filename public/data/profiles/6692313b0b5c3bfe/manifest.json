@@ -1,0 +1,54 @@
+{
+  "compressedPublicationBytes": 228957,
+  "coverage": {
+    "aves": 505,
+    "commonNames": 829,
+    "descriptions": 953,
+    "essential": 95,
+    "primates": 400,
+    "profiles": 1000,
+    "synonyms": 515
+  },
+  "format": 1,
+  "maxCompressedShardBytes": 5419,
+  "openTree": {
+    "synthId": "opentree16.1",
+    "taxonomyVersion": "3.7draft3"
+  },
+  "profileCount": 1000,
+  "retrievedAt": "2026-09-27T14:19:17+00:00",
+  "routing": "ottId modulo shardCount",
+  "shardCount": 64,
+  "shardPattern": "shards/{shard}.json",
+  "sourcePriority": {
+    "commonNames": "GBIF English preferred names, then other GBIF English names, then canonical Wikipedia title",
+    "description": "English Wikipedia introductory extract whose Wikidata item is a taxon or organism group; never generated or treated as taxonomic authority",
+    "identityAndTopology": "Open Tree of Life",
+    "rankAndSynonyms": "GBIF accepted exact match, then OpenTree"
+  },
+  "sourceSnapshotSha256": "35ba417acd04344b9e76848ca59c22926c5a01c3f063d1ab981858f132c5828b",
+  "sources": [
+    {
+      "name": "Open Tree of Life",
+      "role": "taxon identity and topology",
+      "url": "https://tree.opentreeoflife.org/"
+    },
+    {
+      "name": "GBIF Species API",
+      "role": "rank, common names and synonyms",
+      "url": "https://techdocs.gbif.org/en/openapi/v1/species"
+    },
+    {
+      "license": "CC BY-SA 4.0",
+      "name": "English Wikipedia",
+      "role": "attributed introductory descriptions",
+      "url": "https://en.wikipedia.org/"
+    },
+    {
+      "name": "Wikidata",
+      "role": "article-to-taxon validation",
+      "url": "https://www.wikidata.org/"
+    }
+  ],
+  "version": "6692313b0b5c3bfe"
+}

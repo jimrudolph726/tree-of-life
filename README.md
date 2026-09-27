@@ -2,6 +2,8 @@
 
 A React + TypeScript + deck.gl explorer inspired by [Lifemap](https://lifemap.cnrs.fr/). The default is the **complete OpenTree cellular-life synthesis**: **2,725,682 nodes, 2,599,664 named taxa and 2,385,875 tips**, from **opentree16.1**, taxonomy **3.7draft3**. Eukaryota, Archaea and Bacteria open together with visible subclades inviting exploration. Birds (32,055 nodes) and Primates (1,333 nodes) remain available in the dataset selector. Viruses are outside this source release.
 
+One thousand representative taxa also have compact scientific profiles: the opening clades, 400 Primates, 505 birds and 95 other familiar or foundational taxa. These add common names, synonyms, attributed introductory descriptions and canonical source links without increasing the initial tree payload.
+
 ## Run
 
 Use **Node.js 24 LTS** (the data builder and tests use native TypeScript support).
@@ -36,6 +38,10 @@ The Aves checks exhaustively compare every published ID, name, source label, par
 4. **A Web Worker** fetches, decodes, searches and traverses visible clades. An LRU accounting budget bounds retained decoded pages: 64 MiB for the full release, 24 MiB for smaller datasets. Subtree bounds, projected size and a viewport margin prune invisible or subpixel content. Each dynamically assembled scene is capped at 12,000 visits and 4,000 named nodes. Immutable versioned responses can also use the browser HTTP cache.
 5. **React + deck.gl** draws the current scene using `OrthographicView`, transferable binary branch buffers, pickable nodes and a screen-space grid for label collisions. Scene requests are coalesced; camera animation does not rebuild the entire tree.
 
+Scientific profiles form a separate static data product. The public contract is [pipeline/profile-schema.json](pipeline/profile-schema.json). OpenTree supplies taxon identity and topology; exact accepted GBIF matches supply rank, English common names and synonyms; English Wikipedia supplies attributed introductory extracts only after the linked Wikidata item identifies a taxon or organism group. A normalized, date-stamped source snapshot lives in `data/processed/profiles/source-snapshot.json`. The ETL publishes 64 JSON shards by `ottId % 64`, plus a content-addressed manifest under `public/data/profiles/`.
+
+The browser does not request the profile manifest on startup. Selection or intentional hover loads the manifest and one shard, then a 16-shard LRU serves repeat visits. Missing or failed enrichment never blocks topology, navigation or the base detail panel. The publication is under 225 KiB gzip in total; its largest shard is under 6 KiB gzip against a 24 KiB hard limit. Wikipedia text links to the exact revision and is attributed under CC BY-SA 4.0.
+
 Clades with more than 64 immediate children have a paged spatial hierarchy over their child ranges. These index entries are routing data, never biological nodes. They prune offscreen and subpixel child circles without scanning all siblings. A 100,000-child regression verifies that late children are reachable and remain direct siblings. Collapsed broad clades retain a visible enclosing region. View budgets still limit the amount drawn in one frame.
 
 Aves also includes compact ancestry and clade-summary bundles per node page. These carry the real ancestor IDs, metadata, local transforms and named descendant previews, avoiding serial geometry-page downloads to reconstruct deep lineages or populate a panel. All bundles and spatial indexes use the same bounded cache. Format 2 uses 88-byte geometry records; format 1 remains readable for older fixtures.
@@ -66,6 +72,14 @@ npm run data:validate
 npm run data:test
 npm run data:build
 ```
+
+Normal profile builds are deterministic and offline:
+
+```sh
+npm run data:profiles
+```
+
+`npm run data:profiles:refresh` deliberately queries the official GBIF, Wikipedia and Wikidata APIs, records the retrieval time and identifiers in the normalized snapshot, then republishes. `npm run data:profiles:audit` rechecks saved Wikipedia-to-Wikidata mappings. The CI data tests verify count, routing, required taxon coverage, provenance checksums, attribution fields and compressed payload limits.
 
 `data:import` is the only command here requiring OpenTree network access. It checks the synthesis version before and after downloading, checks source tip counts and sample API lineages, and records checksums and supporting studies. The API's documented 25,000-tip ceiling is enforced; larger imports should use release downloads. Raw Aves responses and Newick live in `data/raw/opentree/aves/opentree16.1/`; processed nodes and provenance live in `data/processed/opentree/aves/`. The footer links to the published version/provenance manifest. LF line endings are pinned for checksummed scientific files.
 
@@ -108,4 +122,4 @@ Build and serve `dist/` on a static host. Data requests respect Vite's `base`; c
 
 The complete cellular-life release is available locally, with reproducible build and validation commands; this is not a hosted production deployment. The current full build peaks around 1.5 GiB process RSS, with search partitions sorted on disk. Search uses word-prefix matching, not fuzzy or arbitrary substring matching. Broad child lists use spatial partitions; one scene still has a bounded work budget. The descendants panel caps its initial list at 100 entries. Spatial distance and angular placement are display choices; they do not imply branch lengths or evolutionary time.
 
-Scientific names and topology come from the pinned snapshots. There is no live taxonomy refresh, inferred rank or encyclopedia enrichment. Automated browser checks supplement actual low-memory-phone testing; they do not reproduce every GPU, memory limit or mobile-radio condition. The 64 MiB cache charge is a conservative accounting estimate, not a measured bound on total browser or worker heap.
+Scientific names and topology come from the pinned snapshots. Profile enrichment is also snapshotted rather than queried from a visitor's browser; refreshing it is a deliberate ETL operation. Automated browser checks supplement actual low-memory-phone testing; they do not reproduce every GPU, memory limit or mobile-radio condition. The 64 MiB cache charge is a conservative accounting estimate, not a measured bound on total browser or worker heap.

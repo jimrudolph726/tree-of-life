@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tree-of-life.example/schemas/scientific-profile-v1.json",
+  "title": "Scientific profile shard",
+  "type": "object",
+  "required": ["profiles"],
+  "additionalProperties": false,
+  "properties": {
+    "profiles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/profile" }
+    }
+  },
+  "$defs": {
+    "profile": {
+      "type": "object",
+      "required": ["ottId", "scientificName", "commonNames", "synonyms"],
+      "additionalProperties": false,
+      "properties": {
+        "ottId": { "type": "integer", "minimum": 1 },
+        "scientificName": { "type": "string", "minLength": 1 },
+        "rank": { "type": "string", "minLength": 1 },
+        "commonNames": {
+          "type": "array",
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": ["name", "language", "source"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "language": { "type": "string", "minLength": 1 },
+              "source": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "synonyms": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "gbif": {
+          "type": "object",
+          "required": ["usageKey", "canonicalName", "scientificName", "rank", "status", "confidence"],
+          "additionalProperties": false,
+          "properties": {
+            "usageKey": { "type": "integer", "minimum": 1 },
+            "canonicalName": { "type": "string" },
+            "scientificName": { "type": "string" },
+            "rank": { "type": "string" },
+            "status": { "type": "string" },
+            "confidence": { "type": "integer", "minimum": 0, "maximum": 100 }
+          }
+        },
+        "wikipedia": {
+          "type": "object",
+          "required": ["title", "url", "extract", "revisionId", "wikidataId"],
+          "additionalProperties": false,
+          "properties": {
+            "title": { "type": "string", "minLength": 1 },
+            "url": { "type": "string", "pattern": "^https://en\\.wikipedia\\.org/wiki/" },
+            "extract": { "type": "string", "minLength": 1 },
+            "revisionId": { "type": "integer", "minimum": 1 },
+            "wikidataId": { "type": "string", "pattern": "^Q[0-9]+$" }
+          }
+        }
+      }
+    }
+  }
+}

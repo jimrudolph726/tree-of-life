@@ -24,6 +24,7 @@ class DeploymentTests(unittest.TestCase):
     def fixture(self):
         self.write('index.html', '<script src="/assets/app-123.js"></script>')
         self.write('assets/app-123.js', 'console.log("app")')
+        self.profile_fixture()
         for dataset in cloud.DATASETS:
             value = json.dumps({'version': '0123456789abcdef', 'pageCount': 1})
             self.write(f'data/{dataset}/manifest.json', value)
@@ -33,6 +34,14 @@ class DeploymentTests(unittest.TestCase):
             if dataset == 'life':
                 self.write(f'data/{dataset}/0123456789abcdef/overview.json', '{}')
                 self.write(f'data/{dataset}/0123456789abcdef/search-top.json', '[]')
+
+    def profile_fixture(self):
+        value = json.dumps({'format': 1, 'version': 'fedcba9876543210', 'profileCount': 1000,
+                            'shardCount': 2, 'maxCompressedShardBytes': 100})
+        self.write('data/profiles/manifest.json', value)
+        self.write('data/profiles/fedcba9876543210/manifest.json', value)
+        self.write('data/profiles/fedcba9876543210/shards/00.json', '{"profiles":[]}')
+        self.write('data/profiles/fedcba9876543210/shards/01.json', '{"profiles":[]}')
 
     def test_preflight_excludes_unrelated_files_and_old_versions(self):
         self.fixture()
@@ -56,12 +65,15 @@ class DeploymentTests(unittest.TestCase):
     def test_app_release_reuses_remote_dataset_pointers_without_local_data(self):
         self.write('index.html', '<script src="/assets/app-123.js"></script>')
         self.write('assets/app-123.js', 'console.log("app")')
+        self.profile_fixture()
         pointers = {f'data/{dataset}/manifest.json':
                     json.dumps({'version': '0123456789abcdef', 'pageCount': 1}).encode()
                     for dataset in cloud.DATASETS}
         release, versions, files, blobs = cloud.prepare_app(self.root, pointers)
         self.assertEqual(versions, {dataset: '0123456789abcdef' for dataset in cloud.DATASETS})
         self.assertIn('assets/app-123.js', [key for _, key, _ in files])
+        self.assertIn('data/profiles/fedcba9876543210/shards/00.json',
+                      [key for _, key, _ in files])
         self.assertEqual({key for _, key, _ in blobs},
                          {f'releases/{release}/data/{dataset}/manifest.json' for dataset in cloud.DATASETS})
         pointers['data/life/manifest.json'] = json.dumps(
@@ -90,6 +102,7 @@ class DeploymentTests(unittest.TestCase):
     def test_app_deploy_publishes_small_release_and_keeps_data_inventory(self):
         self.write('index.html', '<script src="/assets/app-123.js"></script>')
         self.write('assets/app-123.js', 'console.log("app")')
+        self.profile_fixture()
         versions = {dataset: '0123456789abcdef' for dataset in cloud.DATASETS}
         data = {f'data/{dataset}/0123456789abcdef/manifest.json': {'etag': dataset, 'size': 1}
                 for dataset in cloud.DATASETS}
@@ -128,6 +141,7 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(headers['ContentType'], 'application/octet-stream')
         self.assertIn('immutable', headers['CacheControl'])
         self.assertEqual(cloud.encode(file, 'releases/id/manifest.json')[1]['CacheControl'], cloud.FRESH)
+        self.assertEqual(cloud.encode(file, 'releases/id/data/profiles/fedcba9876543210/shards/00.json')[1]['CacheControl'], cloud.IMMUTABLE)
         blob, options = cloud.encode_bytes(b'{}', '.json', 'releases/id/data/life/manifest.json')
         self.assertEqual(gzip.decompress(blob), b'{}')
         self.assertEqual(options['CacheControl'], cloud.FRESH)

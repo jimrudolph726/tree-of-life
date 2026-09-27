@@ -11,6 +11,8 @@ import { cacheBudget } from './stream/format';
 import { useScene } from './stream/useScene';
 import { cameraFromView, deckView, reframe } from './stream/reframe';
 import { useBrowserMetrics } from './stream/useBrowserMetrics';
+import { ProfileClient } from './profiles/client';
+import type { ScientificProfile } from './profiles/types';
 import './App.css';
 
 const TRANSITION = new LinearInterpolator(['target', 'zoomX', 'zoomY']);
@@ -20,6 +22,7 @@ type CameraState = Camera & { transitionDuration?: number | 'auto'; transitionIn
 type Visit = { camera: CameraState; anchor: number; details: Details | null; home: boolean };
 type FocusTarget = { details: Details; camera: Camera };
 type PreparedFocus = { target: Promise<FocusTarget>; ready: Promise<FocusTarget & { scene: Scene }> };
+type ProfileState = { ottId: number; status: 'ready' | 'missing' | 'error'; profile?: ScientificProfile; error?: string };
 const getSize = (): Size => ({ width: window.innerWidth, height: window.innerHeight });
 const animate = (camera: Camera): CameraState => ({ ...camera,
   transitionDuration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650, transitionInterpolator: TRANSITION });
@@ -53,7 +56,7 @@ function openingCamera(root: StreamNode, size: Size, manifest: Manifest) {
     : { top: 90, left: 90, right: 90, bottom: 55 });
 }
 
-function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest }) {
+function TreeMap({ client, profileClient, manifest }: { client: TreeClient; profileClient: ProfileClient; manifest: Manifest }) {
   const root = useMemo(() => rootNode(manifest), [manifest]);
   const container = useRef<HTMLElement>(null);
   const atHome = useRef(true);
@@ -69,6 +72,7 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
   const [past, setPast] = useState<Visit[]>([]);
   const [future, setFuture] = useState<Visit[]>([]);
   const selected = pendingNode ?? details?.node ?? null;
+  const [profileState, setProfileState] = useState<ProfileState | null>(null);
   const [query, setQuery] = useState('');
   const [searchState, setSearchState] = useState<{ query: string; results: Summary[] }>({ query: '', results: [] });
   const searching = query.trim() !== searchState.query;
@@ -115,6 +119,17 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
     }, 160);
     return () => { clearTimeout(timer); controller.abort(); };
   }, [client, query, recordSearch]);
+  useEffect(() => {
+    const ottId = selected?.ottId;
+    if (!ottId || manifest.synthetic) return;
+    const controller = new AbortController();
+    void profileClient.profile(ottId, controller.signal).then(profile => {
+      setProfileState(profile ? { ottId, status: 'ready', profile } : { ottId, status: 'missing' });
+    }).catch(error => {
+      if (!controller.signal.aborted) setProfileState({ ottId, status: 'error', error: error.message });
+    });
+    return () => controller.abort();
+  }, [profileClient, selected?.ottId, manifest.synthetic]);
   const prepareFocus = useCallback((node: Summary): PreparedFocus => {
     const key = `${node.index}:${Math.round(size.width)}x${Math.round(size.height)}`;
     const cached = preparedFocus.current.get(key);
@@ -146,13 +161,15 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
     hoverPrefetch.current = { index: node.index, timer: window.setTimeout(() => {
       hoverPrefetch.current = null;
       void client.prefetchDetails(node.index).catch(() => undefined);
+      void profileClient.prefetch(node.ottId).catch(() => undefined);
     }, 180) };
-  }, [client]);
+  }, [client, profileClient]);
   const prefetchNow = useCallback((node: Summary) => {
     if (hoverPrefetch.current) clearTimeout(hoverPrefetch.current.timer);
     hoverPrefetch.current = null;
     void prepareFocus(node).ready.catch(() => undefined);
-  }, [prepareFocus]);
+    void profileClient.prefetch(node.ottId).catch(() => undefined);
+  }, [prepareFocus, profileClient]);
   useEffect(() => {
     const active = searchOpen ? results[activeResult] : undefined;
     if (active) queuePrefetch(active);
@@ -211,6 +228,13 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
   const namedLineage = lineage.filter(node => !node.isSyntheticNode);
   const breadcrumbs = namedLineage.length > 8 ? [namedLineage[0], ...namedLineage.slice(-6)] : namedLineage;
   const descendants = details?.children ?? [];
+  const selectedProfileState = profileState?.ottId === selected?.ottId ? profileState : null;
+  const profile = selectedProfileState?.profile;
+  const profileStatus = selected?.ottId && !manifest.synthetic ? selectedProfileState?.status ?? 'loading' : undefined;
+  const articleName = profile?.wikipedia?.title;
+  const canonicalCommonName = articleName && profile?.commonNames.find(item => item.name.localeCompare(articleName, undefined, { sensitivity: 'base' }) === 0)?.name;
+  const primaryCommonName = canonicalCommonName ?? profile?.commonNames[0]?.name ?? selected?.commonName;
+  const otherCommonNames = profile?.commonNames.filter(item => item.name !== primaryCommonName) ?? [];
   const labelNodes = useMemo(() => visibleLabels(manifest.presentation === 'life' ? namedNodes.filter(n => n.index !== 0) : namedNodes, camera, size, selected?.id), [namedNodes, camera, size, selected, manifest.presentation]);
   const regions = useMemo(() => namedNodes.filter(node => node.region.length > 0 && (node.index !== 0 || node.collapsedCount)).sort((a, b) => a.depth - b.depth), [namedNodes]);
   const lineData = useMemo(() => {
@@ -255,6 +279,7 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
   }, [regions, showRegions, lineData, highlightedLines, lineageIds, namedNodes, selected, labelNodes, camera, size]);
   return (
     <main className="app" ref={container} data-tree-ready={Boolean(scene)} data-pending-taxon={pendingTaxon ?? undefined}
+      data-profile-status={profileStatus}
       data-scene-node-count={scene?.nodes.length ?? 0}
       data-camera-zoom={camera.zoom.toFixed(4)} data-camera-target={camera.target.slice(0, 2).map(value => value.toFixed(3)).join(',')}>
       <DeckGL views={view} viewState={deckView(camera)} layers={layers}
@@ -327,13 +352,29 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
       </footer>
       {selected && <aside className="detail-panel" aria-label="Taxon details">
         <button className="close-button" onClick={() => { focusRequest.current?.abort(); setPendingTaxon(null); setPendingNode(null); setDetails(null); }} aria-label="Close details">×</button>
-        <div className="rank">{selected.rank ?? (selected.isTerminal ? 'Terminal taxon' : 'Clade')}</div>
+        <div className="rank">{profile?.rank ?? selected.rank ?? (selected.isTerminal ? 'Terminal taxon' : 'Clade')}</div>
         <h1>{selected.scientificName}</h1>
-        {selected.commonName && <p className="common-name">{selected.commonName}</p>}
+        {primaryCommonName && <p className="common-name">{primaryCommonName}</p>}
         <div className="taxon-stat"><strong>{selected.leafCount.toLocaleString()}</strong><span>terminal {selected.leafCount === 1 ? 'taxon' : 'taxa'} in this subtree</span></div>
+        {profileStatus === 'loading' &&
+          <section className="profile-loading" aria-label="Loading scientific profile"><span /><span /><span /></section>}
+        {profile?.wikipedia && <section className="profile-about"><h2>About</h2><p>{profile.wikipedia.extract}</p>
+          <a className="profile-attribution" href={`${profile.wikipedia.url}?oldid=${profile.wikipedia.revisionId}`} target="_blank" rel="noreferrer">
+            From Wikipedia · revision {profile.wikipedia.revisionId} · CC BY-SA 4.0 ↗
+          </a></section>}
+        {profile && profile.synonyms.length > 0 && <section><h2>Also known as</h2><div className="profile-tags">
+          {profile.synonyms.map(name => <span key={name}>{name}</span>)}</div></section>}
+        {otherCommonNames.length > 0 && <section><h2>Other common names</h2><div className="profile-tags common-tags">
+          {otherCommonNames.map(item => <span key={`${item.name}:${item.source}`} title={item.source}>{item.name}</span>)}</div></section>}
         <p className="data-note">{manifest.synthetic ? 'Generated data for performance testing. These are not biological taxa.' : 'Relationships follow the OpenTree synthesis. Tips represent terminal taxa, not necessarily species. Distances on this map do not represent evolutionary time.'}</p>
         {manifest.provenance && <p className="data-note">Synthesis {manifest.provenance.synthId} · Taxonomy {manifest.provenance.taxonomyVersion}<br />Retrieved {manifest.provenance.fetchedAt.slice(0, 10)}</p>}
-        {selected.ottId && <a className="source-link" href={`https://tree.opentreeoflife.org/taxonomy/browse?id=${selected.ottId}`} target="_blank" rel="noreferrer">OpenTree · OTT {selected.ottId} ↗</a>}
+        {selectedProfileState?.status === 'error' && <p className="profile-error">Scientific profile unavailable. {selectedProfileState.error}</p>}
+        {selected.ottId && <section className="profile-sources"><h2>Sources</h2><div>
+          <a href={`https://tree.opentreeoflife.org/taxonomy/browse?id=${selected.ottId}`} target="_blank" rel="noreferrer"><span>OpenTree</span><small>OTT {selected.ottId}</small></a>
+          {profile?.gbif && <a href={`https://www.gbif.org/species/${profile.gbif.usageKey}`} target="_blank" rel="noreferrer"><span>GBIF</span><small>Species {profile.gbif.usageKey}</small></a>}
+          {profile?.wikipedia && <a href={profile.wikipedia.url} target="_blank" rel="noreferrer"><span>Wikipedia</span><small>{profile.wikipedia.title}</small></a>}
+          {profile?.wikipedia?.wikidataId && <a href={`https://www.wikidata.org/wiki/${profile.wikipedia.wikidataId}`} target="_blank" rel="noreferrer"><span>Wikidata</span><small>{profile.wikipedia.wikidataId}</small></a>}
+        </div></section>}
         {descendants.length > 0 && <section><h2>Explore this clade</h2><div className="descendant-list">{descendants.map(node =>
           <button key={node.id} onPointerEnter={() => queuePrefetch(node)} onPointerLeave={() => queuePrefetch()}
             onPointerDown={() => prefetchNow(node)} onFocus={() => queuePrefetch(node)} onClick={() => focusNode(node)}>
@@ -365,6 +406,7 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
 }
 
 function App() {
+  const profileClient = useMemo(() => new ProfileClient(new URL(`${import.meta.env.BASE_URL}data/profiles/manifest.json`, window.location.href).href), []);
   const [loaded, setLoaded] = useState<{ client: TreeClient; manifest: Manifest } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -382,6 +424,6 @@ function App() {
   }, [attempt]);
   if (error) return <main className="app loading-message" role="alert"><div><h1>Unable to open the tree</h1><p>{error}</p><button onClick={() => { setError(null); setAttempt(value => value + 1); }}>Try again</button></div></main>;
   if (!loaded) return <main className="app loading-message" role="status"><div className="loading-indicator" /><p>Opening the tree map…</p></main>;
-  return <TreeMap client={loaded.client} manifest={loaded.manifest} />;
+  return <TreeMap client={loaded.client} profileClient={profileClient} manifest={loaded.manifest} />;
 }
 export default App;
