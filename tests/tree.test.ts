@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { layoutTreeV3, parseTreeData } from '../src/tree/layoutTreeV3.ts';
-import { fitBounds, focusBounds, getLineage, labelOffset, labelSize, labelText, mapInsets, project, searchTaxa, visibleLabels } from '../src/tree/navigation.ts';
+import { centeredFocusCamera, fitBounds, focusBounds, getLineage, labelOffset, labelSize, labelText, mapInsets, project, searchTaxa, visibleLabels } from '../src/tree/navigation.ts';
 import type { TreeNodeInput, Position } from '../src/tree/types.ts';
 
 const input = parseTreeData(JSON.parse(readFileSync(new URL('../public/data/primates.nodes.json', import.meta.url), 'utf8')));
@@ -103,6 +103,16 @@ test('every clade fits into the unobscured map area at desktop and mobile sizes'
         assert.ok(x >= insets.left - 0.001 && x <= size.width - insets.right + 0.001, node.id);
         assert.ok(y >= insets.top - 0.001 && y <= size.height - insets.bottom + 0.001, node.id);
       }
+    }
+  }
+});
+
+test('focused taxa are centered on desktop and mobile screens', () => {
+  const targets = ['Homo sapiens', 'Primates', 'Homo'].map(name => searchTaxa(tree.nodes, name)[0]);
+  for (const size of [{ width: 1280, height: 720 }, { width: 390, height: 844 }]) {
+    for (const node of targets) {
+      const point = project(node.position, centeredFocusCamera(node, size), size);
+      assert.deepEqual(point, [size.width / 2, size.height / 2]);
     }
   }
 });

@@ -33,6 +33,7 @@ test('search, deep focus, wheel zoom, pan, and home stay responsive', async ({ p
   const details = page.getByRole('complementary', { name: 'Taxon details' });
   await expect(details.getByRole('heading', { name: taxon })).toBeVisible({ timeout: hosted ? 30_000 : 15_000 });
   await expect(app).not.toHaveAttribute('data-pending-taxon', taxon, { timeout: hosted ? 30_000 : 15_000 });
+  await expect.poll(async () => Number(await app.getAttribute('data-scene-node-count'))).toBeGreaterThan(0);
 
   const beforeZoom = await app.getAttribute('data-camera-zoom');
   const canvas = page.locator('canvas').first();
@@ -78,6 +79,7 @@ test('selection responds before the focused scene finishes loading', async ({ pa
     await expect(page.locator('.stream-notice[role="status"]').filter({ hasText: `Opening ${taxon}` })).toBeVisible();
     release();
     await expect(app).not.toHaveAttribute('data-pending-taxon', taxon, { timeout: hosted ? 30_000 : 15_000 });
+    await expect.poll(async () => Number(await app.getAttribute('data-scene-node-count'))).toBeGreaterThan(0);
     await expect(page.getByRole('alert')).toHaveCount(0);
     expect(browserErrors).toEqual([]);
   } finally { release(); }

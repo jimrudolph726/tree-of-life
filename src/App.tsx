@@ -3,13 +3,13 @@ import { DeckGL } from '@deck.gl/react';
 import { LinearInterpolator, OrthographicView, type TransitionInterpolator } from '@deck.gl/core';
 import { LineLayer, PolygonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
 import type { MapTreeNode } from './tree/layoutTreeV3';
-import { fitBounds, focusBounds, labelOffset, labelSize, labelText, mapInsets, visibleLabels } from './tree/navigation';
+import { centeredFocusCamera, fitBounds, focusBounds, labelOffset, labelSize, labelText, mapInsets, visibleLabels } from './tree/navigation';
 import type { Camera, Size } from './tree/navigation';
 import { TreeClient } from './stream/client';
 import type { Details, Manifest, Scene, StreamNode, Summary } from './stream/format';
 import { cacheBudget } from './stream/format';
 import { useScene } from './stream/useScene';
-import { cameraFromView, deckView } from './stream/reframe';
+import { cameraFromView, deckView, reframe } from './stream/reframe';
 import { useBrowserMetrics } from './stream/useBrowserMetrics';
 import './App.css';
 
@@ -123,9 +123,13 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
       return cached;
     }
     const target = client.prefetchDetails(node.index).then(details => ({ details,
-      camera: fitBounds(focusBounds(details.focus), size, mapInsets(size, true)) }));
-    const ready = target.then(async value => ({ ...value,
-      scene: await client.view({ anchor: value.details.anchor, camera: value.camera, size }) }));
+      camera: centeredFocusCamera(details.focus, size) }));
+    const ready = target.then(async value => {
+      const scene = await client.view({ anchor: value.details.anchor, camera: value.camera, size });
+      const settled = scene.rebase ? reframe(scene, value.camera) : { scene, camera: value.camera };
+      if (!settled.scene.nodes.length) throw new Error('This part of the tree could not be drawn. Please try again.');
+      return { ...value, ...settled };
+    });
     const prepared = { target, ready };
     preparedFocus.current.set(key, prepared);
     while (preparedFocus.current.size > 24) preparedFocus.current.delete(preparedFocus.current.keys().next().value!);
@@ -162,7 +166,7 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
     const prepared = prepareFocus(node);
     if (isPositioned(node)) {
       atHome.current = false;
-      setCamera(animate(fitBounds(focusBounds(node), size, mapInsets(size, true))));
+      setCamera(animate(centeredFocusCamera(node, size)));
     }
     setPendingNode(node); setDetails(null);
     setPendingTaxon(node.scientificName);
@@ -173,8 +177,8 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
       if (controller.signal.aborted) return;
       setPast(history => [...history.slice(-49), previous]); setFuture([]);
       atHome.current = false; setPendingTaxon(null); prime(completed.scene);
-      setDetails(completed.details); setAnchor(completed.details.anchor);
-      setCamera(completed.details.anchor === anchor ? animate(completed.camera) : { ...completed.camera, transitionDuration: 0 });
+      setDetails(completed.details); setAnchor(completed.scene.anchor);
+      setCamera(completed.scene.anchor === anchor ? animate(completed.camera) : { ...completed.camera, transitionDuration: 0 });
       recordFocusReady(node.index);
     }).catch(error => { if (!controller.signal.aborted) {
       atHome.current = previous.home; setNavigationError(error.message); setPendingTaxon(null); setPendingNode(null);
@@ -251,6 +255,7 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
   }, [regions, showRegions, lineData, highlightedLines, lineageIds, namedNodes, selected, labelNodes, camera, size]);
   return (
     <main className="app" ref={container} data-tree-ready={Boolean(scene)} data-pending-taxon={pendingTaxon ?? undefined}
+      data-scene-node-count={scene?.nodes.length ?? 0}
       data-camera-zoom={camera.zoom.toFixed(4)} data-camera-target={camera.target.slice(0, 2).map(value => value.toFixed(3)).join(',')}>
       <DeckGL views={view} viewState={deckView(camera)} layers={layers}
         controller={{ dragPan: true, scrollZoom: { speed: 0.03, smooth: true }, doubleClickZoom: true, touchZoom: true, touchRotate: false, keyboard: true }}

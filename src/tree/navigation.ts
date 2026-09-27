@@ -39,6 +39,11 @@ export function focusBounds(node: MapTreeNode): Bounds {
   return [node.bounds[0] - padding, node.bounds[1] - padding, node.bounds[2] + padding, node.bounds[3] + padding];
 }
 
+export function centeredFocusCamera(node: MapTreeNode, size: Size): Camera {
+  const fitted = fitBounds(focusBounds(node), size, mapInsets(size, true));
+  return { ...fitted, target: [node.position[0], node.position[1], 0] };
+}
+
 export function getLineage(node: MapTreeNode, nodeMap: Map<string, MapTreeNode>): MapTreeNode[] {
   const result: MapTreeNode[] = [];
   let current: MapTreeNode | undefined = node;
