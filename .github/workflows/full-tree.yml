@@ -19,6 +19,9 @@ jobs:
       STAGING_BUCKET: ${{ vars.STAGING_BUCKET }}
       STAGING_DISTRIBUTION: ${{ vars.STAGING_DISTRIBUTION }}
       STAGING_URL: ${{ vars.STAGING_URL }}
+      VITE_RELEASE_ID: ${{ github.sha }}
+      VITE_RUM_APP_MONITOR_ID: ${{ vars.RUM_APP_MONITOR_ID }}
+      VITE_RUM_REGION: us-east-1
     steps:
       - uses: actions/checkout@v4
       # Authenticate before spending time rebuilding the complete publication.

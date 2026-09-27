@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Camera } from '../tree/navigation.ts';
+import { recordRumEvent } from '../monitoring/rum.ts';
 export interface BrowserMetrics {
   firstMapMs: number | null;
   frameP95Ms: number | null;
@@ -28,15 +29,23 @@ export function useBrowserMetrics(enabled: boolean, camera: Camera, setCamera: (
   }, [enabled]);
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
   const onPaint = useCallback((selectedIndex?: number) => {
-    if (!enabled) return;
-    if (!painted.current) { painted.current = true; setMetrics(old => ({ ...old, firstMapMs: performance.now() })); }
+    if (!painted.current) {
+      painted.current = true;
+      const duration = performance.now();
+      recordRumEvent('tree_first_map', { duration });
+      if (enabled) setMetrics(old => ({ ...old, firstMapMs: duration }));
+    }
     if (focus.current && focus.current.index === selectedIndex) {
       const duration = performance.now() - focus.current.started; focus.current = null;
-      setMetrics(old => ({ ...old, selectionPaintMs: duration }));
+      recordRumEvent('tree_selection_paint', { duration });
+      if (enabled) setMetrics(old => ({ ...old, selectionPaintMs: duration }));
     }
   }, [enabled]);
-  const startFocus = useCallback((index: number) => { if (enabled) focus.current = { index, started: performance.now() }; }, [enabled]);
-  const recordSearch = useCallback((duration: number) => { if (enabled) setMetrics(old => ({ ...old, searchMs: duration })); }, [enabled]);
+  const startFocus = useCallback((index: number) => { focus.current = { index, started: performance.now() }; }, []);
+  const recordSearch = useCallback((duration: number) => {
+    recordRumEvent('tree_search', { duration });
+    if (enabled) setMetrics(old => ({ ...old, searchMs: duration }));
+  }, [enabled]);
   const run = () => {
     if (running) return;
     setRunning(true);

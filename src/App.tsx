@@ -178,7 +178,8 @@ function TreeMap({ client, manifest }: { client: TreeClient; manifest: Manifest 
     ];
   }, [regions, showRegions, lineData, highlightedLines, lineageIds, namedNodes, selected, labelNodes, camera, size]);
   return (
-    <main className="app" ref={container}>
+    <main className="app" ref={container} data-tree-ready={Boolean(scene)}
+      data-camera-zoom={camera.zoom.toFixed(4)} data-camera-target={camera.target.slice(0, 2).map(value => value.toFixed(3)).join(',')}>
       <DeckGL views={view} viewState={deckView(camera)} layers={layers}
         controller={{ dragPan: true, scrollZoom: { speed: 0.03, smooth: true }, doubleClickZoom: true, touchZoom: true, touchRotate: false, keyboard: true }}
         onViewStateChange={({ viewState, interactionState }) => {

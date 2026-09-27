@@ -178,6 +178,46 @@ Resources:
       Threshold: 5
       ComparisonOperator: GreaterThanThreshold
       TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
+  AlarmTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: Tree of Life staging alerts
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref AlertEmail
+  RumAppMonitor:
+    Type: AWS::RUM::AppMonitor
+    Properties:
+      Name: !Sub '${AWS::StackName}-web'
+      Domain: !GetAtt Distribution.DomainName
+      Platform: Web
+      AppMonitorConfiguration:
+        AllowCookies: false
+        EnableXRay: false
+        SessionSampleRate: 0.05
+        Telemetries: [errors, performance, http]
+      CustomEvents: {Status: ENABLED}
+      CwLogEnabled: false
+      ResourcePolicy:
+        PolicyDocument: !Sub |
+          {"Version":"2012-10-17","Statement":[{"Sid":"AllowUnsignedBrowserTelemetry","Effect":"Allow","Action":"rum:PutRumEvents","Resource":"arn:${AWS::Partition}:rum:${AWS::Region}:${AWS::AccountId}:appmonitor/${AWS::StackName}-web","Principal":"*"}]}
+  BrowserErrors:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Sampled browser JavaScript errors exceeded 5 events in two consecutive 5-minute periods.
+      Namespace: AWS/RUM
+      MetricName: JsErrorCount
+      Dimensions:
+        - {Name: application_name, Value: !Ref RumAppMonitor}
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 2
+      DatapointsToAlarm: 2
+      Threshold: 5
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
   DeployRole:
     Type: AWS::IAM::Role
     Condition: HasGitHubOidc
@@ -216,3 +256,6 @@ Outputs:
   DeployRoleArn:
     Condition: HasGitHubOidc
     Value: !GetAtt DeployRole.Arn
+  RumAppMonitorId: {Value: !GetAtt RumAppMonitor.Id}
+  RumAppMonitorName: {Value: !Ref RumAppMonitor}
+  AlarmTopicArn: {Value: !Ref AlarmTopic}

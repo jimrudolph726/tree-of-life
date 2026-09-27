@@ -1,0 +1,33 @@
+name: Check production browsers
+on:
+  schedule:
+    - cron: '17 10 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tree-of-life-production-browser
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PLAYWRIGHT_BASE_URL: https://dgilsep5ai167.cloudfront.net
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:browser:all
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: production-browser-failure
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

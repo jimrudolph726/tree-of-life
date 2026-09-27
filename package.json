@@ -19,12 +19,15 @@
     "benchmark:real": "node pipeline/benchmark-real.ts",
     "benchmark:life": "node pipeline/benchmark-life.ts",
     "test": "node --test tests/*.test.ts",
+    "test:browser": "playwright test --project=chromium",
+    "test:browser:all": "playwright test",
     "build": "node pipeline/check-publication.mjs && npm run build:app",
     "build:app": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-rum/web-slim": "^3.2.1",
     "@deck.gl/core": "^9.4.0",
     "@deck.gl/layers": "^9.4.0",
     "@deck.gl/react": "^9.4.0",
@@ -33,6 +36,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
@@ -44,5 +48,8 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.69.0",
     "vite": "^8.3.0"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }
