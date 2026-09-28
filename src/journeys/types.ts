@@ -1,5 +1,14 @@
 export interface JourneySource { label: string; url: string }
 
+export interface JourneyImage {
+  src: string;
+  alt: string;
+  caption: string;
+  credit: string;
+  license: string;
+  sourceUrl: string;
+}
+
 export interface JourneyStep {
   title: string;
   taxon: string;
@@ -11,6 +20,7 @@ export interface JourneyStep {
   summary: string;
   evidence: string;
   uncertainty: string;
+  image: JourneyImage;
   sources: JourneySource[];
 }
 

@@ -1,4 +1,5 @@
 import { birdsFlight } from './birdsFlight.ts';
+import type { JourneyImage as JourneyImageData } from './types.ts';
 
 interface Props {
   view: 'library' | 'playing' | 'complete';
@@ -11,23 +12,32 @@ interface Props {
   onComplete: () => void;
 }
 
+function JourneyImage({ image, priority = false }: { image: JourneyImageData; priority?: boolean }) {
+  return <figure className="journey-image">
+    <div><img src={`${import.meta.env.BASE_URL}${image.src}`} alt={image.alt} loading={priority ? 'eager' : 'lazy'} /></div>
+    <figcaption><span>{image.caption}</span><a href={image.sourceUrl} target="_blank" rel="noreferrer">{image.credit} · {image.license} ↗</a></figcaption>
+  </figure>;
+}
+
 export default function JourneyPanel({ view, step, onBegin, onStep, onPause, onClose, onLibrary, onComplete }: Props) {
   if (view === 'library') return <aside className="journey-panel journey-library" aria-label="Evolutionary journeys">
     <button className="close-button" onClick={onClose} aria-label="Close journeys">×</button>
-    <div className="journey-eyebrow">GUIDED EXPLORATION</div>
-    <h1>Evolutionary journeys</h1>
-    <p className="journey-lede">Follow one branch of evidence at a time. Each stop connects a biological innovation to the tree.</p>
-    <section>
-      <h2>Flight</h2>
-      <article className="journey-card">
-        <div className="journey-card-art" aria-hidden="true"><span>羽</span></div>
-        <div><small>FEATURED JOURNEY</small><h3>{birdsFlight.title}</h3><p>{birdsFlight.subtitle}</p>
-          <div className="journey-meta"><span>{birdsFlight.steps.length} stops</span><span>{birdsFlight.duration}</span></div>
-          <p className="journey-method">{birdsFlight.introduction}</p>
-          <button className="journey-primary" onClick={onBegin}>Begin journey <span>→</span></button></div>
-      </article>
-    </section>
-    <section className="journey-coming"><h2>Coming next</h2><div><span>Vision</span><strong>From light-sensitive cells to vertebrate eyes</strong></div></section>
+    <div className="journey-eyebrow">EVOLUTIONARY JOURNEY</div>
+    <h1 className="journey-subject">Flight</h1>
+    <h2 className="journey-route">{birdsFlight.title}</h2>
+    <p className="journey-lede">{birdsFlight.subtitle}</p>
+    <article className="journey-card">
+      <JourneyImage image={birdsFlight.steps[0].image} priority />
+      <div className="journey-card-body">
+        <div className="journey-meta"><span>{birdsFlight.steps.length} stops</span><span>{birdsFlight.duration}</span></div>
+        <p className="journey-method">{birdsFlight.introduction}</p>
+        <button className="journey-primary" onClick={onBegin}>Begin journey <span>→</span></button>
+      </div>
+    </article>
+    <section className="journey-coming"><h2>More journeys in development</h2><div className="journey-topic-grid">
+      <div><strong>Vision</strong><span>From light-sensitive cells to vertebrate eyes</span></div>
+      <div><strong>Bipedalism</strong><span>How walking on two legs evolved</span></div>
+    </div></section>
   </aside>;
 
   if (view === 'complete') return <aside className="journey-panel journey-complete" aria-label="Journey complete">
@@ -53,6 +63,7 @@ export default function JourneyPanel({ view, step, onBegin, onStep, onPause, onC
     <h1>{current.title}</h1>
     <div className="journey-taxon"><em>{current.taxon}</em><span>{current.kind}</span></div>
     {current.mapTaxon && <p className="journey-map-context">Map context: <em>{current.mapTaxon}</em>, a nearby evidence branch</p>}
+    <JourneyImage image={current.image} priority />
     <p className="journey-summary">{current.summary}</p>
     <details className="journey-evidence"><summary>Evidence and uncertainty</summary><p>{current.evidence}</p><p className="journey-uncertainty">{current.uncertainty}</p>
       <div>{current.sources.map(source => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a>)}</div></details>

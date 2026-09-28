@@ -14,6 +14,11 @@ export const birdsFlight: Journey = {
       summary: 'The small theropod Sinosauropteryx preserves a coat of simple filament-like feathers. They did not form wings, showing that feathers first served roles such as insulation, display, or signaling before they powered flight.',
       evidence: 'Microscopic pigment-bearing structures support the interpretation that its body covering was feather-like and patterned. This places feather functions well outside flight.',
       uncertainty: 'Sinosauropteryx is an evidence-bearing cousin, not a direct ancestor of birds.',
+      image: {
+        src: 'images/journeys/birds-flight/sinosauropteryx.webp', alt: 'Scientific reconstruction of Sinosauropteryx with orange-and-white filamentous plumage',
+        caption: 'A reconstruction based on fossil plumage and preserved pigment patterns.', credit: 'Conty', license: 'CC BY 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Sinosauropteryx_color_pattern_(feathers).JPG',
+      },
       sources: [{ label: 'Zhang et al., Nature (2010)', url: 'https://www.nature.com/articles/nature08740' }],
     },
     {
@@ -22,6 +27,11 @@ export const birdsFlight: Journey = {
       summary: 'Caudipteryx carried large, symmetrical vaned feathers on its arms and tail, yet its proportions were poorly suited to flight. Complex feathers could evolve for display and other functions before becoming aerodynamic structures.',
       evidence: 'Across maniraptoran dinosaurs, pennaceous feathers occur in body regions and forms that do not make a flight surface. Later lineages could recruit this existing structure for aerodynamics.',
       uncertainty: 'The original functions of fossil feathers are inferred from anatomy and distribution; behavior itself is rarely preserved.',
+      image: {
+        src: 'images/journeys/birds-flight/caudipteryx.webp', alt: 'Caudipteryx fossil displayed at the Henan Geological Museum',
+        caption: 'A Caudipteryx fossil preserving the proportions of its arms and feathered tail.', credit: 'Gary Todd', license: 'CC0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Caudipteryx.jpg',
+      },
       sources: [{ label: 'Foth et al., Nature (2014)', url: 'https://www.nature.com/articles/nature13467' }],
     },
     {
@@ -30,6 +40,11 @@ export const birdsFlight: Journey = {
       summary: 'Anchiornis had long feathers on both forelimbs and hindlimbs. Its body plan shows that dinosaurs experimented with broad feathered surfaces before the modern bird wing appeared.',
       evidence: 'Exceptionally preserved fossils reveal feathered arms, legs, a tail fan, and a soft leading-edge structure called a propatagium. Together they changed body shape and airflow.',
       uncertainty: 'Researchers still debate whether Anchiornis could generate useful lift or used its elaborate plumage mainly for non-aerial functions.',
+      image: {
+        src: 'images/journeys/birds-flight/anchiornis.webp', alt: 'Skeletal reconstruction of Anchiornis with fossil soft-tissue details',
+        caption: 'Fossil evidence reconstructs a feathered body with long feathers on all four limbs.', credit: 'Wang et al. and Scott Hartman', license: 'CC BY 4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Anchiornis_huxleyi_skel_hartman_2017.png',
+      },
       sources: [
         { label: 'Wang et al., Nature Communications (2017)', url: 'https://www.nature.com/articles/ncomms14576' },
         { label: 'Kiat et al., Communications Biology (2025)', url: 'https://www.nature.com/articles/s42003-025-09019-2' },
@@ -41,6 +56,11 @@ export const birdsFlight: Journey = {
       summary: 'Microraptor formed lifting surfaces with long feathers on its arms, legs, and tail. It represents one of several aerial experiments close to the origin of birds rather than a required four-winged stage.',
       evidence: 'Wind-tunnel models indicate stable, effective gliding at high lift even without a modern wing. Its tail and hindlimb feathers also helped control descent and landing.',
       uncertainty: 'Its exact launch behavior and amount of powered flapping remain debated; aerodynamic models test plausible poses rather than observed behavior.',
+      image: {
+        src: 'images/journeys/birds-flight/microraptor.webp', alt: 'Life reconstruction of the four-winged dinosaur Microraptor',
+        caption: 'Microraptor carried long flight feathers on its arms, legs, and tail.', credit: 'Entelognathus', license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Microraptor_recon.png',
+      },
       sources: [{ label: 'Dyke et al., Nature Communications (2013)', url: 'https://www.nature.com/articles/ncomms3489' }],
     },
     {
@@ -49,6 +69,11 @@ export const birdsFlight: Journey = {
       summary: 'Archaeopteryx combines toothed jaws, clawed fingers, and a long bony tail with feathered wings. It could actively take to the air, although its flight stroke differed from that of living birds.',
       evidence: 'Wing-bone geometry falls with living birds that use short bursts of flapping flight. This makes powered flight at least Late Jurassic in age.',
       uncertainty: 'Archaeopteryx is not positioned in this OpenTree synthesis, so the map remains on the nearby Anchiornis evidence branch for this stop.',
+      image: {
+        src: 'images/journeys/birds-flight/archaeopteryx.webp', alt: 'Berlin Archaeopteryx fossil showing its skeleton and feather impressions',
+        caption: 'The Berlin specimen preserves a long bony tail, clawed fingers, and feathered wings.', credit: 'Shyamal', license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Berlin_archaeopteryx.jpg',
+      },
       sources: [{ label: 'Voeten et al., Nature Communications (2018)', url: 'https://www.nature.com/articles/s41467-018-03296-8' }],
     },
     {
@@ -57,6 +82,11 @@ export const birdsFlight: Journey = {
       summary: 'Confuciusornis shows a bird body becoming more integrated: a toothless beak, a short fused tail, and a shoulder and forelimb devoted more strongly to flight. Long display feathers remained in some individuals.',
       evidence: 'Tail reduction shifted the center of mass and reduced the muscular tail inherited from non-bird theropods. Preserved soft tissues also reveal a more derived ankle and crouched posture.',
       uncertainty: 'Confuciusornis could fly, but its performance and takeoff style were unlike those of many living birds.',
+      image: {
+        src: 'images/journeys/birds-flight/confuciusornis.webp', alt: 'Confuciusornis fossil with a compact skeleton and long display feathers',
+        caption: 'Confuciusornis combined a short fused tail with long display feathers in some individuals.', credit: 'M.violante', license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Confuciosornis.jpg',
+      },
       sources: [{ label: 'Falk et al., Nature Communications (2017)', url: 'https://www.nature.com/articles/ncomms14779' }],
     },
     {
@@ -65,6 +95,11 @@ export const birdsFlight: Journey = {
       summary: 'Yanornis belonged to a lineage closer to modern birds than many famous early flyers. Its breastbone, shoulder, and flight feathers supported more capable flapping, while its skeleton still retained primitive features.',
       evidence: 'Early ornithuromorph birds document increasingly specialized flight anatomy alongside ecological variety, including perching, wading, swimming, and sustained aerial movement.',
       uncertainty: 'Early-bird relationships continue to change as new fossils and analyses are published; Yanornis is a representative evidence point.',
+      image: {
+        src: 'images/journeys/birds-flight/yanornis.webp', alt: 'Life reconstruction of the early bird Yanornis',
+        caption: 'Yanornis represents an early bird lineage with a more capable flapping apparatus.', credit: 'Entelognathus', license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Yanornis_recon.png',
+      },
       sources: [{ label: 'O’Connor et al., Nature Communications (2022)', url: 'https://www.nature.com/articles/s41467-022-35039-1' }],
     },
     {
@@ -73,6 +108,11 @@ export const birdsFlight: Journey = {
       summary: 'Crown birds are the shared lineage containing every living bird. Their flight system combines an enlarged keeled breastbone, fused hand and tail bones, efficient lungs, rapid growth, and precisely controlled feathers.',
       evidence: 'Fossils and molecular clocks place the origin and early diversification of major living-bird lineages around the end of the Cretaceous, with rapid expansion after the mass extinction.',
       uncertainty: 'The exact timing and branching order of the earliest crown birds remain active research questions.',
+      image: {
+        src: 'images/journeys/birds-flight/aves.webp', alt: 'A gull in flight with both wings fully extended',
+        caption: 'Living birds integrate feathers, skeleton, muscles, and respiration into one flight system.', credit: 'Bengt Nyman', license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Bird_in_flight_wings_spread.jpg',
+      },
       sources: [{ label: 'Field et al., Current Biology (2017)', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5544281/' }],
     },
     {
@@ -81,6 +121,11 @@ export const birdsFlight: Journey = {
       summary: 'The house sparrow inherits the result of this long, branching history: a compact skeleton, asymmetric flight feathers, powerful breast muscles, and continuous fine control of each wingbeat.',
       evidence: 'Every living bird is a theropod dinosaur. Modern flight is a refined combination of traits that appeared at different times and originally served different functions.',
       uncertainty: 'The sparrow is one contemporary example, not an endpoint or “most evolved” bird. Evolution continues across every living lineage.',
+      image: {
+        src: 'images/journeys/birds-flight/house-sparrow.webp', alt: 'A living house sparrow perched against dark green foliage',
+        caption: 'The house sparrow is one living expression of a flight system assembled over millions of years.', credit: 'Jolanta Dyr', license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Passer_domesticus_-_male.jpg',
+      },
       sources: [{ label: 'Kiat & O’Connor, Communications Biology (2023)', url: 'https://www.nature.com/articles/s42003-023-05048-x' }],
     },
   ],

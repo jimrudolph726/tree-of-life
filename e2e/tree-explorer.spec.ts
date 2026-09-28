@@ -126,7 +126,15 @@ test('bird-flight journey navigates real OpenTree evidence and can be paused', a
   await page.goto('/?dataset=life', { waitUntil: 'domcontentloaded' });
   const app = page.locator('main.app');
   await expect(app).toHaveAttribute('data-tree-ready', 'true', { timeout: 20_000 });
-  await page.getByRole('button', { name: /Journeys/ }).click();
+  const header = page.locator('header.top-bar');
+  await expect(header.getByText('Tree of Life', { exact: true })).toBeVisible();
+  await expect(header.getByRole('combobox', { name: 'Search taxa' })).toBeVisible();
+  await expect(page.locator('.explore-hint')).toHaveCount(0);
+  await header.getByRole('button', { name: 'Explore' }).click();
+  await expect(header.getByRole('menuitemradio', { name: 'All life' })).toHaveAttribute('aria-checked', 'true');
+  await header.getByRole('button', { name: 'Explore' }).press('Escape');
+  await header.getByRole('button', { name: /Journeys/ }).click();
+  await header.getByRole('menuitem', { name: /From Feathered Dinosaurs to Modern Birds/ }).click();
   const library = page.getByLabel('Evolutionary journeys');
   await expect(library.getByRole('heading', { name: 'Evolutionary journeys' })).toBeVisible();
   await library.getByRole('button', { name: /Begin journey/ }).click();

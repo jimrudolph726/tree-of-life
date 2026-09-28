@@ -103,6 +103,8 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
   const [navigationError, setNavigationError] = useState<string | null>(null);
   const [showRegions, setShowRegions] = useState(true);
   const [journeyState, setJourneyState] = useState<JourneyState>(initialJourneyState);
+  const [datasetMenuOpen, setDatasetMenuOpen] = useState(false);
+  const [journeyMenuOpen, setJourneyMenuOpen] = useState(false);
   const initialJourneyLoaded = useRef(false);
   const homeCamera = useMemo(() => openingCamera(root, size, manifest), [root, size, manifest]);
   const { scene, error: streamError, prime } = useScene(client, anchor, camera, size, (nextAnchor, nextCamera) => {
@@ -356,6 +358,7 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
         updateTriggers: { getColor: [selected?.id], getText: [size.width], getPixelOffset: [camera, size] } }),
     ];
   }, [regions, showRegions, lineData, highlightedLines, lineageIds, namedNodes, selected, labelNodes, camera, size]);
+  const activeDataset = manifest.presentation === 'life' ? 'life' : manifest.root.ottId === 81461 ? 'aves' : 'primates';
   return (
     <main className="app" ref={container} data-tree-ready={Boolean(scene)} data-pending-taxon={pendingTaxon ?? undefined}
       data-profile-status={profileStatus}
@@ -384,9 +387,7 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
         onAfterRender={() => { if (scene) telemetry.onPaint(scene.nodes.some(n => n.index === selected?.index) ? selected?.index : undefined); }}
       />
       <header className="top-bar">
-        <div className="brand"><span className="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M16 27V17M16 17L7 10V5M16 17L25 10V5M16 17V6M7 10L3 7M25 10L29 7" /><circle cx="16" cy="5" r="2" /></svg></span><div>Tree of Life{manifest.synthetic ? <span className="brand-subtitle">GENERATED SCALE TEST</span> : <select className="brand-subtitle dataset-select" aria-label="Tree dataset" value={manifest.presentation === 'life' ? 'life' : manifest.root.ottId === 81461 ? 'aves' : 'primates'} onChange={event => {
-          const url = new URL(window.location.href); url.searchParams.set('dataset', event.target.value); window.location.assign(url);
-        }}><option value="life">ALL LIFE</option><option value="aves">BIRDS · AVES</option><option value="primates">PRIMATES</option></select>}</div></div>
+        <div className="brand"><span className="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M16 27V17M16 17L7 10V5M16 17L25 10V5M16 17V6M7 10L3 7M25 10L29 7" /><circle cx="16" cy="5" r="2" /></svg></span><div>Tree of Life{manifest.synthetic && <span className="brand-subtitle">GENERATED SCALE TEST</span>}</div></div>
         <div className="search-box" onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setSearchOpen(false); }}>
           <span className="search-icon" aria-hidden="true">⌕</span>
           <input aria-label="Search taxa" placeholder="Search a taxon or OpenTree ID…" value={query}
@@ -414,9 +415,35 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
             </button>) : <p role="status">{searching ? 'Searching…' : 'No matching taxa in this dataset.'}</p>}
           </div>}
         </div>
-        {manifest.presentation === 'life' && <button className="journey-header-button" onClick={() => {
-          setJourneyState({ view: 'library', step: journeyState.step }); updateJourneyUrl('library', journeyState.step);
-        }}><span aria-hidden="true">✦</span> Journeys</button>}
+        {!manifest.synthetic && <div className="header-menu dataset-menu" onBlur={event => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setDatasetMenuOpen(false);
+        }} onKeyDown={event => { if (event.key === 'Escape') setDatasetMenuOpen(false); }}>
+          <button className="header-menu-trigger" aria-haspopup="menu" aria-expanded={datasetMenuOpen} onClick={() => {
+            setJourneyMenuOpen(false); setDatasetMenuOpen(open => !open);
+          }}>Explore <b aria-hidden="true">⌄</b></button>
+          {datasetMenuOpen && <div className="header-menu-popover dataset-menu-popover" role="menu" aria-label="Tree datasets">
+            <span>Choose a tree</span>
+            {[['life', 'All life'], ['aves', 'Birds · Aves'], ['primates', 'Primates']].map(([id, label]) =>
+              <button key={id} role="menuitemradio" aria-checked={activeDataset === id} onClick={() => {
+                setDatasetMenuOpen(false);
+                if (activeDataset === id) return;
+                const url = new URL(window.location.href); url.searchParams.set('dataset', id); window.location.assign(url);
+              }}><strong>{label}</strong><i aria-hidden="true">{activeDataset === id ? '✓' : ''}</i></button>)}
+          </div>}
+        </div>}
+        {manifest.presentation === 'life' && <div className="header-menu" onBlur={event => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setJourneyMenuOpen(false);
+        }} onKeyDown={event => { if (event.key === 'Escape') setJourneyMenuOpen(false); }}>
+          <button className="header-menu-trigger" aria-haspopup="menu" aria-expanded={journeyMenuOpen} onClick={() => {
+            setDatasetMenuOpen(false); setJourneyMenuOpen(open => !open);
+          }}>Journeys <b aria-hidden="true">⌄</b></button>
+          {journeyMenuOpen && <div className="header-menu-popover" role="menu" aria-label="Guided journeys">
+            <span>Guided journey</span>
+            <button className="journey-menu-item" role="menuitem" onClick={() => {
+              setJourneyMenuOpen(false); setJourneyState({ view: 'library', step: journeyState.step }); updateJourneyUrl('library', journeyState.step);
+            }}><strong>From Feathered Dinosaurs to Modern Birds</strong><small>Follow nine milestones in the evolution of flight</small></button>
+          </div>}
+        </div>}
       </header>
       <nav className="map-controls" aria-label="Map controls">
         <button onClick={() => revisit('back')} disabled={!past.length} aria-label="Back to previous view" title="Back">←</button>
@@ -474,8 +501,6 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
       {!scene && <div className="stream-notice" role="status">Loading this part of the tree…</div>}
       {scene?.stats.limited && <div className="stream-notice" role="status">Showing an overview. Zoom in for more detail.</div>}
       {details?.childrenTruncated && selected && <div className="children-note">Showing {descendants.length} named descendants. Search to find more.</div>}
-      {manifest.presentation === 'life' && !selected && anchor === 0 && camera.zoom <= homeCamera.zoom + 0.15 && journeyState.view === 'closed' && <div className="explore-hint"><span>Explore a branch.</span><p>Choose a group or zoom in to explore.</p>
-        <button onClick={() => { setJourneyState({ view: 'library', step: journeyState.step }); updateJourneyUrl('library', journeyState.step); }}><i aria-hidden="true">✦</i><strong>Take a guided journey</strong><small>From feathered dinosaurs to modern birds</small></button></div>}
       {journeyState.view === 'paused' && <button className="journey-resume" onClick={() => goJourneyStep(journeyState.step)}>
         <span aria-hidden="true">✦</span><span><small>Journey paused</small>Resume: From Feathered Dinosaurs to Modern Birds</span><b>→</b></button>}
       {['library', 'playing', 'complete'].includes(journeyState.view) && <Suspense fallback={<aside className="journey-panel journey-loading" aria-label="Loading journey"><div className="loading-indicator" /></aside>}>

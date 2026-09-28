@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { test } from 'node:test';
 import { birdsFlight } from '../src/journeys/birdsFlight.ts';
 import { searchProfiles } from '../src/profiles/search.ts';
@@ -30,6 +32,10 @@ test('bird-flight pilot is a complete, sourced journey through validated OpenTre
     assert.ok(step.summary.length > 80, step.title);
     assert.ok(step.evidence.length > 60, step.title);
     assert.ok(step.uncertainty.length > 40, step.title);
+    assert.ok(existsSync(join(process.cwd(), 'public', step.image.src)), `${step.title} image is published`);
+    assert.ok(step.image.alt.length > 30 && step.image.caption.length > 40, `${step.title} image is described`);
+    assert.match(step.image.sourceUrl, /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
+    assert.match(step.image.license, /^(CC0|CC BY)/);
     assert.ok(step.sources.length > 0 && step.sources.every(source => source.url.startsWith('https://')));
   }
 });
