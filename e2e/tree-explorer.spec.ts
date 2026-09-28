@@ -136,13 +136,17 @@ test('bird-flight journey navigates real OpenTree evidence and can be paused', a
   await header.getByRole('button', { name: /Journeys/ }).click();
   await header.getByRole('menuitem', { name: /From Feathered Dinosaurs to Modern Birds/ }).click();
   const library = page.getByLabel('Evolutionary journeys');
-  await expect(library.getByRole('heading', { name: 'Evolutionary journeys' })).toBeVisible();
+  await expect(library.getByRole('heading', { name: 'Flight' })).toBeVisible();
+  await expect(library.getByRole('heading', { name: 'From Feathered Dinosaurs to Modern Birds' })).toBeVisible();
+  await expect(library.getByRole('img', { name: /Sinosauropteryx/ })).toBeVisible();
   await library.getByRole('button', { name: /Begin journey/ }).click();
   const player = page.getByLabel('Evolutionary journey');
   await expect(player.getByRole('heading', { name: 'Feathers before flight' })).toBeVisible();
+  await expect(player.getByRole('img', { name: /Sinosauropteryx/ })).toBeVisible();
   await expect(app).not.toHaveAttribute('data-pending-taxon', 'Sinosauropteryx', { timeout: 20_000 });
   await player.getByRole('button', { name: /Next: Vaned feathers become versatile/ }).click();
   await expect(player.getByRole('heading', { name: 'Vaned feathers become versatile' })).toBeVisible();
+  await expect(player.getByRole('img', { name: /Caudipteryx/ })).toBeVisible();
   await expect(page).toHaveURL(/journey=birds-flight.*step=1/);
   await player.getByRole('button', { name: 'Explore from here' }).click();
   await expect(page.getByRole('button', { name: /Resume: From Feathered Dinosaurs/ })).toBeVisible();
