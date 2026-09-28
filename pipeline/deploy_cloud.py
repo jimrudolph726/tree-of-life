@@ -75,7 +75,10 @@ def app_sources(folder):
     published = json.loads((profile_folder / 'manifest.json').read_text(encoding='utf-8'))
     if published != profile_manifest:
         raise ValueError('Scientific-profile pointer does not match version manifest')
-    profile_files = [profile_folder / 'manifest.json']
+    search_file = profile_manifest.get('searchFile')
+    if search_file != 'search.json' or profile_manifest.get('compressedSearchBytes', 10**9) > 64 * 1024:
+        raise ValueError('Invalid scientific-profile search publication')
+    profile_files = [profile_folder / 'manifest.json', profile_folder / search_file]
     for shard in range(shard_count):
         path = profile_folder / 'shards' / f'{shard:02d}.json'
         if not path.is_file():

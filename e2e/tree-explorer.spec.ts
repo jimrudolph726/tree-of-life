@@ -107,3 +107,35 @@ test('scientific profiles stay off the initial path and load after selection', a
   expect(profileRequests.filter(url => /\/data\/profiles\/[a-f0-9]{16}\/shards\/\d{2}\.json$/.test(url))).toHaveLength(1);
   expect(browserErrors).toEqual([]);
 });
+
+test('common names discover the corresponding scientific taxon', async ({ page }) => {
+  test.skip(hosted, 'This assertion targets the checked-in profile publication.');
+  const { browserErrors } = await openTree(page);
+  const search = page.getByRole('combobox', { name: 'Search taxa' });
+  await search.fill('red junglefowl');
+  const result = page.getByRole('option').filter({ hasText: 'Gallus gallus' });
+  await expect(result).toContainText('Matched common name: Red Junglefowl');
+  await search.press('Enter');
+  await expect(page.getByRole('complementary', { name: 'Taxon details' })
+    .getByRole('heading', { name: 'Gallus gallus' })).toBeVisible();
+  expect(browserErrors).toEqual([]);
+});
+
+test('bird-flight journey navigates real OpenTree evidence and can be paused', async ({ page, browserName }) => {
+  test.skip(hosted || browserName !== 'chromium', 'The full pilot runs once against the checked-in life publication.');
+  await page.goto('/?dataset=life', { waitUntil: 'domcontentloaded' });
+  const app = page.locator('main.app');
+  await expect(app).toHaveAttribute('data-tree-ready', 'true', { timeout: 20_000 });
+  await page.getByRole('button', { name: /Journeys/ }).click();
+  const library = page.getByLabel('Evolutionary journeys');
+  await expect(library.getByRole('heading', { name: 'Evolutionary journeys' })).toBeVisible();
+  await library.getByRole('button', { name: /Begin journey/ }).click();
+  const player = page.getByLabel('Evolutionary journey');
+  await expect(player.getByRole('heading', { name: 'Feathers before flight' })).toBeVisible();
+  await expect(app).not.toHaveAttribute('data-pending-taxon', 'Sinosauropteryx', { timeout: 20_000 });
+  await player.getByRole('button', { name: /Next: Vaned feathers become versatile/ }).click();
+  await expect(player.getByRole('heading', { name: 'Vaned feathers become versatile' })).toBeVisible();
+  await expect(page).toHaveURL(/journey=birds-flight.*step=1/);
+  await player.getByRole('button', { name: 'Explore from here' }).click();
+  await expect(page.getByRole('button', { name: /Resume: From Feathered Dinosaurs/ })).toBeVisible();
+});

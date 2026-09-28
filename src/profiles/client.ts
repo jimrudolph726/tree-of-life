@@ -1,4 +1,6 @@
-import { validateProfileManifest, validateProfileShard, type ProfileManifest, type ScientificProfile } from './types.ts';
+import { validateProfileManifest, validateProfileSearch, validateProfileShard, type ProfileManifest,
+  type ProfileSearchHit, type ProfileSearchRecord, type ScientificProfile } from './types.ts';
+import { searchProfiles } from './search.ts';
 
 const MAX_CACHED_SHARDS = 16;
 
@@ -7,6 +9,7 @@ export class ProfileClient {
   private manifest?: Promise<ProfileManifest>;
   private shards = new Map<number, Map<number, ScientificProfile>>();
   private requests = new Map<number, Promise<Map<number, ScientificProfile>>>();
+  private searchIndex?: Promise<ProfileSearchRecord[]>;
 
   constructor(manifestUrl: string) { this.manifestUrl = manifestUrl; }
 
@@ -56,6 +59,19 @@ export class ProfileClient {
 
   prefetch(ottId?: number | null) {
     return ottId ? this.profile(ottId).then(() => undefined) : Promise.resolve();
+  }
+
+  async search(query: string, signal?: AbortSignal): Promise<ProfileSearchHit[]> {
+    if (!query.trim()) return [];
+    const manifest = await this.withSignal(this.getManifest(), signal);
+    if (!this.searchIndex) {
+      this.searchIndex = fetch(new URL(`${manifest.version}/${manifest.searchFile}`, this.manifestUrl).href,
+        { cache: 'force-cache' }).then(async response => {
+          if (!response.ok) throw new Error(`Scientific search could not be loaded (${response.status}).`);
+          return validateProfileSearch(await response.json());
+        }).catch(error => { this.searchIndex = undefined; throw error; });
+    }
+    return searchProfiles(await this.withSignal(this.searchIndex, signal), query);
   }
 
   private withSignal<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {

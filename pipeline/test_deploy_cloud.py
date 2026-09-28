@@ -37,11 +37,13 @@ class DeploymentTests(unittest.TestCase):
 
     def profile_fixture(self):
         value = json.dumps({'format': 1, 'version': 'fedcba9876543210', 'profileCount': 1000,
-                            'shardCount': 2, 'maxCompressedShardBytes': 100})
+                            'shardCount': 2, 'maxCompressedShardBytes': 100,
+                            'searchFile': 'search.json', 'compressedSearchBytes': 100})
         self.write('data/profiles/manifest.json', value)
         self.write('data/profiles/fedcba9876543210/manifest.json', value)
         self.write('data/profiles/fedcba9876543210/shards/00.json', '{"profiles":[]}')
         self.write('data/profiles/fedcba9876543210/shards/01.json', '{"profiles":[]}')
+        self.write('data/profiles/fedcba9876543210/search.json', '{"profiles":[]}')
 
     def test_preflight_excludes_unrelated_files_and_old_versions(self):
         self.fixture()

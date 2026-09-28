@@ -14,6 +14,12 @@ test('scientific profiles are complete, correctly routed, and within the payload
   assert.equal(manifest.profileCount, 1000);
   assert.equal(manifest.shardCount, 64);
   assert.ok(manifest.maxCompressedShardBytes <= 24 * 1024);
+  assert.equal(manifest.searchFile, 'search.json');
+  assert.ok(manifest.compressedSearchBytes <= 64 * 1024);
+  const searchRaw = readFileSync(join(root, manifest.version, manifest.searchFile));
+  assert.ok(gzipSync(searchRaw, { level: 9 }).byteLength <= manifest.compressedSearchBytes);
+  const search = JSON.parse(searchRaw.toString('utf8'));
+  assert.equal(search.profiles.length, manifest.profileCount);
 
   const profiles: Record<string, unknown>[] = [];
   let compressedTotal = 0;

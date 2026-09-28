@@ -29,6 +29,7 @@ OUTPUT = ROOT / 'public/data/profiles'
 COUNT = 1000
 SHARDS = 64
 MAX_GZIP_SHARD_BYTES = 24 * 1024
+MAX_GZIP_SEARCH_BYTES = 64 * 1024
 USER_AGENT = 'TreeOfLifeExplorer/0.1 scientific-profile-etl'
 
 SOURCE_PRIORITY = {
@@ -386,6 +387,12 @@ def public_profile(profile):
     return value
 
 
+def search_profile(profile):
+    """Compact, lazy-loaded discovery metadata; descriptions remain in routed shards."""
+    return [profile['ottId'], profile['scientificName'], profile.get('rank'),
+            [item['name'] for item in profile.get('commonNames', [])], profile.get('synonyms', [])]
+
+
 def publish(snapshot):
     profiles = snapshot.get('profiles', [])
     if len(profiles) != COUNT or len({item['ottId'] for item in profiles}) != COUNT:
@@ -402,9 +409,14 @@ def publish(snapshot):
     for profile, public in zip(profiles, public_profiles):
         buckets[profile['ottId'] % SHARDS].append(public)
     shard_text = [compact_json({'profiles': bucket}) + '\n' for bucket in buckets]
+    search_text = compact_json({'profiles': [search_profile(profile) for profile in public_profiles]}) + '\n'
+    search_compressed = len(gzip.compress(search_text.encode(), compresslevel=9, mtime=0))
+    if search_compressed > MAX_GZIP_SEARCH_BYTES:
+        raise ValueError(f'Compressed profile search index exceeds {MAX_GZIP_SEARCH_BYTES} bytes')
     hash_value = hashlib.sha256()
     for index, text in enumerate(shard_text):
         hash_value.update(f'{index:02d}.json'.encode()); hash_value.update(text.encode())
+    hash_value.update(b'search.json'); hash_value.update(search_text.encode())
     hash_value.update(sha256(SNAPSHOT).encode())
     version = hash_value.hexdigest()[:16]
     coverage = {
@@ -423,6 +435,7 @@ def publish(snapshot):
         'format': 1, 'version': version, 'profileCount': COUNT, 'shardCount': SHARDS,
         'shardPattern': 'shards/{shard}.json', 'routing': 'ottId modulo shardCount',
         'maxCompressedShardBytes': max(compressed), 'compressedPublicationBytes': sum(compressed),
+        'searchFile': 'search.json', 'compressedSearchBytes': search_compressed,
         'retrievedAt': snapshot['retrievedAt'], 'openTree': snapshot['openTree'],
         'sourcePriority': snapshot['sourcePriority'], 'coverage': coverage,
         'sources': [
@@ -442,6 +455,7 @@ def publish(snapshot):
         folder = stage / version / 'shards'; folder.mkdir(parents=True)
         for index, text in enumerate(shard_text):
             (folder / f'{index:02d}.json').write_text(text, encoding='utf-8', newline='\n')
+        (stage / version / 'search.json').write_text(search_text, encoding='utf-8', newline='\n')
         manifest_text = compact_json(manifest, pretty=True) + '\n'
         (stage / version / 'manifest.json').write_text(manifest_text, encoding='utf-8', newline='\n')
         destination = OUTPUT / version
@@ -459,7 +473,8 @@ def publish(snapshot):
         shutil.rmtree(stage)
     print(compact_json({'version': version, **coverage,
                         'maxCompressedShardBytes': max(compressed),
-                        'compressedPublicationBytes': sum(compressed)}, pretty=True))
+                        'compressedPublicationBytes': sum(compressed),
+                        'compressedSearchBytes': search_compressed}, pretty=True))
     return manifest
 
 

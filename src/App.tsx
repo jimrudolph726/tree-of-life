@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeckGL } from '@deck.gl/react';
 import { LinearInterpolator, OrthographicView, type TransitionInterpolator } from '@deck.gl/core';
 import { LineLayer, PolygonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
@@ -13,7 +13,10 @@ import { cameraFromView, deckView, reframe } from './stream/reframe';
 import { useBrowserMetrics } from './stream/useBrowserMetrics';
 import { ProfileClient } from './profiles/client';
 import type { ScientificProfile } from './profiles/types';
+import type { ProfileSearchHit } from './profiles/types';
 import './App.css';
+
+const JourneyPanel = lazy(() => import('./journeys/JourneyPanel.tsx'));
 
 const TRANSITION = new LinearInterpolator(['target', 'zoomX', 'zoomY']);
 const PALETTE: [number, number, number, number][] = [[84, 143, 121, 24], [87, 125, 162, 24], [185, 141, 82, 24], [140, 117, 163, 24]];
@@ -23,11 +26,28 @@ type Visit = { camera: CameraState; anchor: number; details: Details | null; hom
 type FocusTarget = { details: Details; camera: Camera };
 type PreparedFocus = { target: Promise<FocusTarget>; ready: Promise<FocusTarget & { scene: Scene }> };
 type ProfileState = { ottId: number; status: 'ready' | 'missing' | 'error'; profile?: ScientificProfile; error?: string };
+type SearchResult = { node: Summary; commonName?: string; rank?: string; matchedName?: string;
+  matchKind?: ProfileSearchHit['matchKind'] | 'OpenTree ID' };
+type JourneyState = { view: 'closed' | 'library' | 'playing' | 'paused' | 'complete'; step: number };
 const getSize = (): Size => ({ width: window.innerWidth, height: window.innerHeight });
 const animate = (camera: Camera): CameraState => ({ ...camera,
   transitionDuration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650, transitionInterpolator: TRANSITION });
 const EMPTY_NODES: StreamNode[] = [];
 const benchmarkMode = new URLSearchParams(window.location.search).has('bench');
+
+function initialJourneyState(): JourneyState {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('journey') !== 'birds-flight') return { view: 'closed', step: 0 };
+  const step = Math.max(0, Math.min(8, Number(params.get('step')) || 0));
+  return { view: 'playing', step };
+}
+
+function updateJourneyUrl(view: JourneyState['view'], step: number) {
+  const url = new URL(window.location.href);
+  if (view === 'closed' || view === 'library') { url.searchParams.delete('journey'); url.searchParams.delete('step'); }
+  else { url.searchParams.set('journey', 'birds-flight'); url.searchParams.set('step', String(step)); }
+  window.history.replaceState(null, '', url);
+}
 
 function waitForSignal<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
   signal.throwIfAborted();
@@ -74,7 +94,7 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
   const selected = pendingNode ?? details?.node ?? null;
   const [profileState, setProfileState] = useState<ProfileState | null>(null);
   const [query, setQuery] = useState('');
-  const [searchState, setSearchState] = useState<{ query: string; results: Summary[] }>({ query: '', results: [] });
+  const [searchState, setSearchState] = useState<{ query: string; results: SearchResult[] }>({ query: '', results: [] });
   const searching = query.trim() !== searchState.query;
   const results = useMemo(() => searching ? [] : searchState.results, [searching, searchState.results]);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -82,6 +102,8 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
   const [renderError, setRenderError] = useState<string | null>(null);
   const [navigationError, setNavigationError] = useState<string | null>(null);
   const [showRegions, setShowRegions] = useState(true);
+  const [journeyState, setJourneyState] = useState<JourneyState>(initialJourneyState);
+  const initialJourneyLoaded = useRef(false);
   const homeCamera = useMemo(() => openingCamera(root, size, manifest), [root, size, manifest]);
   const { scene, error: streamError, prime } = useScene(client, anchor, camera, size, (nextAnchor, nextCamera) => {
     setAnchor(nextAnchor); setCamera({ ...nextCamera, transitionDuration: 0 });
@@ -111,14 +133,41 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
     const controller = new AbortController();
     const started = performance.now();
     const timer = setTimeout(() => {
-      void client.search(query, controller.signal).then(results => {
-        setSearchState({ query: query.trim(), results });
+      const directRequest = client.search(query, controller.signal);
+      void directRequest.then(direct => {
+        setSearchState({ query: query.trim(), results: direct.map(node => ({ node,
+          matchKind: /^(?:ott)?\d+$/i.test(query.trim()) ? 'OpenTree ID' : undefined })) });
         if (query.trim()) recordSearch(performance.now() - started);
-      })
-        .catch(error => { if (!controller.signal.aborted) setNavigationError(error.message); });
+      }).catch(error => { if (!controller.signal.aborted) setNavigationError(error.message); });
+      const profileRequest = profileClient.search(query, controller.signal).catch(error => {
+        if (controller.signal.aborted) throw error;
+        return [] as ProfileSearchHit[];
+      });
+      void Promise.all([directRequest, profileRequest]).then(async ([direct, profileHits]) => {
+        controller.signal.throwIfAborted();
+        const profileByOtt = new Map(profileHits.map(hit => [hit.ottId, hit]));
+        const combined = new Map<number, SearchResult>();
+        for (const node of direct) {
+          const hit = node.ottId ? profileByOtt.get(node.ottId) : undefined;
+          combined.set(node.index, { node, commonName: hit?.commonName, rank: hit?.rank,
+            matchedName: hit?.matchedName, matchKind: hit?.matchKind ?? (/^(?:ott)?\d+$/i.test(query.trim()) ? 'OpenTree ID' : undefined) });
+        }
+        const missing = profileHits.filter(hit => ![...combined.values()].some(result => result.node.ottId === hit.ottId)).slice(0, 8);
+        const resolved = await Promise.all(missing.map(async hit => {
+          const nodes = await client.search(`ott${hit.ottId}`, controller.signal);
+          const node = nodes.find(item => item.ottId === hit.ottId);
+          return node ? { node, commonName: hit.commonName, rank: hit.rank, matchedName: hit.matchedName, matchKind: hit.matchKind } satisfies SearchResult : null;
+        }));
+        for (const result of resolved) if (result && !combined.has(result.node.index)) combined.set(result.node.index, result);
+        const results = [...combined.values()].sort((a, b) => {
+          const aHit = profileByOtt.get(a.node.ottId ?? -1), bHit = profileByOtt.get(b.node.ottId ?? -1);
+          return Number(!aHit) - Number(!bHit) || a.node.scientificName.localeCompare(b.node.scientificName);
+        }).slice(0, 12);
+        setSearchState({ query: query.trim(), results });
+      }).catch(error => { if (!controller.signal.aborted) setNavigationError(error.message); });
     }, 160);
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [client, query, recordSearch]);
+  }, [client, profileClient, query, recordSearch]);
   useEffect(() => {
     const ottId = selected?.ottId;
     if (!ottId || manifest.synthetic) return;
@@ -171,11 +220,12 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
     void profileClient.prefetch(node.ottId).catch(() => undefined);
   }, [prepareFocus, profileClient]);
   useEffect(() => {
-    const active = searchOpen ? results[activeResult] : undefined;
+    const active = searchOpen ? results[activeResult]?.node : undefined;
     if (active) queuePrefetch(active);
     return () => queuePrefetch();
   }, [searchOpen, results, activeResult, queuePrefetch]);
-  const focusNode = useCallback((node: Summary) => {
+  const focusNode = useCallback((node: Summary, preserveJourney = false) => {
+    if (!preserveJourney && journeyState.view === 'playing') setJourneyState(current => ({ ...current, view: 'paused' }));
     startFocus(node.index);
     focusRequest.current?.abort();
     const controller = new AbortController(); focusRequest.current = controller;
@@ -201,8 +251,37 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
       atHome.current = previous.home; setNavigationError(error.message); setPendingTaxon(null); setPendingNode(null);
       setDetails(previous.details); setCamera(animate(previous.camera));
     } });
-  }, [size, anchor, camera, details, startFocus, recordFocusReady, prime, prepareFocus]);
+  }, [size, anchor, camera, details, startFocus, recordFocusReady, prime, prepareFocus, journeyState.view]);
+  const goJourneyStep = useCallback((step: number) => {
+    if (manifest.presentation !== 'life') return;
+    void import('./journeys/birdsFlight.ts').then(async ({ birdsFlight }) => {
+      const bounded = Math.max(0, Math.min(birdsFlight.steps.length - 1, step));
+      const current = birdsFlight.steps[bounded];
+      const matches = await client.search(`ott${current.ottId}`);
+      const node = matches.find(item => item.ottId === current.ottId);
+      if (!node) throw new Error(`${current.mapTaxon ?? current.taxon} is not available in this tree publication.`);
+      setJourneyState({ view: 'playing', step: bounded });
+      localStorage.setItem('tree-of-life:journey:birds-flight', String(bounded));
+      updateJourneyUrl('playing', bounded);
+      focusNode(node, true);
+    }).catch(error => setNavigationError(error.message));
+  }, [client, focusNode, manifest.presentation]);
+  useEffect(() => {
+    if (initialJourneyLoaded.current || journeyState.view !== 'playing') return;
+    initialJourneyLoaded.current = true;
+    goJourneyStep(journeyState.step);
+  }, [goJourneyStep, journeyState.step, journeyState.view]);
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (journeyState.view !== 'playing' || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+      if (event.key === 'ArrowLeft' && journeyState.step > 0) { event.preventDefault(); goJourneyStep(journeyState.step - 1); }
+      if (event.key === 'ArrowRight' && journeyState.step < 8) { event.preventDefault(); goJourneyStep(journeyState.step + 1); }
+      if (event.key === 'Escape') setJourneyState(current => ({ ...current, view: 'paused' }));
+    };
+    window.addEventListener('keydown', onKeyDown); return () => window.removeEventListener('keydown', onKeyDown);
+  }, [goJourneyStep, journeyState]);
   const goHome = () => {
+    if (journeyState.view === 'playing') setJourneyState(current => ({ ...current, view: 'paused' }));
     if (!atHome.current || details) { setPast(history => [...history.slice(-49), { camera, anchor, details, home: atHome.current }]); setFuture([]); }
     focusRequest.current?.abort(); atHome.current = true;
     setPendingTaxon(null); setPendingNode(null);
@@ -312,7 +391,7 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
           <span className="search-icon" aria-hidden="true">⌕</span>
           <input aria-label="Search taxa" placeholder="Search a taxon or OpenTree ID…" value={query}
             role="combobox" aria-autocomplete="list" aria-expanded={searchOpen && !!query.trim()} aria-controls="taxon-results"
-            aria-activedescendant={searchOpen && results[activeResult] ? `result-${results[activeResult].id}` : undefined}
+            aria-activedescendant={searchOpen && results[activeResult] ? `result-${results[activeResult].node.id}` : undefined}
             onFocus={() => setSearchOpen(true)}
             onChange={event => { setQuery(event.target.value); setActiveResult(0); setSearchOpen(true); }}
             onKeyDown={event => {
@@ -321,17 +400,23 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
                 event.preventDefault(); setSearchOpen(true);
                 setActiveResult(index => results.length ? (index + (event.key === 'ArrowDown' ? 1 : -1) + results.length) % results.length : 0);
               }
-              if (event.key === 'Enter' && results[activeResult]) { event.preventDefault(); focusNode(results[activeResult]); }
+              if (event.key === 'Enter' && results[activeResult]) { event.preventDefault(); focusNode(results[activeResult].node); }
             }} />
           {query && <button className="search-clear" aria-label="Clear search" onClick={() => { setQuery(''); setActiveResult(0); }}>×</button>}
           {searchOpen && query.trim() && <div className="search-results" id="taxon-results" role="listbox" aria-label="Matching taxa">
-            {results.length ? results.map((node, index) => <button type="button" role="option" aria-selected={index === activeResult}
-              id={`result-${node.id}`} key={node.id} onPointerEnter={() => queuePrefetch(node)} onPointerLeave={() => queuePrefetch()}
-              onPointerDown={() => prefetchNow(node)} onFocus={() => queuePrefetch(node)} onClick={() => focusNode(node)}>
-              <span>{node.scientificName}</span><small>{node.isTerminal ? 'Terminal taxon' : `${node.leafCount} terminal taxa`}</small>
+            {results.length ? results.map((result, index) => <button type="button" role="option" aria-selected={index === activeResult}
+              id={`result-${result.node.id}`} key={result.node.id} onPointerEnter={() => queuePrefetch(result.node)} onPointerLeave={() => queuePrefetch()}
+              onPointerDown={() => prefetchNow(result.node)} onFocus={() => queuePrefetch(result.node)} onClick={() => focusNode(result.node)}>
+              <span className="search-result-title"><strong><span>{result.node.scientificName}</span></strong>{result.commonName && <em>{result.commonName}</em>}</span>
+              <small><span>{result.rank ?? (result.node.isTerminal ? 'Terminal taxon' : 'Clade')}</span>
+                <span>{result.matchKind && result.matchedName && result.matchedName.localeCompare(result.node.scientificName, undefined, { sensitivity: 'base' }) !== 0
+                  ? `Matched ${result.matchKind}: ${result.matchedName}` : result.node.isTerminal ? '1 terminal taxon' : `${result.node.leafCount.toLocaleString()} terminal taxa`}</span></small>
             </button>) : <p role="status">{searching ? 'Searching…' : 'No matching taxa in this dataset.'}</p>}
           </div>}
         </div>
+        {manifest.presentation === 'life' && <button className="journey-header-button" onClick={() => {
+          setJourneyState({ view: 'library', step: journeyState.step }); updateJourneyUrl('library', journeyState.step);
+        }}><span aria-hidden="true">✦</span> Journeys</button>}
       </header>
       <nav className="map-controls" aria-label="Map controls">
         <button onClick={() => revisit('back')} disabled={!past.length} aria-label="Back to previous view" title="Back">←</button>
@@ -350,7 +435,7 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
       <footer className="map-footer"><span><strong>{manifest.namedCount.toLocaleString()}</strong> named taxa · {root.leafCount} tips<span className="desktop-hint"> · Drag to pan · Scroll to zoom</span></span>
         <span className="attribution">{manifest.synthetic ? 'Generated benchmark data · ' : 'Data: Open Tree of Life · '}{manifest.provenance && <><a href={`${import.meta.env.BASE_URL}data/${manifest.presentation === 'life' ? 'life' : 'aves'}/${manifest.version}/manifest.json`} target="_blank" rel="noreferrer">{manifest.provenance.synthId}</a> · </>}<a href="https://lifemap.cnrs.fr/" target="_blank" rel="noreferrer">Inspired by Lifemap</a></span>
       </footer>
-      {selected && <aside className="detail-panel" aria-label="Taxon details">
+      {selected && !['library', 'playing', 'complete'].includes(journeyState.view) && <aside className="detail-panel" aria-label="Taxon details">
         <button className="close-button" onClick={() => { focusRequest.current?.abort(); setPendingTaxon(null); setPendingNode(null); setDetails(null); }} aria-label="Close details">×</button>
         <div className="rank">{profile?.rank ?? selected.rank ?? (selected.isTerminal ? 'Terminal taxon' : 'Clade')}</div>
         <h1>{selected.scientificName}</h1>
@@ -389,7 +474,19 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
       {!scene && <div className="stream-notice" role="status">Loading this part of the tree…</div>}
       {scene?.stats.limited && <div className="stream-notice" role="status">Showing an overview. Zoom in for more detail.</div>}
       {details?.childrenTruncated && selected && <div className="children-note">Showing {descendants.length} named descendants. Search to find more.</div>}
-      {manifest.presentation === 'life' && !selected && anchor === 0 && camera.zoom <= homeCamera.zoom + 0.15 && <div className="explore-hint"><span>Explore a branch.</span>Choose a group or zoom in to explore.</div>}
+      {manifest.presentation === 'life' && !selected && anchor === 0 && camera.zoom <= homeCamera.zoom + 0.15 && journeyState.view === 'closed' && <div className="explore-hint"><span>Explore a branch.</span><p>Choose a group or zoom in to explore.</p>
+        <button onClick={() => { setJourneyState({ view: 'library', step: journeyState.step }); updateJourneyUrl('library', journeyState.step); }}><i aria-hidden="true">✦</i><strong>Take a guided journey</strong><small>From feathered dinosaurs to modern birds</small></button></div>}
+      {journeyState.view === 'paused' && <button className="journey-resume" onClick={() => goJourneyStep(journeyState.step)}>
+        <span aria-hidden="true">✦</span><span><small>Journey paused</small>Resume: From Feathered Dinosaurs to Modern Birds</span><b>→</b></button>}
+      {['library', 'playing', 'complete'].includes(journeyState.view) && <Suspense fallback={<aside className="journey-panel journey-loading" aria-label="Loading journey"><div className="loading-indicator" /></aside>}>
+        <JourneyPanel view={journeyState.view as 'library' | 'playing' | 'complete'} step={journeyState.step}
+          onBegin={() => goJourneyStep(Number(localStorage.getItem('tree-of-life:journey:birds-flight')) || 0)}
+          onStep={goJourneyStep}
+          onPause={() => setJourneyState(current => ({ ...current, view: 'paused' }))}
+          onClose={() => { setJourneyState(current => ({ ...current, view: 'closed' })); updateJourneyUrl('closed', journeyState.step); }}
+          onLibrary={() => { setJourneyState(current => ({ ...current, view: 'library' })); updateJourneyUrl('library', journeyState.step); }}
+          onComplete={() => { setJourneyState(current => ({ ...current, view: 'complete' })); updateJourneyUrl('complete', journeyState.step); }} />
+      </Suspense>}
       {benchmarkMode && <aside className="benchmark-panel" aria-label="Performance diagnostics">
         <strong>{manifest.title}</strong>
         <div>{manifest.nodeCount.toLocaleString()} total nodes · {scene?.nodes.length ?? 0} loaded for display</div>

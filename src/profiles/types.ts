@@ -42,6 +42,22 @@ export interface ProfileManifest {
   compressedPublicationBytes: number;
   retrievedAt: string;
   coverage: Record<string, number>;
+  searchFile: string;
+  compressedSearchBytes: number;
+}
+
+export type ProfileSearchRecord = [ottId: number, scientificName: string, rank: string | null,
+  commonNames: string[], synonyms: string[]];
+
+export type ProfileMatchKind = 'scientific name' | 'common name' | 'synonym';
+
+export interface ProfileSearchHit {
+  ottId: number;
+  scientificName: string;
+  rank?: string;
+  commonName?: string;
+  matchedName: string;
+  matchKind: ProfileMatchKind;
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -55,10 +71,22 @@ export function validateProfileManifest(value: unknown): ProfileManifest {
       typeof value.shardPattern !== 'string' || !value.shardPattern.includes('{shard}') ||
       typeof value.routing !== 'string' || !Number.isInteger(value.maxCompressedShardBytes) ||
       !Number.isInteger(value.compressedPublicationBytes) || typeof value.retrievedAt !== 'string' ||
-      !isObject(value.coverage)) {
+      !isObject(value.coverage) || typeof value.searchFile !== 'string' ||
+      !Number.isInteger(value.compressedSearchBytes)) {
     throw new Error('The scientific-profile manifest is invalid.');
   }
   return value as unknown as ProfileManifest;
+}
+
+export function validateProfileSearch(value: unknown): ProfileSearchRecord[] {
+  if (!isObject(value) || !Array.isArray(value.profiles) || value.profiles.some(row =>
+    !Array.isArray(row) || row.length !== 5 || !Number.isInteger(row[0]) || typeof row[1] !== 'string' ||
+    (row[2] !== null && typeof row[2] !== 'string') || !Array.isArray(row[3]) ||
+    !row[3].every(name => typeof name === 'string') || !Array.isArray(row[4]) ||
+    !row[4].every(name => typeof name === 'string'))) {
+    throw new Error('The scientific-profile search index is invalid.');
+  }
+  return value.profiles as ProfileSearchRecord[];
 }
 
 function validCommonName(value: unknown): value is CommonName {
