@@ -338,6 +338,8 @@ function TreeMap({ client, profileClient, journeyClient, manifest }: { client: T
   const canonicalCommonName = articleName && profile?.commonNames.find(item => item.name.localeCompare(articleName, undefined, { sensitivity: 'base' }) === 0)?.name;
   const primaryCommonName = canonicalCommonName ?? profile?.commonNames[0]?.name ?? selected?.commonName;
   const otherCommonNames = profile?.commonNames.filter(item => item.name !== primaryCommonName) ?? [];
+  const profileImageUrl = profile?.image ? new URL(profile.image.src,
+    new URL(import.meta.env.BASE_URL, window.location.href)).href : undefined;
   const labelNodes = useMemo(() => visibleLabels(manifest.presentation === 'life' ? namedNodes.filter(n => n.index !== 0) : namedNodes, camera, size, selected?.id), [namedNodes, camera, size, selected, manifest.presentation]);
   const regions = useMemo(() => namedNodes.filter(node => node.region.length > 0 && (node.index !== 0 || node.collapsedCount)).sort((a, b) => a.depth - b.depth), [namedNodes]);
   const lineData = useMemo(() => {
@@ -491,12 +493,22 @@ function TreeMap({ client, profileClient, journeyClient, manifest }: { client: T
         <h1>{selected.scientificName}</h1>
         {primaryCommonName && <p className="common-name">{primaryCommonName}</p>}
         <div className="taxon-stat"><strong>{selected.leafCount.toLocaleString()}</strong><span>terminal {selected.leafCount === 1 ? 'taxon' : 'taxa'} in this subtree</span></div>
+        {profile?.image && profileImageUrl && <figure className="profile-image">
+          <img src={profileImageUrl} alt={profile.image.alt} loading="lazy" decoding="async" />
+          <figcaption>{profile.image.caption}<a href={profile.image.sourceUrl} target="_blank" rel="noreferrer">
+            {profile.image.credit} · {profile.image.license} ↗</a></figcaption>
+        </figure>}
         {profileStatus === 'loading' &&
           <section className="profile-loading" aria-label="Loading scientific profile"><span /><span /><span /></section>}
         {profile?.wikipedia && <section className="profile-about"><h2>About</h2><p>{profile.wikipedia.extract}</p>
           <a className="profile-attribution" href={`${profile.wikipedia.url}?oldid=${profile.wikipedia.revisionId}`} target="_blank" rel="noreferrer">
             From Wikipedia · revision {profile.wikipedia.revisionId} · CC BY-SA 4.0 ↗
           </a></section>}
+        {profile?.facts && profile.facts.length > 0 && <section className="profile-facts"><h2>Field notes</h2><div>
+          {profile.facts.map((fact, index) => <article key={`${fact.kind}:${fact.label}:${index}`}>
+            <small>{fact.label}</small><p>{fact.value}</p>
+            <a href={fact.source.url} target="_blank" rel="noreferrer">{fact.source.label} ↗</a>
+          </article>)}</div></section>}
         {profile && profile.synonyms.length > 0 && <section><h2>Also known as</h2><div className="profile-tags">
           {profile.synonyms.map(name => <span key={name}>{name}</span>)}</div></section>}
         {otherCommonNames.length > 0 && <section><h2>Other common names</h2><div className="profile-tags common-tags">
@@ -508,7 +520,9 @@ function TreeMap({ client, profileClient, journeyClient, manifest }: { client: T
           <a href={`https://tree.opentreeoflife.org/taxonomy/browse?id=${selected.ottId}`} target="_blank" rel="noreferrer"><span>OpenTree</span><small>OTT {selected.ottId}</small></a>
           {profile?.gbif && <a href={`https://www.gbif.org/species/${profile.gbif.usageKey}`} target="_blank" rel="noreferrer"><span>GBIF</span><small>Species {profile.gbif.usageKey}</small></a>}
           {profile?.wikipedia && <a href={profile.wikipedia.url} target="_blank" rel="noreferrer"><span>Wikipedia</span><small>{profile.wikipedia.title}</small></a>}
+          {!profile?.wikipedia && profile?.wikidata && <a href={profile.wikidata.articleUrl} target="_blank" rel="noreferrer"><span>Wikipedia</span><small>{profile.wikidata.articleTitle}</small></a>}
           {profile?.wikipedia?.wikidataId && <a href={`https://www.wikidata.org/wiki/${profile.wikipedia.wikidataId}`} target="_blank" rel="noreferrer"><span>Wikidata</span><small>{profile.wikipedia.wikidataId}</small></a>}
+          {profile?.wikidata && <a href={`https://www.wikidata.org/wiki/${profile.wikidata.itemId}`} target="_blank" rel="noreferrer"><span>Wikidata</span><small>{profile.wikidata.itemId}</small></a>}
         </div></section>}
         {descendants.length > 0 && <section><h2>Explore this clade</h2><div className="descendant-list">{descendants.map(node =>
           <button key={node.id} onPointerEnter={() => queuePrefetch(node)} onPointerLeave={() => queuePrefetch()}

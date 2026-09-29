@@ -19,9 +19,10 @@ const profileRoot = 'public/data/profiles';
 const profilePointer = join(profileRoot, 'manifest.json');
 if (!existsSync(profilePointer)) throw new Error('Scientific profiles have not been prepared. Run npm run data:profiles.');
 const profiles = JSON.parse(readFileSync(profilePointer, 'utf8'));
-if (profiles.format !== 1 || !/^[a-f0-9]{16}$/.test(profiles.version) || profiles.profileCount !== 10000 ||
-    !Number.isInteger(profiles.shardCount) || profiles.shardCount < 1 || profiles.maxCompressedShardBytes > 24 * 1024 ||
-    profiles.searchFile !== 'search.json' || profiles.compressedSearchBytes > 256 * 1024) {
+if (profiles.format !== 2 || !/^[a-f0-9]{16}$/.test(profiles.version) || profiles.profileCount !== 10000 ||
+    profiles.shardCount !== 128 || profiles.maxCompressedShardBytes > 64 * 1024 ||
+    profiles.compressedPublicationBytes > 8 * 1024 * 1024 ||
+    profiles.searchFile !== 'search.json' || profiles.compressedSearchBytes > 512 * 1024) {
   throw new Error('Invalid scientific-profile publication. Run npm run data:profiles.');
 }
 const searchPath = join(profileRoot, profiles.version, profiles.searchFile);
@@ -45,7 +46,7 @@ for (let shard = 0; shard < profiles.shardCount; shard++) {
   }
   counted += value.profiles.length;
 }
-if (counted !== profiles.profileCount || maxCompressed > 24 * 1024) {
+if (counted !== profiles.profileCount || maxCompressed > 64 * 1024) {
   throw new Error('Scientific-profile counts or compressed payload budget do not match the manifest.');
 }
 

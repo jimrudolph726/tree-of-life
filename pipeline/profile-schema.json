@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://tree-of-life.example/schemas/scientific-profile-v1.json",
+  "$id": "https://tree-of-life.example/schemas/scientific-profile-v2.json",
   "title": "Scientific profile shard",
   "type": "object",
   "required": ["profiles"],
@@ -63,6 +63,52 @@
             "extract": { "type": "string", "minLength": 1 },
             "revisionId": { "type": "integer", "minimum": 1 },
             "wikidataId": { "type": "string", "pattern": "^Q[0-9]+$" }
+          }
+        },
+        "wikidata": {
+          "type": "object",
+          "required": ["itemId", "articleTitle", "articleUrl"],
+          "additionalProperties": false,
+          "properties": {
+            "itemId": { "type": "string", "pattern": "^Q[0-9]+$" },
+            "articleTitle": { "type": "string", "minLength": 1 },
+            "articleUrl": { "type": "string", "pattern": "^https://en\\.wikipedia\\.org/wiki/" }
+          }
+        },
+        "image": {
+          "type": "object",
+          "required": ["src", "alt", "caption", "credit", "license", "sourceUrl"],
+          "additionalProperties": false,
+          "properties": {
+            "src": { "type": "string", "pattern": "^images/" },
+            "alt": { "type": "string", "minLength": 1 },
+            "caption": { "type": "string", "minLength": 1 },
+            "credit": { "type": "string", "minLength": 1 },
+            "license": { "type": "string", "minLength": 1 },
+            "sourceUrl": { "type": "string", "pattern": "^https://" }
+          }
+        },
+        "facts": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "required": ["kind", "label", "value", "source"],
+            "additionalProperties": false,
+            "properties": {
+              "kind": { "enum": ["status", "age", "trait", "habitat", "range"] },
+              "label": { "type": "string", "minLength": 1 },
+              "value": { "type": "string", "minLength": 1 },
+              "source": {
+                "type": "object",
+                "required": ["label", "url"],
+                "additionalProperties": false,
+                "properties": {
+                  "label": { "type": "string", "minLength": 1 },
+                  "url": { "type": "string", "pattern": "^https://" }
+                }
+              }
+            }
           }
         }
       }

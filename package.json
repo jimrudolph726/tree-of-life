@@ -10,6 +10,7 @@
     "data:build": "node pipeline/build-tree.ts",
     "data:profiles": "python pipeline/build_profiles.py",
     "data:profiles:refresh": "python pipeline/build_profiles.py --refresh",
+    "data:profiles:expand": "python pipeline/build_profiles.py --expand",
     "data:profiles:audit": "python pipeline/build_profiles.py --audit-snapshot",
     "data:journeys": "python pipeline/build_journeys.py",
     "data:import": "python pipeline/import_opentree.py",

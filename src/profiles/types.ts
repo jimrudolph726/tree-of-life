@@ -21,6 +21,33 @@ export interface WikipediaProfile {
   wikidataId: string;
 }
 
+export interface WikidataIdentity {
+  itemId: string;
+  articleTitle: string;
+  articleUrl: string;
+}
+
+export interface ProfileSource {
+  label: string;
+  url: string;
+}
+
+export interface ProfileFact {
+  kind: 'status' | 'age' | 'trait' | 'habitat' | 'range';
+  label: string;
+  value: string;
+  source: ProfileSource;
+}
+
+export interface ProfileImage {
+  src: string;
+  alt: string;
+  caption: string;
+  credit: string;
+  license: string;
+  sourceUrl: string;
+}
+
 export interface ScientificProfile {
   ottId: number;
   scientificName: string;
@@ -29,6 +56,9 @@ export interface ScientificProfile {
   synonyms: string[];
   gbif?: GbifProfile;
   wikipedia?: WikipediaProfile;
+  wikidata?: WikidataIdentity;
+  facts?: ProfileFact[];
+  image?: ProfileImage;
 }
 
 export interface ProfileManifest {
@@ -65,7 +95,7 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 export function validateProfileManifest(value: unknown): ProfileManifest {
-  if (!isObject(value) || value.format !== 1 || typeof value.version !== 'string' ||
+  if (!isObject(value) || value.format !== 2 || typeof value.version !== 'string' ||
       !/^[a-f0-9]{16}$/.test(value.version) || !Number.isInteger(value.profileCount) ||
       !Number.isInteger(value.shardCount) || (value.shardCount as number) < 1 ||
       typeof value.shardPattern !== 'string' || !value.shardPattern.includes('{shard}') ||
@@ -94,6 +124,20 @@ function validCommonName(value: unknown): value is CommonName {
     typeof value.source === 'string';
 }
 
+function validFact(value: unknown): value is ProfileFact {
+  if (!isObject(value) || !['status', 'age', 'trait', 'habitat', 'range'].includes(String(value.kind)) ||
+      typeof value.label !== 'string' || typeof value.value !== 'string' || !isObject(value.source) ||
+      typeof value.source.label !== 'string' || typeof value.source.url !== 'string' ||
+      !value.source.url.startsWith('https://')) return false;
+  return true;
+}
+
+function validImage(value: unknown): value is ProfileImage {
+  return isObject(value) && typeof value.src === 'string' && value.src.startsWith('images/') &&
+    typeof value.alt === 'string' && typeof value.caption === 'string' && typeof value.credit === 'string' &&
+    typeof value.license === 'string' && typeof value.sourceUrl === 'string' && value.sourceUrl.startsWith('https://');
+}
+
 function validProfile(value: unknown): value is ScientificProfile {
   if (!isObject(value) || !Number.isInteger(value.ottId) || typeof value.scientificName !== 'string' ||
       !Array.isArray(value.commonNames) || !value.commonNames.every(validCommonName) ||
@@ -105,6 +149,13 @@ function validProfile(value: unknown): value is ScientificProfile {
       typeof value.wikipedia.url !== 'string' || typeof value.wikipedia.extract !== 'string' ||
       !Number.isInteger(value.wikipedia.revisionId) || typeof value.wikipedia.wikidataId !== 'string' ||
       !/^Q\d+$/.test(value.wikipedia.wikidataId))) return false;
+  if (value.wikidata !== undefined && (!isObject(value.wikidata) || typeof value.wikidata.itemId !== 'string' ||
+      !/^Q\d+$/.test(value.wikidata.itemId) || typeof value.wikidata.articleTitle !== 'string' ||
+      typeof value.wikidata.articleUrl !== 'string' ||
+      !value.wikidata.articleUrl.startsWith('https://en.wikipedia.org/wiki/'))) return false;
+  if (value.facts !== undefined && (!Array.isArray(value.facts) || value.facts.length > 8 ||
+      !value.facts.every(validFact))) return false;
+  if (value.image !== undefined && !validImage(value.image)) return false;
   return true;
 }
 

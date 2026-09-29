@@ -1,8 +1,9 @@
-"""Build a small, versioned scientific-profile publication.
+"""Build the versioned scientific-profile publication.
 
 The checked-in source snapshot makes normal builds deterministic and offline.
 Use --refresh deliberately to resolve current Wikipedia articles and GBIF names,
-ranks, and synonyms for a representative set of OpenTree taxa.
+ranks, and synonyms. Use --expand to add validated Wikipedia/Wikidata profiles
+until the source snapshot contains the full field-guide set.
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ import re
 import shutil
 import struct
 import time
+from urllib.parse import unquote, urlparse
 
 import requests
 
@@ -26,11 +28,14 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT = ROOT / 'data/processed/profiles/source-snapshot.json'
 OUTPUT = ROOT / 'public/data/profiles'
-ENRICHED_COUNT = 1000
+GBIF_ENRICHED_COUNT = 1000
 COUNT = 10000
-SHARDS = 64
-MAX_GZIP_SHARD_BYTES = 24 * 1024
-MAX_GZIP_SEARCH_BYTES = 256 * 1024
+SHARDS = 128
+MAX_GZIP_SHARD_BYTES = 64 * 1024
+MAX_GZIP_SEARCH_BYTES = 512 * 1024
+MAX_GZIP_PUBLICATION_BYTES = 8 * 1024 * 1024
+MAX_PROFILE_IMAGE_BYTES = 512 * 1024
+WIKIDATA_CANDIDATE_LIMIT = 60000
 USER_AGENT = 'TreeOfLifeExplorer/0.1 scientific-profile-etl'
 
 SOURCE_PRIORITY = {
@@ -38,6 +43,8 @@ SOURCE_PRIORITY = {
     'rankAndSynonyms': 'GBIF accepted exact match, then OpenTree',
     'commonNames': 'GBIF English preferred names, then other GBIF English names, then canonical Wikipedia title',
     'description': 'English Wikipedia introductory extract whose Wikidata item is a taxon or organism group or has a matching scientific-name property; never generated or treated as taxonomic authority',
+    'fieldNotes': 'Peer-reviewed sources selected for the guided Journeys; each displayed fact carries its own citation',
+    'media': 'Locally hosted Wikimedia Commons media with creator, license, source URL, and integrity metadata',
 }
 WIKIDATA_TAXON_CLASSES = {'Q16521', 'Q55983715'}  # taxon; organisms known by a particular common name
 
@@ -146,7 +153,10 @@ def request_json(url, *, params=None, data=None, attempts=8):
             if response.status_code == 429 or response.status_code >= 500:
                 raise requests.HTTPError(f'HTTP {response.status_code}', response=response)
             response.raise_for_status()
-            return response.json()
+            # WDQS occasionally emits a literal control character inside a
+            # scientific-name string. Python's tolerant mode still requires a
+            # complete JSON document while allowing that upstream defect.
+            return json.loads(response.text, strict=False)
         except (requests.RequestException, ValueError) as error:
             if attempt + 1 == attempts:
                 raise
@@ -156,7 +166,7 @@ def request_json(url, *, params=None, data=None, attempts=8):
 
 
 def wikipedia_batch(rows):
-    titles = [row['scientificName'] for row in rows]
+    titles = [row.get('wikipediaTitle', row['scientificName']) for row in rows]
     value = request_json('https://en.wikipedia.org/w/api.php', data={
         'action': 'query', 'format': 'json', 'formatversion': 2, 'redirects': 1,
         'prop': 'extracts|info|revisions|pageprops', 'inprop': 'url', 'rvprop': 'ids',
@@ -178,7 +188,8 @@ def wikipedia_batch(rows):
     pages = {page.get('title'): page for page in query.get('pages', []) if 'missing' not in page}
     output = {}
     for row in rows:
-        page = pages.get(resolved(row['scientificName']))
+        lookup_title = row.get('wikipediaTitle', row['scientificName'])
+        page = pages.get(resolved(lookup_title))
         props = page.get('pageprops', {}) if page else {}
         extract = re.sub(r'\s+', ' ', page.get('extract', '')).strip() if page else ''
         if not page or 'disambiguation' in props or not extract:
@@ -192,6 +203,95 @@ def wikipedia_batch(rows):
     return output
 
 
+def wikidata_taxa(limit=WIKIDATA_CANDIDATE_LIMIT):
+    """Return source-backed taxa that also have an English Wikipedia article."""
+    rows, seen = [], set()
+    page_size = 5000
+    for offset in range(0, limit, page_size):
+        query = f'''SELECT DISTINCT ?taxon ?name ?article WHERE {{
+          ?taxon wdt:P31 wd:Q16521; wdt:P225 ?name.
+          ?article schema:about ?taxon; schema:isPartOf <https://en.wikipedia.org/>.
+        }} LIMIT {min(page_size, limit - offset)} OFFSET {offset}'''
+        value = request_json('https://query.wikidata.org/sparql', params={'query': query, 'format': 'json'})
+        bindings = value.get('results', {}).get('bindings', [])
+        for item in bindings:
+            taxon = item.get('taxon', {}).get('value', '').rsplit('/', 1)[-1]
+            name = re.sub(r'\s+', ' ', item.get('name', {}).get('value', '')).strip()
+            article = item.get('article', {}).get('value', '')
+            key = (taxon, name, article)
+            if key in seen or not re.fullmatch(r'Q\d+', taxon) or not name or not article.startswith('https://en.wikipedia.org/wiki/'):
+                continue
+            seen.add(key)
+            rows.append({'wikidataId': taxon, 'scientificName': name,
+                         'wikipediaTitle': unquote(urlparse(article).path.rsplit('/', 1)[-1]).replace('_', ' ')})
+        print(f'Resolved Wikidata candidate page {offset // page_size + 1}/{(limit + page_size - 1) // page_size}', flush=True)
+        if len(bindings) < min(page_size, limit - offset):
+            break
+        time.sleep(0.2)
+    # Earlier Wikidata items tend to represent well-established and widely used
+    # concepts. The hash provides a stable spread among items created together.
+    rows.sort(key=lambda row: (int(row['wikidataId'][1:]),
+              hashlib.sha256(row['scientificName'].encode()).hexdigest()))
+    return rows
+
+
+def opentree_matches(rows):
+    """Resolve exact Wikidata scientific names against the imported OpenTree release."""
+    wanted = {row['scientificName'] for row in rows}
+    provenance = json.loads((ROOT / 'data/processed/opentree/life/provenance.json').read_text(encoding='utf-8'))
+    folder = ROOT / provenance['snapshotPath']
+    offsets = array('I')
+    with (folder / 'labels.u32').open('rb') as stream:
+        offsets.fromfile(stream, (folder / 'labels.u32').stat().st_size // offsets.itemsize)
+    labels = (folder / 'labels.utf8').read_bytes()
+    found = {}
+    for offset, length in zip(offsets[::2], offsets[1::2]):
+        label = labels[offset:offset + length].decode('utf-8')
+        match = re.fullmatch(r'(.+)_ott(\d+)', label)
+        if not match:
+            continue
+        name = match.group(1).replace('_', ' ')
+        if name in wanted:
+            ott_id = int(match.group(2))
+            found.setdefault(name, ott_id)
+    output = []
+    for row in rows:
+        ott_id = found.get(row['scientificName'])
+        if ott_id:
+            output.append({**row, 'ottId': ott_id, 'selection': 'wikidata'})
+    return output
+
+
+def wikidata_ranks(rows):
+    """Resolve taxon ranks in compact batches; unknown ranks remain absent."""
+    ids = sorted({row['wikidataId'] for row in rows if row.get('wikidataId')})
+    rank_by_item, rank_ids = {}, set()
+    for start in range(0, len(ids), 50):
+        value = request_json('https://www.wikidata.org/w/api.php', params={
+            'action': 'wbgetentities', 'format': 'json', 'ids': '|'.join(ids[start:start + 50]),
+            'props': 'claims',
+        })
+        for item_id, entity in value.get('entities', {}).items():
+            claims = entity.get('claims', {}).get('P105', [])
+            rank_id = next((claim.get('mainsnak', {}).get('datavalue', {}).get('value', {}).get('id')
+                            for claim in claims if claim.get('rank') != 'deprecated'), None)
+            if rank_id:
+                rank_by_item[item_id] = rank_id; rank_ids.add(rank_id)
+        time.sleep(0.1)
+    rank_labels = {}
+    ordered = sorted(rank_ids)
+    for start in range(0, len(ordered), 50):
+        value = request_json('https://www.wikidata.org/w/api.php', params={
+            'action': 'wbgetentities', 'format': 'json', 'ids': '|'.join(ordered[start:start + 50]),
+            'props': 'labels', 'languages': 'en',
+        })
+        for rank_id, entity in value.get('entities', {}).items():
+            label = entity.get('labels', {}).get('en', {}).get('value')
+            if label:
+                rank_labels[rank_id] = label.lower()
+    return {item_id: rank_labels[rank_id] for item_id, rank_id in rank_by_item.items() if rank_id in rank_labels}
+
+
 def wikipedia(rows, batch_size=50):
     output = {}
     batches = [rows[i:i + batch_size] for i in range(0, len(rows), batch_size)]
@@ -202,6 +302,19 @@ def wikipedia(rows, batch_size=50):
         time.sleep(0.2)
         if completed % 10 == 0:
             print(f'Resolved Wikipedia batch {completed}/{len(batches)}', flush=True)
+    return output
+
+
+def wikipedia_parallel(rows, batch_size=50, workers=4):
+    """Resolve a large, one-time expansion while keeping concurrency modest."""
+    output = {}
+    batches = [rows[i:i + batch_size] for i in range(0, len(rows), batch_size)]
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = {executor.submit(wikipedia_batch, batch): index for index, batch in enumerate(batches)}
+        for completed, future in enumerate(as_completed(futures), 1):
+            output.update(future.result())
+            if completed % 10 == 0 or completed == len(batches):
+                print(f'Resolved Wikipedia batch {completed}/{len(batches)}', flush=True)
     return output
 
 
@@ -223,17 +336,17 @@ def choose(rows, articles):
     take('primates', 430)
     take('aves', 430)
     for row in rows:
-        if len(selected) == ENRICHED_COUNT:
+        if len(selected) == GBIF_ENRICHED_COUNT:
             break
         if row['ottId'] not in seen and articles.get(row['ottId']):
             seen.add(row['ottId']); selected.append(row)
     if len(selected) < ENRICHED_COUNT:
         for row in rows:
-            if len(selected) == ENRICHED_COUNT:
+            if len(selected) == GBIF_ENRICHED_COUNT:
                 break
             if row['ottId'] not in seen:
                 seen.add(row['ottId']); selected.append(row)
-    if len(selected) != ENRICHED_COUNT:
+    if len(selected) != GBIF_ENRICHED_COUNT:
         raise ValueError(f'Only {len(selected)} profile candidates were available')
     return selected
 
@@ -357,6 +470,110 @@ def refresh():
     return snapshot
 
 
+def journey_profile_overlays():
+    """Turn reviewed Journey evidence into cited, reusable field-guide notes."""
+    registry_path = ROOT / 'data/content/journey-media.json'
+    registry = json.loads(registry_path.read_text(encoding='utf-8'))['media']
+    overlays = {}
+    for path in sorted((ROOT / 'data/content/journeys').glob('*.json')):
+        journey = json.loads(path.read_text(encoding='utf-8'))
+        for step in journey['steps']:
+            # Some Journey stops deliberately display the nearest positioned
+            # relative. Never attach that stop's facts to the substitute taxon.
+            if step.get('mapTaxon') and step['mapTaxon'] != step['taxon']:
+                continue
+            ott_id = step['ottId']
+            value = overlays.setdefault(ott_id, {'ottId': ott_id, 'scientificName': step['taxon'],
+                                                  'facts': []})
+            sources = step.get('sources', [])
+            if not sources:
+                raise ValueError(f"Journey step {step['taxon']} has no scientific source")
+            source = {'label': sources[0]['label'], 'url': sources[0]['url']}
+            if not any(fact['kind'] == 'status' for fact in value['facts']):
+                value['facts'].append({'kind': 'status', 'label': 'Evidence type',
+                                       'value': step['kind'].capitalize(), 'source': source})
+            if not any(fact['kind'] == 'age' for fact in value['facts']):
+                value['facts'].append({'kind': 'age', 'label': 'Time', 'value': step['age'], 'source': source})
+            if len(value['facts']) < 8:
+                value['facts'].append({'kind': 'trait',
+                    'label': f"{journey['category']} · {step['title']}",
+                    'value': step['summary'], 'source': source})
+            media_id = step.get('image', {}).get('mediaId')
+            media = registry.get(media_id)
+            if media and 'image' not in value:
+                image_path = ROOT / 'public' / media['src']
+                if not image_path.is_file() or image_path.stat().st_size == 0:
+                    raise ValueError(f'Missing profile media: {media["src"]}')
+                if image_path.stat().st_size > MAX_PROFILE_IMAGE_BYTES:
+                    raise ValueError(f'Profile media exceeds {MAX_PROFILE_IMAGE_BYTES} bytes: {media["src"]}')
+                recorded_hash = media.get('sha256', '')
+                if re.fullmatch(r'[a-f0-9]{64}', recorded_hash) and sha256(image_path) != recorded_hash:
+                    raise ValueError(f'Profile media checksum changed: {media["src"]}')
+                value['image'] = {
+                    'src': media['src'], 'alt': step['image']['alt'],
+                    'caption': step['image']['caption'], 'credit': media['credit'],
+                    'license': media['license'], 'sourceUrl': media['sourceUrl'],
+                }
+    return overlays
+
+
+def expand(snapshot):
+    """Expand the 1,000-record GBIF snapshot to 10,000 sourced profiles."""
+    existing = list(snapshot.get('profiles', []))
+    if len(existing) == COUNT:
+        return snapshot
+    if len(existing) != GBIF_ENRICHED_COUNT:
+        raise ValueError(f'Expansion expects {GBIF_ENRICHED_COUNT} starting profiles, found {len(existing)}')
+    seen_ids = {profile['ottId'] for profile in existing}
+    seen_names = {profile['scientificName'].casefold() for profile in existing}
+
+    # Journey taxa are guaranteed entry before the broad Wikidata selection.
+    overlays = journey_profile_overlays()
+    journey_rows = [{'ottId': item['ottId'], 'scientificName': item['scientificName'], 'selection': 'journey'}
+                    for item in overlays.values() if item['ottId'] not in seen_ids]
+    journey_articles = wikipedia(journey_rows, batch_size=25) if journey_rows else {}
+    if journey_rows:
+        validate_wikidata_articles(journey_rows, journey_articles)
+    for row in journey_rows:
+        article = journey_articles.get(row['ottId'])
+        profile = {'ottId': row['ottId'], 'scientificName': row['scientificName'], 'selection': 'journey',
+                   'commonNames': preferred_common_names([], article, row['scientificName']), 'synonyms': []}
+        if article:
+            profile['wikipedia'] = article
+        existing.append(profile); seen_ids.add(row['ottId']); seen_names.add(row['scientificName'].casefold())
+
+    print('Querying validated Wikidata taxa with English Wikipedia articles', flush=True)
+    matched = opentree_matches(wikidata_taxa())
+    pool, pool_ids = [], set()
+    for row in matched:
+        if row['ottId'] in seen_ids or row['ottId'] in pool_ids or row['scientificName'].casefold() in seen_names:
+            continue
+        pool_ids.add(row['ottId']); pool.append(row)
+    needed = COUNT - len(existing)
+    if len(pool) < needed:
+        raise ValueError(f'Only {len(pool):,} new OpenTree/Wikidata matches were available; need {needed:,}')
+    selected = pool[:needed]
+    for row in selected:
+        title = row['wikipediaTitle']
+        article_url = f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}"
+        article_identity = {'title': title, 'url': article_url}
+        profile = {'ottId': row['ottId'], 'scientificName': row['scientificName'],
+                   'selection': 'wikidata',
+                   'commonNames': preferred_common_names([], article_identity, row['scientificName']),
+                   'synonyms': [], 'wikidata': {'itemId': row['wikidataId'],
+                   'articleTitle': title, 'articleUrl': article_url}}
+        existing.append(profile)
+    if len(existing) != COUNT or len({item['ottId'] for item in existing}) != COUNT:
+        raise ValueError('Expanded profile snapshot is incomplete or contains duplicate OTT IDs')
+    snapshot = {**snapshot, 'format': 2,
+                'retrievedAt': datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+                'sourcePriority': SOURCE_PRIORITY,
+                'profiles': sorted(existing, key=lambda item: item['ottId'])}
+    SNAPSHOT.write_text(compact_json(snapshot, pretty=True) + '\n', encoding='utf-8', newline='\n')
+    print(f'Wrote {COUNT:,} source-backed profiles to {SNAPSHOT}', flush=True)
+    return snapshot
+
+
 def validate_profile(profile):
     if not isinstance(profile.get('ottId'), int) or profile['ottId'] <= 0:
         raise ValueError('Profile has an invalid OTT ID')
@@ -369,6 +586,26 @@ def validate_profile(profile):
                     not isinstance(article.get('revisionId'), int) or not article.get('extract') or
                     not re.fullmatch(r'Q\d+', article.get('wikidataId', ''))):
         raise ValueError(f"Invalid Wikipedia attribution for {profile['scientificName']}")
+    wikidata = profile.get('wikidata')
+    if wikidata and (not re.fullmatch(r'Q\d+', wikidata.get('itemId', '')) or
+                     not wikidata.get('articleTitle') or
+                     not wikidata.get('articleUrl', '').startswith('https://en.wikipedia.org/wiki/')):
+        raise ValueError(f"Invalid Wikidata identity for {profile['scientificName']}")
+    image = profile.get('image')
+    if image and (not image.get('src', '').startswith('images/') or
+                  not image.get('sourceUrl', '').startswith('https://') or
+                  not all(isinstance(image.get(key), str) and image[key].strip()
+                          for key in ('alt', 'caption', 'credit', 'license'))):
+        raise ValueError(f"Invalid media attribution for {profile['scientificName']}")
+    facts = profile.get('facts', [])
+    if len(facts) > 8:
+        raise ValueError(f"Too many field notes for {profile['scientificName']}")
+    for fact in facts:
+        source = fact.get('source', {})
+        if (fact.get('kind') not in {'status', 'age', 'trait', 'habitat', 'range'} or
+                not all(isinstance(fact.get(key), str) and fact[key].strip() for key in ('label', 'value')) or
+                not source.get('label') or not source.get('url', '').startswith('https://')):
+            raise ValueError(f"Unsupported or unattributed fact for {profile['scientificName']}")
 
 
 def public_profile(profile):
@@ -386,6 +623,32 @@ def public_profile(profile):
         seen.add(folded); common.append(item)
     value['commonNames'] = common
     return value
+
+
+def apply_profile_overlays(profiles):
+    by_id = {profile['ottId']: dict(profile) for profile in profiles}
+    for ott_id, overlay in journey_profile_overlays().items():
+        profile = by_id.get(ott_id)
+        if not profile:
+            raise ValueError(f'Journey profile OTT {ott_id} is absent from the source snapshot')
+        if profile['scientificName'] != overlay['scientificName']:
+            raise ValueError(f'Journey/OpenTree identity conflict for OTT {ott_id}: '
+                             f"{overlay['scientificName']} != {profile['scientificName']}")
+        profile['facts'] = overlay['facts']
+        if overlay.get('image'):
+            profile['image'] = overlay['image']
+        by_id[ott_id] = profile
+    return [by_id[profile['ottId']] for profile in profiles]
+
+
+def curation_sha256():
+    digest = hashlib.sha256()
+    paths = [ROOT / 'data/content/journey-media.json',
+             *sorted((ROOT / 'data/content/journeys').glob('*.json'))]
+    for path in paths:
+        digest.update(path.relative_to(ROOT).as_posix().encode())
+        digest.update(path.read_bytes())
+    return digest.hexdigest()
 
 
 def search_profile(profile):
@@ -444,10 +707,10 @@ def tree_wide_profiles(existing, target_count):
 
 
 def publish(snapshot):
-    enriched = snapshot.get('profiles', [])
-    if len(enriched) != ENRICHED_COUNT or len({item['ottId'] for item in enriched}) != ENRICHED_COUNT:
-        raise ValueError(f'Profile snapshot must contain exactly {ENRICHED_COUNT} unique enriched taxa')
-    profiles = [*enriched, *tree_wide_profiles(enriched, COUNT)]
+    source_profiles = snapshot.get('profiles', [])
+    if len(source_profiles) != COUNT or len({item['ottId'] for item in source_profiles}) != COUNT:
+        raise ValueError(f'Profile snapshot must contain exactly {COUNT} unique sourced taxa; run with --expand')
+    profiles = apply_profile_overlays(source_profiles)
     for profile in profiles:
         validate_profile(profile)
     required = {'Eukaryota', 'Archaea', 'Bacteria', 'Fungi', 'Opisthokonta', 'Bilateria',
@@ -469,14 +732,18 @@ def publish(snapshot):
         hash_value.update(f'{index:02d}.json'.encode()); hash_value.update(text.encode())
     hash_value.update(b'search.json'); hash_value.update(search_text.encode())
     hash_value.update(sha256(SNAPSHOT).encode())
+    hash_value.update(curation_sha256().encode())
     version = hash_value.hexdigest()[:16]
     coverage = {
         'profiles': len(profiles),
-        'enriched': len(enriched),
-        'treeWide': len(profiles) - len(enriched),
+        'enriched': sum(bool(item.get('wikipedia') or item.get('wikidata') or item.get('gbif') or item.get('facts')) for item in profiles),
+        'treeWide': 0,
         'descriptions': sum('wikipedia' in item for item in public_profiles),
         'commonNames': sum(bool(item.get('commonNames')) for item in public_profiles),
         'synonyms': sum(bool(item.get('synonyms')) for item in public_profiles),
+        'fieldNotes': sum(bool(item.get('facts')) for item in public_profiles),
+        'media': sum(bool(item.get('image')) for item in public_profiles),
+        'wikidata': sum(item.get('selection') == 'wikidata' for item in profiles),
         'primates': sum(item.get('selection') == 'primates' for item in profiles),
         'aves': sum(item.get('selection') == 'aves' for item in profiles),
         'essential': sum(item.get('selection') == 'essential' for item in profiles),
@@ -484,14 +751,16 @@ def publish(snapshot):
     compressed = [len(gzip.compress(text.encode(), compresslevel=9, mtime=0)) for text in shard_text]
     if max(compressed) > MAX_GZIP_SHARD_BYTES:
         raise ValueError(f'Compressed profile shard exceeds {MAX_GZIP_SHARD_BYTES} bytes')
+    if sum(compressed) > MAX_GZIP_PUBLICATION_BYTES:
+        raise ValueError(f'Compressed profile publication exceeds {MAX_GZIP_PUBLICATION_BYTES} bytes')
     manifest = {
-        'format': 1, 'version': version, 'profileCount': COUNT, 'shardCount': SHARDS,
+        'format': 2, 'version': version, 'profileCount': COUNT, 'shardCount': SHARDS,
         'shardPattern': 'shards/{shard}.json', 'routing': 'ottId modulo shardCount',
         'maxCompressedShardBytes': max(compressed), 'compressedPublicationBytes': sum(compressed),
         'searchFile': 'search.json', 'compressedSearchBytes': search_compressed,
         'retrievedAt': snapshot['retrievedAt'], 'openTree': snapshot['openTree'],
         'sourcePriority': {**snapshot['sourcePriority'],
-                           'treeWideCoverage': 'OpenTree scientific identity only; enriched fields remain empty until sourced'},
+                           'coverage': 'Every published profile has OpenTree identity plus at least one independently sourced field'},
         'coverage': coverage,
         'sources': [
             {'name': 'Open Tree of Life', 'url': 'https://tree.opentreeoflife.org/', 'role': 'taxon identity and topology'},
@@ -499,8 +768,11 @@ def publish(snapshot):
             {'name': 'English Wikipedia', 'url': 'https://en.wikipedia.org/', 'role': 'attributed introductory descriptions',
              'license': 'CC BY-SA 4.0'},
             {'name': 'Wikidata', 'url': 'https://www.wikidata.org/', 'role': 'article-to-taxon validation'},
+            {'name': 'Journey research', 'url': 'data/journeys/manifest.json',
+             'role': 'peer-reviewed, field-level facts and locally hosted attributed media'},
         ],
         'sourceSnapshotSha256': sha256(SNAPSHOT),
+        'curationSha256': curation_sha256(),
     }
     stage = OUTPUT / '.build-stage'
     if stage.exists():
@@ -536,14 +808,17 @@ def publish(snapshot):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--refresh', action='store_true', help='Fetch a new official-source snapshot before publishing')
+    parser.add_argument('--expand', action='store_true', help='Expand the saved source snapshot to the full field-guide set')
     parser.add_argument('--audit-snapshot', action='store_true', help='Revalidate saved Wikipedia articles using Wikidata')
     args = parser.parse_args()
     if args.refresh:
-        snapshot = refresh()
+        snapshot = expand(refresh())
     elif SNAPSHOT.exists():
         snapshot = json.loads(SNAPSHOT.read_text(encoding='utf-8'))
     else:
         parser.error('Missing profile source snapshot. Run with --refresh once.')
+    if args.expand:
+        snapshot = expand(snapshot)
     if args.audit_snapshot:
         articles = {profile['ottId']: profile.get('wikipedia') for profile in snapshot['profiles']}
         rows = [{'ottId': profile['ottId'], 'scientificName': profile['scientificName']}
