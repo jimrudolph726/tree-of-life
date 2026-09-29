@@ -118,8 +118,8 @@ def app_sources(folder):
     for path in journey_files + image_files:
         if path.is_symlink() or not path.resolve().is_relative_to(root):
             raise ValueError('Journey publication contains a symlink/outside file')
-    app_files.append(journey_pointer)
-    assets.extend(journey_files + image_files)
+    app_files.extend([journey_pointer, *image_files])
+    assets.extend(journey_files)
     return root, app_files, assets
 
 
@@ -355,14 +355,14 @@ def deploy_app(s3, cf, bucket, distribution, folder):
         _, pointers[key] = read_json_object(s3, bucket, f'releases/{active}/{key}')
     release, versions, files, blobs = prepare_app(folder, pointers)
     inventory = inherited_data_inventory(record, versions)
-    existing = listing(s3, bucket, ['assets/', 'data/profiles/', 'data/journeys/', 'images/journeys/', f'releases/{release}/'])
+    existing = listing(s3, bucket, ['assets/', 'data/profiles/', 'data/journeys/', f'releases/{release}/'])
     with ThreadPoolExecutor(max_workers=12) as executor:
         inventory.update(executor.map(lambda entry: upload_file(s3, bucket, entry, existing), files))
         inventory.update(executor.map(lambda entry: upload_bytes(s3, bucket, entry, existing), blobs))
     tree_prefixes = tuple(f'data/{dataset}/' for dataset in DATASETS)
     app_inventory = {key: value for key, value in inventory.items() if not key.startswith(tree_prefixes)}
     verify_inventory(app_inventory, listing(s3, bucket,
-                     ['assets/', 'data/profiles/', 'data/journeys/', 'images/journeys/', f'releases/{release}/']))
+                     ['assets/', 'data/profiles/', 'data/journeys/', f'releases/{release}/']))
     next_record = {'release': release, 'datasets': versions, 'objects': inventory}
     s3.put_object(Bucket=bucket, Key=f'releases/{release}/release.json',
                   Body=gzip.compress(json.dumps(next_record, sort_keys=True).encode(), mtime=0),

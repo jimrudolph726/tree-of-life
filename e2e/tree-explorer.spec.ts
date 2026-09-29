@@ -1,6 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
+import { existsSync } from 'node:fs';
 
 const hosted = Boolean(process.env.PLAYWRIGHT_BASE_URL);
+const hasLifePublication = existsSync('public/data/life/manifest.json');
 const path = hosted ? '/' : '/?dataset=aves';
 const taxon = hosted ? 'Homo sapiens' : 'Camarhynchus psittacula';
 
@@ -122,7 +124,8 @@ test('common names discover the corresponding scientific taxon', async ({ page }
 });
 
 test('bird-flight journey navigates real OpenTree evidence and can be paused', async ({ page, browserName }) => {
-  test.skip(hosted || browserName !== 'chromium', 'The full pilot runs once against the checked-in life publication.');
+  test.skip(hosted || browserName !== 'chromium' || !hasLifePublication,
+    'The full pilot runs once when the complete local life publication is available.');
   const journeyRequests: string[] = [];
   page.on('request', request => { if (request.url().includes('/data/journeys/')) journeyRequests.push(request.url()); });
   await page.goto('/?dataset=life', { waitUntil: 'domcontentloaded' });
@@ -170,7 +173,8 @@ test('bird-flight journey navigates real OpenTree evidence and can be paused', a
 });
 
 test('a newly published scientific Journey loads its media and navigates a real taxon', async ({ page, browserName }) => {
-  test.skip(hosted || browserName !== 'chromium', 'Editorial Journey publications run once against local pinned data.');
+  test.skip(hosted || browserName !== 'chromium' || !hasLifePublication,
+    'Editorial Journey navigation runs once when the complete local life publication is available.');
   await page.goto('/?dataset=life', { waitUntil: 'domcontentloaded' });
   const app = page.locator('main.app');
   await expect(app).toHaveAttribute('data-tree-ready', 'true', { timeout: 20_000 });

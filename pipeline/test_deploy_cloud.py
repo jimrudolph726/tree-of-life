@@ -67,6 +67,8 @@ class DeploymentTests(unittest.TestCase):
         keys = [key for _, key, _ in files]
         self.assertIn(f'releases/{release}/data/life/manifest.json', keys)
         self.assertIn('assets/app-123.js', keys)
+        self.assertIn(f'releases/{release}/images/journeys/flight/cover.webp', keys)
+        self.assertNotIn('images/journeys/flight/cover.webp', keys)
         self.assertFalse(any('.env' in key or 'aaaaaaaaaaaaaaaa' in key for key in keys))
         self.assertEqual(cloud.prepare(self.root)[0], release)
         self.write('index.html', 'changed app')
@@ -89,6 +91,8 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(versions, {dataset: '0123456789abcdef' for dataset in cloud.DATASETS})
         self.assertIn('assets/app-123.js', [key for _, key, _ in files])
         self.assertIn('data/profiles/fedcba9876543210/shards/00.json',
+                      [key for _, key, _ in files])
+        self.assertIn(f'releases/{release}/images/journeys/flight/cover.webp',
                       [key for _, key, _ in files])
         self.assertEqual({key for _, key, _ in blobs},
                          {f'releases/{release}/data/{dataset}/manifest.json' for dataset in cloud.DATASETS})
@@ -159,6 +163,7 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(cloud.encode(file, 'releases/id/manifest.json')[1]['CacheControl'], cloud.FRESH)
         self.assertEqual(cloud.encode(file, 'releases/id/data/profiles/fedcba9876543210/shards/00.json')[1]['CacheControl'], cloud.IMMUTABLE)
         self.assertEqual(cloud.encode(file, 'releases/id/data/journeys/abcdef0123456789/vision.json')[1]['CacheControl'], cloud.IMMUTABLE)
+        self.assertEqual(cloud.encode(file, 'releases/id/images/journeys/flight/cover.webp')[1]['CacheControl'], cloud.IMMUTABLE)
         blob, options = cloud.encode_bytes(b'{}', '.json', 'releases/id/data/life/manifest.json')
         self.assertEqual(gzip.decompress(blob), b'{}')
         self.assertEqual(options['CacheControl'], cloud.FRESH)
