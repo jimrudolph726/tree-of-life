@@ -1,0 +1,118 @@
+{
+  "id": "vertebrate-vision",
+  "category": "Vision",
+  "title": "From Light-Sensitive Cells to Vertebrate Eyes",
+  "subtitle": "Trace how light detection, pigment, lenses, layered retinas, and color vision accumulated along the chordate branch.",
+  "duration": "8–10 min",
+  "introduction": "Living species are not frozen ancestors. Each stop is a surviving cousin that preserves evidence about traits inferred for successive branches of chordate history. The map shows their real relationships; dates describe divergences or fossil evidence, not the age of the living species.",
+  "completion": {
+    "title": "Light became a detailed world",
+    "summary": "You followed evidence from a few light-sensitive cells to the focusing optics, layered retina, and specialized color vision of living vertebrates."
+  },
+  "steps": [
+    {
+      "title": "A direction for light",
+      "taxon": "Branchiostoma lanceolatum",
+      "ottId": 801608,
+      "age": "chordate comparison · today",
+      "era": "Living lineage",
+      "kind": "living lineage",
+      "summary": "Lancelets possess small frontal photoreceptive organs rather than a vertebrate camera eye. Pigment beside light-sensitive cells helps distinguish the direction of illumination, turning simple detection into spatial information.",
+      "evidence": "Developmental genes and ciliary photoreceptors in lancelets share parts of the molecular toolkit later used to construct vertebrate eyes and retinas.",
+      "uncertainty": "Modern lancelets are specialized living cousins, so their organs are comparisons rather than direct replicas of an ancestral chordate eye.",
+      "image": { "mediaId": "vision-lancelet", "alt": "A translucent European lancelet showing its narrow fish-like chordate body", "caption": "A living lancelet preserves a chordate body plan with small frontal photoreceptive organs." },
+      "sources": [{ "label": "Lamb et al., Nature Reviews Neuroscience (2007)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3143066/" }]
+    },
+    {
+      "title": "An ocellus guides a larva",
+      "taxon": "Ciona intestinalis",
+      "ottId": 744224,
+      "age": "tunicate comparison · today",
+      "era": "Living lineage",
+      "kind": "living lineage",
+      "summary": "A sea-squirt larva carries an ocellus containing photoreceptors and a pigment cell. It cannot form a detailed image, but it can steer the swimming larva by reporting light direction and intensity.",
+      "evidence": "The larval ocellus combines ciliary photoreceptors, pigment, and neural connections, providing a comparative model for an early chordate light-sensing circuit.",
+      "uncertainty": "Tunicates are the closest living invertebrate relatives of vertebrates, but their compact larval sensory system has its own long evolutionary history.",
+      "image": { "mediaId": "vision-tunicate", "alt": "A translucent sea squirt attached to a rock beneath the water", "caption": "Adult sea squirts look simple, while their mobile larvae carry a directional light-sensing ocellus." },
+      "sources": [{ "label": "Lamb, Progress in Retinal and Eye Research (2022)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9018162/" }]
+    },
+    {
+      "title": "A vertebrate eye in reduced light",
+      "taxon": "Eptatretus stoutii",
+      "ottId": 852671,
+      "age": "jawless vertebrate comparison · today",
+      "era": "Living lineage",
+      "kind": "living lineage",
+      "summary": "The Pacific hagfish has small eyes beneath translucent skin. Its retina and photoreceptors retain vertebrate features, yet its dim habitat and life history are associated with greatly reduced image-forming structures.",
+      "evidence": "Comparisons of hagfish development, retinal organization, and genes help separate ancient vertebrate features from reductions that evolved within hagfish.",
+      "uncertainty": "A simple-looking living eye is not automatically ancestral; researchers debate how much hagfish anatomy reflects secondary reduction.",
+      "image": { "mediaId": "vision-hagfish", "alt": "A Pacific hagfish with an elongated body and small head", "caption": "The Pacific hagfish offers evidence from a living jawless vertebrate with strongly reduced eyes." },
+      "sources": [{ "label": "Oisi et al., Frontiers in Cell and Developmental Biology (2022)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8826474/" }]
+    },
+    {
+      "title": "The camera eye is assembled",
+      "taxon": "Petromyzon marinus",
+      "ottId": 227494,
+      "age": "vertebrate design present by 500 Ma",
+      "era": "Cambrian roots",
+      "kind": "living lineage",
+      "summary": "Adult lampreys possess a cornea, lens, iris, layered retina, rods, and cones. The basic vertebrate camera-eye architecture was therefore established before jawless and jawed vertebrates separated.",
+      "evidence": "Lamprey retinal cell types and gene-expression programs reveal deep homology with the conserved retina of jawed vertebrates, despite later lineage-specific changes.",
+      "uncertainty": "Lampreys are modern animals, and their complex eyes do not show one historical moment; ancestral states are inferred through comparison and fossils.",
+      "image": { "mediaId": "vision-lamprey", "alt": "A sea lamprey viewed from the side with its eye visible", "caption": "The sea lamprey has the main optical and retinal components of a vertebrate camera eye." },
+      "sources": [{ "label": "Hain et al., Nature Communications (2024)", "url": "https://www.nature.com/articles/s41467-024-55019-x" }]
+    },
+    {
+      "title": "Color channels multiply",
+      "taxon": "Danio rerio",
+      "ottId": 1005914,
+      "age": "jawed vertebrate radiation · after 450 Ma",
+      "era": "Paleozoic roots",
+      "kind": "living lineage",
+      "summary": "Zebrafish use four cone classes sensitive to ultraviolet, short, medium, and long wavelengths. Duplicated opsin genes and patterned cone mosaics expanded what a vertebrate retina could distinguish.",
+      "evidence": "Genetics, physiology, and retinal imaging connect specific zebrafish opsins and cone types with wavelength-sensitive visual circuits.",
+      "uncertainty": "Four-channel zebrafish vision is one specialized outcome of fish evolution, not a universal stage through which every vertebrate passed.",
+      "image": { "mediaId": "vision-zebrafish", "alt": "A striped zebrafish swimming against a plain background", "caption": "Zebrafish retinas organize several cone types into a highly patterned color-sensing mosaic." },
+      "sources": [{ "label": "Baden and Osorio, Annual Review of Vision Science (2019)", "url": "https://doi.org/10.1146/annurev-vision-091718-014741" }]
+    },
+    {
+      "title": "Eyes move onto land",
+      "taxon": "Xenopus laevis",
+      "ottId": 465096,
+      "age": "tetrapod transition · about 375 Ma",
+      "era": "Late Devonian roots",
+      "kind": "living lineage",
+      "summary": "Frogs inherit the vertebrate camera eye but must operate across water, air, and metamorphosis. Changes to focusing, eyelids, tear films, and visual circuits accompanied the move into terrestrial environments.",
+      "evidence": "Amphibian development shows the conserved vertebrate eye program repeatedly adapting as a larva becomes a terrestrial or semi-aquatic adult.",
+      "uncertainty": "The African clawed frog is secondarily aquatic, so it illustrates developmental conservation and adaptation rather than the first land-going eye.",
+      "image": { "mediaId": "vision-frog", "alt": "An African clawed frog showing its upward-facing eyes", "caption": "The African clawed frog retains a tetrapod eye while living a secondarily aquatic life." },
+      "sources": [{ "label": "Nilsson, Philosophical Transactions B (2009)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2781858/" }]
+    },
+    {
+      "title": "A retina tuned to darkness",
+      "taxon": "Mus musculus",
+      "ottId": 542509,
+      "age": "mammalian radiation · after 200 Ma",
+      "era": "Mesozoic roots",
+      "kind": "living lineage",
+      "summary": "Mouse retinas are dominated by highly sensitive rods, reflecting the nocturnal history of early mammals. Neural pooling sacrifices fine detail while improving the detection of scarce photons.",
+      "evidence": "Mammalian retinal anatomy, opsins, and visual behavior document a deep low-light specialization followed by later reinvention of color and acuity in some branches.",
+      "uncertainty": "Mice are an extreme modern nocturnal example; early mammal vision varied, and soft retinal tissues rarely fossilize directly.",
+      "image": { "mediaId": "vision-mouse", "alt": "A small house mouse photographed in side view", "caption": "The house mouse represents a mammalian retina strongly weighted toward sensitive low-light vision." },
+      "sources": [{ "label": "Gerkema et al., Proceedings B (2013)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3692450/" }]
+    },
+    {
+      "title": "High-acuity primate sight",
+      "taxon": "Homo sapiens",
+      "ottId": 770315,
+      "age": "today",
+      "era": "Living species",
+      "kind": "living lineage",
+      "summary": "Human vision concentrates cones in a tiny fovea for detailed central sight and uses three cone pigments for trichromatic color. Eye movements rapidly place important features onto that high-resolution region.",
+      "evidence": "Anatomy, genetics, and psychophysics connect primate foveal organization and duplicated cone opsins with fine spatial discrimination and red–green color vision.",
+      "uncertainty": "Human sight is one specialized primate solution, with narrow spectral reach and a blind spot; it is not a measure of evolutionary progress.",
+      "image": { "mediaId": "vision-human", "alt": "Close-up photograph of a human iris and pupil", "caption": "A human eye feeds a fovea-centered, trichromatic visual system inherited from primate ancestors." },
+      "sources": [{ "label": "Jacobs, Evolution of colour vision in mammals (2009)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2781854/" }]
+    }
+  ]
+}

@@ -19,9 +19,9 @@ const profileRoot = 'public/data/profiles';
 const profilePointer = join(profileRoot, 'manifest.json');
 if (!existsSync(profilePointer)) throw new Error('Scientific profiles have not been prepared. Run npm run data:profiles.');
 const profiles = JSON.parse(readFileSync(profilePointer, 'utf8'));
-if (profiles.format !== 1 || !/^[a-f0-9]{16}$/.test(profiles.version) || profiles.profileCount !== 1000 ||
+if (profiles.format !== 1 || !/^[a-f0-9]{16}$/.test(profiles.version) || profiles.profileCount !== 10000 ||
     !Number.isInteger(profiles.shardCount) || profiles.shardCount < 1 || profiles.maxCompressedShardBytes > 24 * 1024 ||
-    profiles.searchFile !== 'search.json' || profiles.compressedSearchBytes > 64 * 1024) {
+    profiles.searchFile !== 'search.json' || profiles.compressedSearchBytes > 256 * 1024) {
   throw new Error('Invalid scientific-profile publication. Run npm run data:profiles.');
 }
 const searchPath = join(profileRoot, profiles.version, profiles.searchFile);
@@ -47,4 +47,27 @@ for (let shard = 0; shard < profiles.shardCount; shard++) {
 }
 if (counted !== profiles.profileCount || maxCompressed > 24 * 1024) {
   throw new Error('Scientific-profile counts or compressed payload budget do not match the manifest.');
+}
+
+const journeyRoot = 'public/data/journeys';
+const journeyPointer = join(journeyRoot, 'manifest.json');
+if (!existsSync(journeyPointer)) throw new Error('Journeys have not been prepared. Run npm run data:journeys.');
+const journeys = JSON.parse(readFileSync(journeyPointer, 'utf8'));
+if (journeys.format !== 1 || !/^[a-f0-9]{16}$/.test(journeys.version) || journeys.journeyCount < 3 ||
+    journeys.maxCompressedJourneyBytes > 20 * 1024 || journeys.compressedCatalogBytes > 8 * 1024) {
+  throw new Error('Invalid Journey publication. Run npm run data:journeys.');
+}
+const journeyVersion = join(journeyRoot, journeys.version);
+if (readFileSync(join(journeyVersion, 'manifest.json'), 'utf8') !== readFileSync(journeyPointer, 'utf8')) {
+  throw new Error('Journey pointer does not match its immutable version.');
+}
+const catalog = JSON.parse(readFileSync(join(journeyVersion, journeys.catalogFile), 'utf8'));
+if (!Array.isArray(catalog.journeys) || catalog.journeys.length !== journeys.journeyCount) {
+  throw new Error('The Journey catalog is incomplete.');
+}
+for (const item of catalog.journeys) {
+  const path = join(journeyVersion, journeys.journeyPattern.replace('{id}', item.id));
+  if (!existsSync(path) || gzipSync(readFileSync(path), { level: 9 }).byteLength > 20 * 1024) {
+    throw new Error(`Journey ${item.id} is missing or exceeds its payload budget.`);
+  }
 }

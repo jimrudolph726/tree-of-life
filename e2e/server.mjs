@@ -8,9 +8,12 @@ const outputRoot = resolve('.e2e-dist');
 const avesRoot = resolve('public', 'data', 'aves');
 const lifeRoot = resolve('public', 'data', 'life');
 const profilesRoot = resolve('public', 'data', 'profiles');
+const journeysRoot = resolve('public', 'data', 'journeys');
+const imagesRoot = resolve('public', 'images');
 const contentTypes = new Map([
   ['.bin', 'application/octet-stream'], ['.css', 'text/css'], ['.html', 'text/html'],
   ['.js', 'text/javascript'], ['.json', 'application/json'], ['.map', 'application/json'],
+  ['.webp', 'image/webp'],
 ]);
 
 await build({ configFile: 'vite.e2e.config.ts', build: { outDir: outputRoot, emptyOutDir: true } });
@@ -19,7 +22,9 @@ createServer((request, response) => {
   const pathname = decodeURIComponent(new URL(request.url ?? '/', `http://${request.headers.host}`).pathname);
   const data = pathname.startsWith('/data/aves/') ? { root: avesRoot, prefix: '/data/aves/' }
     : pathname.startsWith('/data/life/') ? { root: lifeRoot, prefix: '/data/life/' }
-    : pathname.startsWith('/data/profiles/') ? { root: profilesRoot, prefix: '/data/profiles/' } : null;
+    : pathname.startsWith('/data/profiles/') ? { root: profilesRoot, prefix: '/data/profiles/' }
+    : pathname.startsWith('/data/journeys/') ? { root: journeysRoot, prefix: '/data/journeys/' }
+    : pathname.startsWith('/images/') ? { root: imagesRoot, prefix: '/images/' } : null;
   const root = data?.root ?? outputRoot;
   const relative = data ? pathname.slice(data.prefix.length) : pathname.slice(1);
   let file = resolve(root, relative || 'index.html');

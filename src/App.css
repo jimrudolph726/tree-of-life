@@ -34,6 +34,7 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid 
 .header-menu-popover small { color: #7b897f; font-size: 10px; line-height: 1.4; }
 .header-menu-popover i { color: #267056; font-size: 13px; font-style: normal; }
 .header-menu-popover .journey-menu-item { align-items: flex-start; flex-direction: column; gap: 4px; }
+.journey-menu-loading { margin: 0; padding: 10px; color: #7b897f; font-size: 11px; }
 .map-controls { position: absolute; top: 110px; left: 24px; z-index: 5; display: flex; flex-direction: column; border: 1px solid #dce3d7; border-radius: 9px; overflow: hidden; box-shadow: 0 2px 8px #203a2510; }
 .map-controls button { width: 40px; height: 40px; border: 0; border-bottom: 1px solid #e9ede5; background: #fff; color: #526d5c; font-size: 24px; line-height: 1; }
 .map-controls button:last-child { border-bottom: 0; }
@@ -67,9 +68,11 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid 
 .journey-primary:hover { background: #235e48; }
 .journey-card .journey-primary { width: 100%; }
 .journey-topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.journey-topic-grid > div { display: flex; flex-direction: column; gap: 5px; padding: 12px; border: 1px solid #e1e7dd; border-radius: 9px; background: #fafbf7; color: #718174; }
+.journey-topic-grid > button { display: flex; flex-direction: column; gap: 5px; padding: 12px; border: 1px solid #e1e7dd; border-radius: 9px; background: #fafbf7; color: #718174; text-align: left; }
+.journey-topic-grid > button:hover, .journey-topic-grid > button:focus-visible { border-color: #abc6b3; background: #f1f7ee; }
 .journey-topic-grid strong { color: #4c6757; font-size: 14px; font-weight: 650; }
 .journey-topic-grid span { font-family: Georgia, serif; font-size: 11px; line-height: 1.4; }
+.journey-topic-grid small { color: #859187; font-size: 9px; }
 .journey-image { margin: 16px 0 18px; overflow: hidden; border: 1px solid #dfe6db; border-radius: 11px; background: #f0f3eb; }
 .journey-image > div { display: grid; place-items: center; height: 190px; overflow: hidden; background: radial-gradient(circle at 50% 40%, #fffef9, #edf1e8); }
 .journey-image img { display: block; width: 100%; height: 100%; object-fit: contain; }

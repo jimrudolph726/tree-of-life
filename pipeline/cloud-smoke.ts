@@ -4,6 +4,7 @@ import { TreeStore } from '../src/stream/store.ts';
 import { validateManifest } from '../src/stream/format.ts';
 import { fitBounds, focusBounds, mapInsets } from '../src/tree/navigation.ts';
 import { validateProfileManifest, validateProfileShard } from '../src/profiles/types.ts';
+import { validateJourney, validateJourneyCatalog, validateJourneyManifest } from '../src/journeys/types.ts';
 
 const address = process.argv[2];
 assert.ok(address, 'Usage: node pipeline/cloud-smoke.ts https://distribution.cloudfront.net [report.json]');
@@ -32,6 +33,18 @@ await read(script, true);
 const profileManifest = validateProfileManifest(JSON.parse(new TextDecoder().decode(await read('data/profiles/manifest.json'))));
 const profileVersion = JSON.parse(new TextDecoder().decode(await read(`data/profiles/${profileManifest.version}/manifest.json`, true)));
 assert.deepEqual(profileVersion, profileManifest);
+const journeyManifest = validateJourneyManifest(JSON.parse(new TextDecoder().decode(await read('data/journeys/manifest.json'))));
+const journeyVersion = JSON.parse(new TextDecoder().decode(await read(`data/journeys/${journeyManifest.version}/manifest.json`, true)));
+assert.deepEqual(journeyVersion, journeyManifest);
+const journeyCatalog = validateJourneyCatalog(JSON.parse(new TextDecoder().decode(
+  await read(`data/journeys/${journeyManifest.version}/${journeyManifest.catalogFile}`, true))));
+assert.equal(journeyCatalog.length, 3);
+for (const summary of journeyCatalog) {
+  const file = journeyManifest.journeyPattern.replace('{id}', summary.id);
+  const journey = validateJourney(JSON.parse(new TextDecoder().decode(
+    await read(`data/journeys/${journeyManifest.version}/${file}`, true))));
+  assert.equal(journey.steps.length, summary.stepCount);
+}
 const results = [];
 for (const [dataset, query] of [['life', 'Homo sapiens'], ['aves', 'Camarhynchus psittacula'], ['primates', 'Homo sapiens']]) {
   const manifest = validateManifest(JSON.parse(new TextDecoder().decode(await read(`data/${dataset}/manifest.json`))));

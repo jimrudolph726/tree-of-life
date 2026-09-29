@@ -36,7 +36,7 @@ class DeploymentTests(unittest.TestCase):
                 self.write(f'data/{dataset}/0123456789abcdef/search-top.json', '[]')
 
     def profile_fixture(self):
-        value = json.dumps({'format': 1, 'version': 'fedcba9876543210', 'profileCount': 1000,
+        value = json.dumps({'format': 1, 'version': 'fedcba9876543210', 'profileCount': 10000,
                             'shardCount': 2, 'maxCompressedShardBytes': 100,
                             'searchFile': 'search.json', 'compressedSearchBytes': 100})
         self.write('data/profiles/manifest.json', value)
@@ -44,6 +44,20 @@ class DeploymentTests(unittest.TestCase):
         self.write('data/profiles/fedcba9876543210/shards/00.json', '{"profiles":[]}')
         self.write('data/profiles/fedcba9876543210/shards/01.json', '{"profiles":[]}')
         self.write('data/profiles/fedcba9876543210/search.json', '{"profiles":[]}')
+        self.journey_fixture()
+
+    def journey_fixture(self):
+        value = json.dumps({'format': 1, 'version': 'abcdef0123456789', 'journeyCount': 3,
+                            'catalogFile': 'catalog.json', 'journeyPattern': '{id}.json',
+                            'maxCompressedJourneyBytes': 100, 'compressedCatalogBytes': 100})
+        folder = 'data/journeys/abcdef0123456789'
+        catalog = {'journeys': [{'id': item} for item in ('flight', 'vision', 'walking')]}
+        self.write('data/journeys/manifest.json', value)
+        self.write(f'{folder}/manifest.json', value)
+        self.write(f'{folder}/catalog.json', json.dumps(catalog))
+        for item in ('flight', 'vision', 'walking'):
+            self.write(f'{folder}/{item}.json', '{}')
+        self.write('images/journeys/flight/cover.webp', 'image')
 
     def test_preflight_excludes_unrelated_files_and_old_versions(self):
         self.fixture()
@@ -144,6 +158,7 @@ class DeploymentTests(unittest.TestCase):
         self.assertIn('immutable', headers['CacheControl'])
         self.assertEqual(cloud.encode(file, 'releases/id/manifest.json')[1]['CacheControl'], cloud.FRESH)
         self.assertEqual(cloud.encode(file, 'releases/id/data/profiles/fedcba9876543210/shards/00.json')[1]['CacheControl'], cloud.IMMUTABLE)
+        self.assertEqual(cloud.encode(file, 'releases/id/data/journeys/abcdef0123456789/vision.json')[1]['CacheControl'], cloud.IMMUTABLE)
         blob, options = cloud.encode_bytes(b'{}', '.json', 'releases/id/data/life/manifest.json')
         self.assertEqual(gzip.decompress(blob), b'{}')
         self.assertEqual(options['CacheControl'], cloud.FRESH)

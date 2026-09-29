@@ -7,6 +7,8 @@ const publicRoot = resolve('public');
 const avesRoot = resolve(publicRoot, 'data', 'aves');
 const lifeRoot = resolve(publicRoot, 'data', 'life');
 const profilesRoot = resolve(publicRoot, 'data', 'profiles');
+const journeysRoot = resolve(publicRoot, 'data', 'journeys');
+const imagesRoot = resolve(publicRoot, 'images');
 
 export default defineConfig({
   publicDir: false,
@@ -16,9 +18,12 @@ export default defineConfig({
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
         const pathname = decodeURIComponent((request.url ?? '').split('?')[0]);
-        if (!pathname.startsWith('/data/aves/') && !pathname.startsWith('/data/life/') && !pathname.startsWith('/data/profiles/')) return next();
+        if (!pathname.startsWith('/data/aves/') && !pathname.startsWith('/data/life/') &&
+            !pathname.startsWith('/data/profiles/') && !pathname.startsWith('/data/journeys/') &&
+            !pathname.startsWith('/images/')) return next();
         const file = resolve(publicRoot, pathname.slice(1));
-        const allowed = [avesRoot, lifeRoot, profilesRoot].some(root => file === root || file.startsWith(`${root}${sep}`));
+        const allowed = [avesRoot, lifeRoot, profilesRoot, journeysRoot, imagesRoot]
+          .some(root => file === root || file.startsWith(`${root}${sep}`));
         if (!allowed) {
           response.statusCode = 404; response.end(); return;
         }

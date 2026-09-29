@@ -7,6 +7,20 @@ Release download: https://files.opentreeoflife.org/synthesis/opentree16.1/
 Birds: OpenTree 16.1 Aves API snapshot, with versioned source provenance.
 Primates: earlier OpenTree snapshot; its synthesis version is unverified.
 
+Scientific profiles: OpenTree supplies identity and topology. Rich records use
+exact accepted GBIF matches for rank, common names and synonyms, and attributed
+English Wikipedia extracts after Wikidata taxon checks. The other tree-wide
+records intentionally contain OpenTree identity and provenance only. Versioned
+source identifiers, retrieval dates and checksums are recorded under
+/data/profiles/.
+
+Guided Journeys: editorial text and step-level scientific sources are recorded
+in each versioned file under /data/journeys/. Illustrations use curated,
+license-checked Wikimedia Commons or GBIF/iNaturalist media. Published steps
+carry creator, license and source URL; the authoring registry also records the
+verified file checksum. Images are optimized locally and served from
+/images/journeys/.
+
 OpenTree et al., Open Tree of Life Synthetic Tree:
 https://doi.org/10.5281/zenodo.3937741
 OpenTree et al., Open Tree of Life Taxonomy:

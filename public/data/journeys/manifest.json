@@ -1,0 +1,13 @@
+{
+  "catalogFile": "catalog.json",
+  "compressedCatalogBytes": 929,
+  "format": 1,
+  "journeyCount": 3,
+  "journeyPattern": "{id}.json",
+  "maxCompressedJourneyBytes": 4003,
+  "openTree": {
+    "synthId": "opentree16.1",
+    "taxonomyVersion": "3.7draft3"
+  },
+  "version": "8543e5c8c395676d"
+}

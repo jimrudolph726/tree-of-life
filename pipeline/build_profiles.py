@@ -26,10 +26,11 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT = ROOT / 'data/processed/profiles/source-snapshot.json'
 OUTPUT = ROOT / 'public/data/profiles'
-COUNT = 1000
+ENRICHED_COUNT = 1000
+COUNT = 10000
 SHARDS = 64
 MAX_GZIP_SHARD_BYTES = 24 * 1024
-MAX_GZIP_SEARCH_BYTES = 64 * 1024
+MAX_GZIP_SEARCH_BYTES = 256 * 1024
 USER_AGENT = 'TreeOfLifeExplorer/0.1 scientific-profile-etl'
 
 SOURCE_PRIORITY = {
@@ -222,17 +223,17 @@ def choose(rows, articles):
     take('primates', 430)
     take('aves', 430)
     for row in rows:
-        if len(selected) == COUNT:
+        if len(selected) == ENRICHED_COUNT:
             break
         if row['ottId'] not in seen and articles.get(row['ottId']):
             seen.add(row['ottId']); selected.append(row)
-    if len(selected) < COUNT:
+    if len(selected) < ENRICHED_COUNT:
         for row in rows:
-            if len(selected) == COUNT:
+            if len(selected) == ENRICHED_COUNT:
                 break
             if row['ottId'] not in seen:
                 seen.add(row['ottId']); selected.append(row)
-    if len(selected) != COUNT:
+    if len(selected) != ENRICHED_COUNT:
         raise ValueError(f'Only {len(selected)} profile candidates were available')
     return selected
 
@@ -393,10 +394,60 @@ def search_profile(profile):
             [item['name'] for item in profile.get('commonNames', [])], profile.get('synonyms', [])]
 
 
+def tree_wide_profiles(existing, target_count):
+    """Add deterministic OpenTree identity profiles without external requests.
+
+    Rich source-backed enrichment remains explicit in the saved snapshot. These
+    lightweight records extend lazy profile routing and discovery across a
+    reproducible sample of the complete tree without inventing descriptions.
+    """
+    if len(existing) >= target_count:
+        return []
+    provenance = json.loads((ROOT / 'data/processed/opentree/life/provenance.json').read_text(encoding='utf-8'))
+    folder = ROOT / provenance['snapshotPath']
+    offsets = array('I')
+    with (folder / 'labels.u32').open('rb') as stream:
+        offsets.fromfile(stream, (folder / 'labels.u32').stat().st_size // offsets.itemsize)
+    labels = (folder / 'labels.utf8').read_bytes()
+    seen = {item['ottId'] for item in existing}
+    needed = target_count - len(existing)
+    result = []
+
+    def consider(index):
+        offset, length = offsets[index * 2], offsets[index * 2 + 1]
+        label = labels[offset:offset + length].decode('utf-8')
+        match = re.fullmatch(r'(.+)_ott(\d+)', label)
+        if not match:
+            return
+        name = match.group(1).replace('_', ' ').strip()
+        ott_id = int(match.group(2))
+        if ott_id in seen or not re.search(r'[A-Za-z]', name) or name.casefold().startswith('mrca'):
+            return
+        seen.add(ott_id)
+        result.append({'ottId': ott_id, 'scientificName': name, 'selection': 'tree-wide',
+                       'commonNames': [], 'synonyms': []})
+
+    node_count = len(offsets) // 2
+    stride = max(1, node_count // (needed * 2))
+    for index in range(0, node_count, stride):
+        consider(index)
+        if len(result) == needed:
+            break
+    if len(result) < needed:
+        for index in range(node_count):
+            consider(index)
+            if len(result) == needed:
+                break
+    if len(result) != needed:
+        raise ValueError(f'Only {len(result):,} tree-wide profiles were available; needed {needed:,}')
+    return result
+
+
 def publish(snapshot):
-    profiles = snapshot.get('profiles', [])
-    if len(profiles) != COUNT or len({item['ottId'] for item in profiles}) != COUNT:
-        raise ValueError(f'Profile snapshot must contain exactly {COUNT} unique taxa')
+    enriched = snapshot.get('profiles', [])
+    if len(enriched) != ENRICHED_COUNT or len({item['ottId'] for item in enriched}) != ENRICHED_COUNT:
+        raise ValueError(f'Profile snapshot must contain exactly {ENRICHED_COUNT} unique enriched taxa')
+    profiles = [*enriched, *tree_wide_profiles(enriched, COUNT)]
     for profile in profiles:
         validate_profile(profile)
     required = {'Eukaryota', 'Archaea', 'Bacteria', 'Fungi', 'Opisthokonta', 'Bilateria',
@@ -421,6 +472,8 @@ def publish(snapshot):
     version = hash_value.hexdigest()[:16]
     coverage = {
         'profiles': len(profiles),
+        'enriched': len(enriched),
+        'treeWide': len(profiles) - len(enriched),
         'descriptions': sum('wikipedia' in item for item in public_profiles),
         'commonNames': sum(bool(item.get('commonNames')) for item in public_profiles),
         'synonyms': sum(bool(item.get('synonyms')) for item in public_profiles),
@@ -437,7 +490,9 @@ def publish(snapshot):
         'maxCompressedShardBytes': max(compressed), 'compressedPublicationBytes': sum(compressed),
         'searchFile': 'search.json', 'compressedSearchBytes': search_compressed,
         'retrievedAt': snapshot['retrievedAt'], 'openTree': snapshot['openTree'],
-        'sourcePriority': snapshot['sourcePriority'], 'coverage': coverage,
+        'sourcePriority': {**snapshot['sourcePriority'],
+                           'treeWideCoverage': 'OpenTree scientific identity only; enriched fields remain empty until sourced'},
+        'coverage': coverage,
         'sources': [
             {'name': 'Open Tree of Life', 'url': 'https://tree.opentreeoflife.org/', 'role': 'taxon identity and topology'},
             {'name': 'GBIF Species API', 'url': 'https://techdocs.gbif.org/en/openapi/v1/species', 'role': 'rank, common names and synonyms'},

@@ -3,7 +3,7 @@ import { DeckGL } from '@deck.gl/react';
 import { LinearInterpolator, OrthographicView, type TransitionInterpolator } from '@deck.gl/core';
 import { LineLayer, PolygonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
 import type { MapTreeNode } from './tree/layoutTreeV3';
-import { centeredFocusCamera, fitBounds, focusBounds, labelOffset, labelSize, labelText, mapInsets, visibleLabels } from './tree/navigation';
+import { centeredFocusCamera, fitBounds, focusBounds, labelOffset, labelSize, labelText, mapInsets, visibleLabels, zoomOutCamera } from './tree/navigation';
 import type { Camera, Size } from './tree/navigation';
 import { TreeClient } from './stream/client';
 import type { Details, Manifest, Scene, StreamNode, Summary } from './stream/format';
@@ -14,11 +14,15 @@ import { useBrowserMetrics } from './stream/useBrowserMetrics';
 import { ProfileClient } from './profiles/client';
 import type { ScientificProfile } from './profiles/types';
 import type { ProfileSearchHit } from './profiles/types';
+import { JourneyClient } from './journeys/client';
+import type { Journey, JourneySummary } from './journeys/types';
 import './App.css';
 
 const JourneyPanel = lazy(() => import('./journeys/JourneyPanel.tsx'));
 
 const TRANSITION = new LinearInterpolator(['target', 'zoomX', 'zoomY']);
+const JOURNEY_CONTEXT_ZOOM_OUT = 1;
+const JOURNEY_CONTEXT_MAX_ZOOM = 11;
 const PALETTE: [number, number, number, number][] = [[84, 143, 121, 24], [87, 125, 162, 24], [185, 141, 82, 24], [140, 117, 163, 24]];
 const DOMAIN_COLORS: [number, number, number, number][] = [[84, 143, 121, 18], [99, 140, 172, 32], [94, 153, 126, 32], [192, 137, 97, 32]];
 type CameraState = Camera & { transitionDuration?: number | 'auto'; transitionInterpolator?: TransitionInterpolator };
@@ -28,7 +32,7 @@ type PreparedFocus = { target: Promise<FocusTarget>; ready: Promise<FocusTarget 
 type ProfileState = { ottId: number; status: 'ready' | 'missing' | 'error'; profile?: ScientificProfile; error?: string };
 type SearchResult = { node: Summary; commonName?: string; rank?: string; matchedName?: string;
   matchKind?: ProfileSearchHit['matchKind'] | 'OpenTree ID' };
-type JourneyState = { view: 'closed' | 'library' | 'playing' | 'paused' | 'complete'; step: number };
+type JourneyState = { view: 'closed' | 'library' | 'playing' | 'paused' | 'complete'; journeyId: string; step: number };
 const getSize = (): Size => ({ width: window.innerWidth, height: window.innerHeight });
 const animate = (camera: Camera): CameraState => ({ ...camera,
   transitionDuration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650, transitionInterpolator: TRANSITION });
@@ -37,15 +41,15 @@ const benchmarkMode = new URLSearchParams(window.location.search).has('bench');
 
 function initialJourneyState(): JourneyState {
   const params = new URLSearchParams(window.location.search);
-  if (params.get('journey') !== 'birds-flight') return { view: 'closed', step: 0 };
-  const step = Math.max(0, Math.min(8, Number(params.get('step')) || 0));
-  return { view: 'playing', step };
+  const journeyId = params.get('journey');
+  if (!journeyId || !/^[a-z0-9-]+$/.test(journeyId)) return { view: 'closed', journeyId: 'birds-flight', step: 0 };
+  return { view: 'playing', journeyId, step: Math.max(0, Number(params.get('step')) || 0) };
 }
 
-function updateJourneyUrl(view: JourneyState['view'], step: number) {
+function updateJourneyUrl(view: JourneyState['view'], journeyId: string, step: number) {
   const url = new URL(window.location.href);
   if (view === 'closed' || view === 'library') { url.searchParams.delete('journey'); url.searchParams.delete('step'); }
-  else { url.searchParams.set('journey', 'birds-flight'); url.searchParams.set('step', String(step)); }
+  else { url.searchParams.set('journey', journeyId); url.searchParams.set('step', String(step)); }
   window.history.replaceState(null, '', url);
 }
 
@@ -76,7 +80,8 @@ function openingCamera(root: StreamNode, size: Size, manifest: Manifest) {
     : { top: 90, left: 90, right: 90, bottom: 55 });
 }
 
-function TreeMap({ client, profileClient, manifest }: { client: TreeClient; profileClient: ProfileClient; manifest: Manifest }) {
+function TreeMap({ client, profileClient, journeyClient, manifest }: { client: TreeClient; profileClient: ProfileClient;
+  journeyClient: JourneyClient; manifest: Manifest }) {
   const root = useMemo(() => rootNode(manifest), [manifest]);
   const container = useRef<HTMLElement>(null);
   const atHome = useRef(true);
@@ -103,6 +108,8 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
   const [navigationError, setNavigationError] = useState<string | null>(null);
   const [showRegions, setShowRegions] = useState(true);
   const [journeyState, setJourneyState] = useState<JourneyState>(initialJourneyState);
+  const [journeyCatalog, setJourneyCatalog] = useState<JourneySummary[]>([]);
+  const [activeJourney, setActiveJourney] = useState<Journey | null>(null);
   const [datasetMenuOpen, setDatasetMenuOpen] = useState(false);
   const [journeyMenuOpen, setJourneyMenuOpen] = useState(false);
   const initialJourneyLoaded = useRef(false);
@@ -181,15 +188,15 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
     });
     return () => controller.abort();
   }, [profileClient, selected?.ottId, manifest.synthetic]);
-  const prepareFocus = useCallback((node: Summary): PreparedFocus => {
-    const key = `${node.index}:${Math.round(size.width)}x${Math.round(size.height)}`;
+  const prepareFocus = useCallback((node: Summary, zoomOut = 0, maximumZoom = Infinity): PreparedFocus => {
+    const key = `${node.index}:${Math.round(size.width)}x${Math.round(size.height)}:${zoomOut}:${maximumZoom}`;
     const cached = preparedFocus.current.get(key);
     if (cached) {
       preparedFocus.current.delete(key); preparedFocus.current.set(key, cached);
       return cached;
     }
     const target = client.prefetchDetails(node.index).then(details => ({ details,
-      camera: centeredFocusCamera(details.focus, size) }));
+      camera: zoomOutCamera(centeredFocusCamera(details.focus, size), zoomOut, maximumZoom) }));
     const ready = target.then(async value => {
       const scene = await client.view({ anchor: value.details.anchor, camera: value.camera, size });
       const settled = scene.rebase ? reframe(scene, value.camera) : { scene, camera: value.camera };
@@ -226,16 +233,16 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
     if (active) queuePrefetch(active);
     return () => queuePrefetch();
   }, [searchOpen, results, activeResult, queuePrefetch]);
-  const focusNode = useCallback((node: Summary, preserveJourney = false) => {
+  const focusNode = useCallback((node: Summary, preserveJourney = false, zoomOut = 0, maximumZoom = Infinity) => {
     if (!preserveJourney && journeyState.view === 'playing') setJourneyState(current => ({ ...current, view: 'paused' }));
     startFocus(node.index);
     focusRequest.current?.abort();
     const controller = new AbortController(); focusRequest.current = controller;
     const previous = { camera, anchor, details, home: atHome.current };
-    const prepared = prepareFocus(node);
+    const prepared = prepareFocus(node, zoomOut, maximumZoom);
     if (isPositioned(node)) {
       atHome.current = false;
-      setCamera(animate(centeredFocusCamera(node, size)));
+      setCamera(animate(zoomOutCamera(centeredFocusCamera(node, size), zoomOut, maximumZoom)));
     }
     setPendingNode(node); setDetails(null);
     setPendingTaxon(node.scientificName);
@@ -254,34 +261,49 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
       setDetails(previous.details); setCamera(animate(previous.camera));
     } });
   }, [size, anchor, camera, details, startFocus, recordFocusReady, prime, prepareFocus, journeyState.view]);
-  const goJourneyStep = useCallback((step: number) => {
+  const loadJourneyCatalog = useCallback(() => {
+    void journeyClient.catalog().then(setJourneyCatalog).catch(error => setNavigationError(error.message));
+  }, [journeyClient]);
+  const openJourney = useCallback((journeyId: string) => {
+    const saved = Math.max(0, Number(localStorage.getItem(`tree-of-life:journey:${journeyId}`)) || 0);
+    setJourneyState({ view: 'library', journeyId, step: saved });
+    setActiveJourney(null); updateJourneyUrl('library', journeyId, saved);
+    void Promise.all([journeyClient.catalog(), journeyClient.journey(journeyId)]).then(([catalog, journey]) => {
+      setJourneyCatalog(catalog); setActiveJourney(journey);
+      setJourneyState(current => current.journeyId === journeyId
+        ? { ...current, step: Math.min(current.step, journey.steps.length - 1) } : current);
+    }).catch(error => setNavigationError(error.message));
+  }, [journeyClient]);
+  const goJourneyStep = useCallback((step: number, requestedJourneyId?: string) => {
     if (manifest.presentation !== 'life') return;
-    void import('./journeys/birdsFlight.ts').then(async ({ birdsFlight }) => {
-      const bounded = Math.max(0, Math.min(birdsFlight.steps.length - 1, step));
-      const current = birdsFlight.steps[bounded];
+    const journeyId = requestedJourneyId ?? journeyState.journeyId;
+    void journeyClient.journey(journeyId).then(async journey => {
+      setActiveJourney(journey);
+      const bounded = Math.max(0, Math.min(journey.steps.length - 1, step));
+      const current = journey.steps[bounded];
       const matches = await client.search(`ott${current.ottId}`);
       const node = matches.find(item => item.ottId === current.ottId);
       if (!node) throw new Error(`${current.mapTaxon ?? current.taxon} is not available in this tree publication.`);
-      setJourneyState({ view: 'playing', step: bounded });
-      localStorage.setItem('tree-of-life:journey:birds-flight', String(bounded));
-      updateJourneyUrl('playing', bounded);
-      focusNode(node, true);
+      setJourneyState({ view: 'playing', journeyId, step: bounded });
+      localStorage.setItem(`tree-of-life:journey:${journeyId}`, String(bounded));
+      updateJourneyUrl('playing', journeyId, bounded);
+      focusNode(node, true, JOURNEY_CONTEXT_ZOOM_OUT, JOURNEY_CONTEXT_MAX_ZOOM);
     }).catch(error => setNavigationError(error.message));
-  }, [client, focusNode, manifest.presentation]);
+  }, [client, focusNode, journeyClient, journeyState.journeyId, manifest.presentation]);
   useEffect(() => {
     if (initialJourneyLoaded.current || journeyState.view !== 'playing') return;
     initialJourneyLoaded.current = true;
-    goJourneyStep(journeyState.step);
-  }, [goJourneyStep, journeyState.step, journeyState.view]);
+    loadJourneyCatalog(); goJourneyStep(journeyState.step, journeyState.journeyId);
+  }, [goJourneyStep, journeyState.journeyId, journeyState.step, journeyState.view, loadJourneyCatalog]);
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (journeyState.view !== 'playing' || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
       if (event.key === 'ArrowLeft' && journeyState.step > 0) { event.preventDefault(); goJourneyStep(journeyState.step - 1); }
-      if (event.key === 'ArrowRight' && journeyState.step < 8) { event.preventDefault(); goJourneyStep(journeyState.step + 1); }
+      if (event.key === 'ArrowRight' && journeyState.step < (activeJourney?.steps.length ?? 1) - 1) { event.preventDefault(); goJourneyStep(journeyState.step + 1); }
       if (event.key === 'Escape') setJourneyState(current => ({ ...current, view: 'paused' }));
     };
     window.addEventListener('keydown', onKeyDown); return () => window.removeEventListener('keydown', onKeyDown);
-  }, [goJourneyStep, journeyState]);
+  }, [activeJourney, goJourneyStep, journeyState]);
   const goHome = () => {
     if (journeyState.view === 'playing') setJourneyState(current => ({ ...current, view: 'paused' }));
     if (!atHome.current || details) { setPast(history => [...history.slice(-49), { camera, anchor, details, home: atHome.current }]); setFuture([]); }
@@ -435,13 +457,14 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
           if (!event.currentTarget.contains(event.relatedTarget)) setJourneyMenuOpen(false);
         }} onKeyDown={event => { if (event.key === 'Escape') setJourneyMenuOpen(false); }}>
           <button className="header-menu-trigger" aria-haspopup="menu" aria-expanded={journeyMenuOpen} onClick={() => {
-            setDatasetMenuOpen(false); setJourneyMenuOpen(open => !open);
+            setDatasetMenuOpen(false); setJourneyMenuOpen(open => !open); loadJourneyCatalog();
           }}>Journeys <b aria-hidden="true">⌄</b></button>
           {journeyMenuOpen && <div className="header-menu-popover" role="menu" aria-label="Guided journeys">
-            <span>Guided journey</span>
-            <button className="journey-menu-item" role="menuitem" onClick={() => {
-              setJourneyMenuOpen(false); setJourneyState({ view: 'library', step: journeyState.step }); updateJourneyUrl('library', journeyState.step);
-            }}><strong>From Feathered Dinosaurs to Modern Birds</strong><small>Follow nine milestones in the evolution of flight</small></button>
+            <span>Guided journeys</span>
+            {journeyCatalog.length ? journeyCatalog.map(item => <button key={item.id} className="journey-menu-item" role="menuitem" onClick={() => {
+              setJourneyMenuOpen(false); openJourney(item.id);
+            }}><strong>{item.category} · {item.title}</strong><small>{item.stepCount} stops · {item.duration}</small></button>)
+              : <p className="journey-menu-loading">Loading journeys…</p>}
           </div>}
         </div>}
       </header>
@@ -502,15 +525,16 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
       {scene?.stats.limited && <div className="stream-notice" role="status">Showing an overview. Zoom in for more detail.</div>}
       {details?.childrenTruncated && selected && <div className="children-note">Showing {descendants.length} named descendants. Search to find more.</div>}
       {journeyState.view === 'paused' && <button className="journey-resume" onClick={() => goJourneyStep(journeyState.step)}>
-        <span aria-hidden="true">✦</span><span><small>Journey paused</small>Resume: From Feathered Dinosaurs to Modern Birds</span><b>→</b></button>}
+        <span aria-hidden="true">✦</span><span><small>Journey paused</small>Resume: {activeJourney?.title ?? 'guided journey'}</span><b>→</b></button>}
       {['library', 'playing', 'complete'].includes(journeyState.view) && <Suspense fallback={<aside className="journey-panel journey-loading" aria-label="Loading journey"><div className="loading-indicator" /></aside>}>
         <JourneyPanel view={journeyState.view as 'library' | 'playing' | 'complete'} step={journeyState.step}
-          onBegin={() => goJourneyStep(Number(localStorage.getItem('tree-of-life:journey:birds-flight')) || 0)}
+          journey={activeJourney} catalog={journeyCatalog} onSelect={openJourney}
+          onBegin={() => goJourneyStep(journeyState.step)}
           onStep={goJourneyStep}
           onPause={() => setJourneyState(current => ({ ...current, view: 'paused' }))}
-          onClose={() => { setJourneyState(current => ({ ...current, view: 'closed' })); updateJourneyUrl('closed', journeyState.step); }}
-          onLibrary={() => { setJourneyState(current => ({ ...current, view: 'library' })); updateJourneyUrl('library', journeyState.step); }}
-          onComplete={() => { setJourneyState(current => ({ ...current, view: 'complete' })); updateJourneyUrl('complete', journeyState.step); }} />
+          onClose={() => { setJourneyState(current => ({ ...current, view: 'closed' })); updateJourneyUrl('closed', journeyState.journeyId, journeyState.step); }}
+          onLibrary={() => { setJourneyState(current => ({ ...current, view: 'library' })); updateJourneyUrl('library', journeyState.journeyId, journeyState.step); }}
+          onComplete={() => { setJourneyState(current => ({ ...current, view: 'complete' })); updateJourneyUrl('complete', journeyState.journeyId, journeyState.step); }} />
       </Suspense>}
       {benchmarkMode && <aside className="benchmark-panel" aria-label="Performance diagnostics">
         <strong>{manifest.title}</strong>
@@ -529,6 +553,7 @@ function TreeMap({ client, profileClient, manifest }: { client: TreeClient; prof
 
 function App() {
   const profileClient = useMemo(() => new ProfileClient(new URL(`${import.meta.env.BASE_URL}data/profiles/manifest.json`, window.location.href).href), []);
+  const journeyClient = useMemo(() => new JourneyClient(new URL(`${import.meta.env.BASE_URL}data/journeys/manifest.json`, window.location.href).href), []);
   const [loaded, setLoaded] = useState<{ client: TreeClient; manifest: Manifest } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -546,6 +571,6 @@ function App() {
   }, [attempt]);
   if (error) return <main className="app loading-message" role="alert"><div><h1>Unable to open the tree</h1><p>{error}</p><button onClick={() => { setError(null); setAttempt(value => value + 1); }}>Try again</button></div></main>;
   if (!loaded) return <main className="app loading-message" role="status"><div className="loading-indicator" /><p>Opening the tree map…</p></main>;
-  return <TreeMap client={loaded.client} profileClient={profileClient} manifest={loaded.manifest} />;
+  return <TreeMap client={loaded.client} profileClient={profileClient} journeyClient={journeyClient} manifest={loaded.manifest} />;
 }
 export default App;

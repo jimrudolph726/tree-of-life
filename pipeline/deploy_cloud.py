@@ -20,7 +20,7 @@ IMMUTABLE = 'public, max-age=31536000, immutable'
 FRESH = 'no-cache, max-age=0, must-revalidate'
 TYPES = {'.html': 'text/html; charset=utf-8', '.js': 'text/javascript',
          '.css': 'text/css', '.json': 'application/json', '.bin': 'application/octet-stream',
-         '.svg': 'image/svg+xml', '.txt': 'text/plain; charset=utf-8'}
+         '.svg': 'image/svg+xml', '.webp': 'image/webp', '.txt': 'text/plain; charset=utf-8'}
 
 
 def valid_release(value):
@@ -68,7 +68,7 @@ def app_sources(folder):
     shard_count = profile_manifest.get('shardCount', 0)
     if (not re.fullmatch(r'[0-9a-f]{16}', profile_version) or
             not isinstance(shard_count, int) or not 1 <= shard_count <= 256 or
-            profile_manifest.get('profileCount') != 1000 or
+            profile_manifest.get('profileCount') != 10000 or
             profile_manifest.get('maxCompressedShardBytes', 10**9) > 24 * 1024):
         raise ValueError('Invalid scientific-profile manifest')
     profile_folder = profile_pointer.parent / profile_version
@@ -76,7 +76,7 @@ def app_sources(folder):
     if published != profile_manifest:
         raise ValueError('Scientific-profile pointer does not match version manifest')
     search_file = profile_manifest.get('searchFile')
-    if search_file != 'search.json' or profile_manifest.get('compressedSearchBytes', 10**9) > 64 * 1024:
+    if search_file != 'search.json' or profile_manifest.get('compressedSearchBytes', 10**9) > 256 * 1024:
         raise ValueError('Invalid scientific-profile search publication')
     profile_files = [profile_folder / 'manifest.json', profile_folder / search_file]
     for shard in range(shard_count):
@@ -89,6 +89,37 @@ def app_sources(folder):
             raise ValueError('Scientific-profile publication contains a symlink/outside file')
     app_files.append(profile_pointer)
     assets.extend(profile_files)
+
+    journey_pointer = root / 'data' / 'journeys' / 'manifest.json'
+    if not journey_pointer.is_file():
+        raise ValueError('Missing Journey publication. Run npm run data:journeys.')
+    journey_manifest = json.loads(journey_pointer.read_text(encoding='utf-8'))
+    journey_version = journey_manifest.get('version', '')
+    if (not re.fullmatch(r'[0-9a-f]{16}', journey_version) or journey_manifest.get('journeyCount', 0) < 3 or
+            journey_manifest.get('maxCompressedJourneyBytes', 10**9) > 20 * 1024 or
+            journey_manifest.get('compressedCatalogBytes', 10**9) > 8 * 1024):
+        raise ValueError('Invalid Journey manifest')
+    journey_folder = journey_pointer.parent / journey_version
+    if json.loads((journey_folder / 'manifest.json').read_text(encoding='utf-8')) != journey_manifest:
+        raise ValueError('Journey pointer does not match version manifest')
+    catalog_path = journey_folder / journey_manifest['catalogFile']
+    catalog = json.loads(catalog_path.read_text(encoding='utf-8')).get('journeys', [])
+    if len(catalog) != journey_manifest['journeyCount']:
+        raise ValueError('Journey catalog is incomplete')
+    journey_files = [journey_folder / 'manifest.json', catalog_path]
+    for item in catalog:
+        path = journey_folder / journey_manifest['journeyPattern'].replace('{id}', item['id'])
+        if not path.is_file():
+            raise ValueError(f'Missing Journey file: {item["id"]}')
+        journey_files.append(path)
+    image_files = sorted((root / 'images' / 'journeys').rglob('*.webp'))
+    if not image_files:
+        raise ValueError('Missing Journey images')
+    for path in journey_files + image_files:
+        if path.is_symlink() or not path.resolve().is_relative_to(root):
+            raise ValueError('Journey publication contains a symlink/outside file')
+    app_files.append(journey_pointer)
+    assets.extend(journey_files + image_files)
     return root, app_files, assets
 
 
@@ -167,7 +198,7 @@ def encode_bytes(raw, suffix, key):
     body = gzip.compress(raw, compresslevel=6, mtime=0)
     return body, {
         'ContentType': TYPES[suffix], 'ContentEncoding': 'gzip',
-        'CacheControl': (IMMUTABLE if re.match(r'^releases/[^/]+/data/profiles/[0-9a-f]{16}/', key)
+        'CacheControl': (IMMUTABLE if re.match(r'^releases/[^/]+/(?:data/(?:profiles|journeys)/[0-9a-f]{16}/|images/journeys/)', key)
                          else FRESH if key.startswith('releases/') else IMMUTABLE),
         'Metadata': {'sha256': hashlib.sha256(raw).hexdigest()},
         'ContentMD5': base64.b64encode(hashlib.md5(body).digest()).decode(),
@@ -324,13 +355,14 @@ def deploy_app(s3, cf, bucket, distribution, folder):
         _, pointers[key] = read_json_object(s3, bucket, f'releases/{active}/{key}')
     release, versions, files, blobs = prepare_app(folder, pointers)
     inventory = inherited_data_inventory(record, versions)
-    existing = listing(s3, bucket, ['assets/', 'data/profiles/', f'releases/{release}/'])
+    existing = listing(s3, bucket, ['assets/', 'data/profiles/', 'data/journeys/', 'images/journeys/', f'releases/{release}/'])
     with ThreadPoolExecutor(max_workers=12) as executor:
         inventory.update(executor.map(lambda entry: upload_file(s3, bucket, entry, existing), files))
         inventory.update(executor.map(lambda entry: upload_bytes(s3, bucket, entry, existing), blobs))
     tree_prefixes = tuple(f'data/{dataset}/' for dataset in DATASETS)
     app_inventory = {key: value for key, value in inventory.items() if not key.startswith(tree_prefixes)}
-    verify_inventory(app_inventory, listing(s3, bucket, ['assets/', 'data/profiles/', f'releases/{release}/']))
+    verify_inventory(app_inventory, listing(s3, bucket,
+                     ['assets/', 'data/profiles/', 'data/journeys/', 'images/journeys/', f'releases/{release}/']))
     next_record = {'release': release, 'datasets': versions, 'objects': inventory}
     s3.put_object(Bucket=bucket, Key=f'releases/{release}/release.json',
                   Body=gzip.compress(json.dumps(next_record, sort_keys=True).encode(), mtime=0),

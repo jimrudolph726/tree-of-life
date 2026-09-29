@@ -123,9 +123,12 @@ test('common names discover the corresponding scientific taxon', async ({ page }
 
 test('bird-flight journey navigates real OpenTree evidence and can be paused', async ({ page, browserName }) => {
   test.skip(hosted || browserName !== 'chromium', 'The full pilot runs once against the checked-in life publication.');
+  const journeyRequests: string[] = [];
+  page.on('request', request => { if (request.url().includes('/data/journeys/')) journeyRequests.push(request.url()); });
   await page.goto('/?dataset=life', { waitUntil: 'domcontentloaded' });
   const app = page.locator('main.app');
   await expect(app).toHaveAttribute('data-tree-ready', 'true', { timeout: 20_000 });
+  expect(journeyRequests).toEqual([]);
   const header = page.locator('header.top-bar');
   await expect(header.getByText('Tree of Life', { exact: true })).toBeVisible();
   await expect(header.getByRole('combobox', { name: 'Search taxa' })).toBeVisible();
@@ -134,9 +137,16 @@ test('bird-flight journey navigates real OpenTree evidence and can be paused', a
   await expect(header.getByRole('menuitemradio', { name: 'All life' })).toHaveAttribute('aria-checked', 'true');
   await header.getByRole('button', { name: 'Explore' }).press('Escape');
   await header.getByRole('button', { name: /Journeys/ }).click();
+  await expect(header.getByRole('menuitem')).toHaveCount(3);
+  expect(journeyRequests.some(url => url.endsWith('/data/journeys/manifest.json'))).toBe(true);
+  expect(journeyRequests.some(url => url.endsWith('/catalog.json'))).toBe(true);
+  expect(journeyRequests.some(url => /\/(?:birds-flight|vertebrate-vision|human-bipedalism)\.json$/.test(url))).toBe(false);
+  await expect(header.getByRole('menuitem', { name: /Vision · From Light-Sensitive Cells/ })).toBeVisible();
+  await expect(header.getByRole('menuitem', { name: /Bipedalism · From Climbing Apes/ })).toBeVisible();
   await header.getByRole('menuitem', { name: /From Feathered Dinosaurs to Modern Birds/ }).click();
   const library = page.getByLabel('Evolutionary journeys');
   await expect(library.getByRole('heading', { name: 'Flight' })).toBeVisible();
+  expect(journeyRequests.filter(url => url.endsWith('/birds-flight.json'))).toHaveLength(1);
   await expect(library.getByRole('heading', { name: 'From Feathered Dinosaurs to Modern Birds' })).toBeVisible();
   await expect(library.getByRole('img', { name: /Sinosauropteryx/ })).toBeVisible();
   await library.getByRole('button', { name: /Begin journey/ }).click();
@@ -144,10 +154,36 @@ test('bird-flight journey navigates real OpenTree evidence and can be paused', a
   await expect(player.getByRole('heading', { name: 'Feathers before flight' })).toBeVisible();
   await expect(player.getByRole('img', { name: /Sinosauropteryx/ })).toBeVisible();
   await expect(app).not.toHaveAttribute('data-pending-taxon', 'Sinosauropteryx', { timeout: 20_000 });
+  await expect.poll(async () => Number(await app.getAttribute('data-camera-zoom'))).toBeLessThanOrEqual(11);
   await player.getByRole('button', { name: /Next: Vaned feathers become versatile/ }).click();
   await expect(player.getByRole('heading', { name: 'Vaned feathers become versatile' })).toBeVisible();
   await expect(player.getByRole('img', { name: /Caudipteryx/ })).toBeVisible();
   await expect(page).toHaveURL(/journey=birds-flight.*step=1/);
+  for (const step of [3, 4, 6]) {
+    await player.getByRole('button', { name: new RegExp(`Go to step ${step}:`) }).click();
+    await expect(page).toHaveURL(new RegExp(`journey=birds-flight.*step=${step - 1}`));
+    await expect(app).not.toHaveAttribute('data-pending-taxon', /.+/, { timeout: 20_000 });
+    await expect.poll(async () => Number(await app.getAttribute('data-camera-zoom'))).toBeLessThanOrEqual(11);
+  }
   await player.getByRole('button', { name: 'Explore from here' }).click();
   await expect(page.getByRole('button', { name: /Resume: From Feathered Dinosaurs/ })).toBeVisible();
+});
+
+test('a newly published scientific Journey loads its media and navigates a real taxon', async ({ page, browserName }) => {
+  test.skip(hosted || browserName !== 'chromium', 'Editorial Journey publications run once against local pinned data.');
+  await page.goto('/?dataset=life', { waitUntil: 'domcontentloaded' });
+  const app = page.locator('main.app');
+  await expect(app).toHaveAttribute('data-tree-ready', 'true', { timeout: 20_000 });
+  const header = page.locator('header.top-bar');
+  await header.getByRole('button', { name: /Journeys/ }).click();
+  await header.getByRole('menuitem', { name: /Vision · From Light-Sensitive Cells/ }).click();
+  const library = page.getByLabel('Evolutionary journeys');
+  await expect(library.getByRole('heading', { name: 'Vision' })).toBeVisible();
+  const image = library.getByRole('img', { name: /European lancelet/ });
+  await expect(image).toBeVisible();
+  await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+  await library.getByRole('button', { name: /Begin journey/ }).click();
+  await expect(page).toHaveURL(/journey=vertebrate-vision.*step=0/);
+  await expect(app).not.toHaveAttribute('data-pending-taxon', 'Branchiostoma lanceolatum', { timeout: 20_000 });
+  await expect(page.getByLabel('Evolutionary journey').getByRole('heading', { name: 'A direction for light' })).toBeVisible();
 });

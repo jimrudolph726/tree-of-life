@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { layoutTreeV3, parseTreeData } from '../src/tree/layoutTreeV3.ts';
-import { centeredFocusCamera, fitBounds, focusBounds, getLineage, labelOffset, labelSize, labelText, mapInsets, project, searchTaxa, visibleLabels } from '../src/tree/navigation.ts';
+import { centeredFocusCamera, fitBounds, focusBounds, getLineage, labelOffset, labelSize, labelText, mapInsets, project, searchTaxa, visibleLabels, zoomOutCamera } from '../src/tree/navigation.ts';
 import type { TreeNodeInput, Position } from '../src/tree/types.ts';
 
 const input = parseTreeData(JSON.parse(readFileSync(new URL('../public/data/primates.nodes.json', import.meta.url), 'utf8')));
@@ -115,6 +115,15 @@ test('focused taxa are centered on desktop and mobile screens', () => {
       assert.deepEqual(point, [size.width / 2, size.height / 2]);
     }
   }
+});
+
+test('journey context zoom keeps the taxon centered while revealing more of the tree', () => {
+  const size = { width: 1280, height: 720 };
+  const node = searchTaxa(tree.nodes, 'Homo sapiens')[0];
+  const focused = centeredFocusCamera(node, size);
+  const context = zoomOutCamera(focused, 1, 11);
+  assert.equal(context.zoom, Math.min(11, focused.zoom - 1));
+  assert.deepEqual(project(node.position, context, size), [size.width / 2, size.height / 2]);
 });
 
 test('labels prefer selection, avoid collisions and respond to panning', () => {

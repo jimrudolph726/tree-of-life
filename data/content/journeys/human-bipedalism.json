@@ -1,0 +1,121 @@
+{
+  "id": "human-bipedalism",
+  "category": "Bipedalism",
+  "title": "From Climbing Apes to Human Walking",
+  "subtitle": "Follow the mosaic evolution of upright posture, stable hips, weight-bearing knees, arched feet, and an efficient human stride.",
+  "duration": "8–10 min",
+  "introduction": "Bipedalism did not appear in one leap or along a straight ladder. Fossils preserve different combinations of climbing and walking traits, and several hominin forms overlapped. Each stop is evidence about a branching history, not necessarily a direct ancestor of the next.",
+  "completion": {
+    "title": "Walking became a whole-body system",
+    "summary": "You followed more than six million years of experiments that reshaped the skull, spine, pelvis, legs, and feet into varied forms of hominin bipedalism."
+  },
+  "steps": [
+    {
+      "title": "The starting point was versatile",
+      "taxon": "Pan troglodytes",
+      "ottId": 417950,
+      "age": "living comparison · today",
+      "era": "Living lineage",
+      "kind": "living lineage",
+      "summary": "Chimpanzees climb, knuckle-walk, and sometimes stand or walk on two legs. Their flexible locomotion helps test hypotheses about the last shared ancestor, although chimpanzees themselves are not our ancestors.",
+      "evidence": "Comparative anatomy and motion studies show how an ape body can combine vertical climbing, suspension, terrestrial movement, and occasional bipedality.",
+      "uncertainty": "The last common ancestor may have differed substantially from every living ape, so chimpanzees provide constraints rather than a preserved starting form.",
+      "image": { "mediaId": "bipedalism-chimpanzee", "alt": "An adult chimpanzee walking on the forest floor", "caption": "Living chimpanzees combine climbing and terrestrial movement with occasional upright posture." },
+      "sources": [{ "label": "Crompton et al., Journal of Anatomy (2008)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2409101/" }]
+    },
+    {
+      "title": "Upright signals near seven million years",
+      "taxon": "Sahelanthropus tchadensis",
+      "ottId": 3607687,
+      "age": "about 7 million years ago",
+      "era": "Late Miocene",
+      "kind": "fossil evidence",
+      "summary": "Sahelanthropus combines a skull carried in a potentially upright posture with limb bones interpreted as evidence for habitual bipedality alongside substantial tree climbing.",
+      "evidence": "The femur’s shape is most consistent with loading during upright walking, while two ulnae retain strong signals of arboreal behavior.",
+      "uncertainty": "Its placement near the human–chimpanzee split and the locomotor interpretation of incomplete bones remain actively debated.",
+      "image": { "mediaId": "bipedalism-sahelanthropus", "alt": "Museum cast of the Sahelanthropus tchadensis cranium", "caption": "The Sahelanthropus cranium and fragmentary limb bones preserve debated evidence for early bipedality." },
+      "sources": [{ "label": "Daver et al., Nature (2022)", "url": "https://www.nature.com/articles/s41586-022-04901-z" }]
+    },
+    {
+      "title": "Walking without abandoning the trees",
+      "taxon": "Ardipithecus ramidus",
+      "mapTaxon": "Ardipithecus",
+      "ottId": 3607705,
+      "age": "about 4.4 million years ago",
+      "era": "Early Pliocene",
+      "kind": "fossil evidence",
+      "summary": "Ardipithecus ramidus combined pelvic and femoral traits used in upright walking with a grasping big toe and anatomy suited to climbing. Early bipedality remained deeply arboreal.",
+      "evidence": "The partial skeleton known as Ardi preserves a shortened upper pelvis that could stabilize the trunk during walking and a foot still capable of grasping branches.",
+      "uncertainty": "Its exact gait, efficiency, and relationship to later hominins remain contested because the skeleton is incomplete and distorted.",
+      "image": { "mediaId": "bipedalism-ardipithecus", "alt": "Reconstructed bones of the Ardipithecus ramidus partial skeleton Ardi", "caption": "Ardi preserves a mosaic of traits associated with both upright walking and movement in trees." },
+      "sources": [{ "label": "Lovejoy et al., Science (2009)", "url": "https://doi.org/10.1126/science.1175831" }]
+    },
+    {
+      "title": "Footprints record repeated strides",
+      "taxon": "Australopithecus afarensis",
+      "mapTaxon": "Australopithecus ramidus",
+      "ottId": 3607716,
+      "age": "3.66 million years ago",
+      "era": "Pliocene",
+      "kind": "fossil evidence",
+      "summary": "The Laetoli trackways record hominins repeatedly walking on two feet. Australopithecus afarensis also had a short broad pelvis, inward-angled knees, and lower limbs adapted to habitual bipedality.",
+      "evidence": "Footprint depth and shape capture heel contact and forward propulsion, while Lucy and other skeletons show how the hips and knees supported single-leg stance.",
+      "uncertainty": "The precise gait reconstructed from the prints is debated, and OpenTree lacks a positioned A. afarensis node, so the map uses a nearby fossil branch.",
+      "image": { "mediaId": "bipedalism-afarensis", "alt": "Museum cast of the Lucy Australopithecus afarensis skeleton", "caption": "Lucy and the Laetoli footprints provide complementary evidence for habitual australopith bipedality." },
+      "sources": [{ "label": "McNutt et al., Nature (2021)", "url": "https://www.nature.com/articles/s41586-021-04187-7" }]
+    },
+    {
+      "title": "A mosaic persists in early Homo",
+      "taxon": "Homo habilis",
+      "ottId": 3607678,
+      "age": "about 2.4–1.4 million years ago",
+      "era": "Early Pleistocene",
+      "kind": "fossil evidence",
+      "summary": "Fossils assigned to Homo habilis combine bipedal lower limbs with relatively long arms and other climbing-related proportions. The origin of Homo did not instantly produce a modern human body.",
+      "evidence": "Fragmentary limb bones and associated skeletons reveal locomotor diversity among early Homo and neighboring australopith lineages.",
+      "uncertainty": "Which postcranial fossils belong to H. habilis is disputed, making its body proportions and locomotion unusually uncertain.",
+      "image": { "mediaId": "bipedalism-habilis", "alt": "Museum cast of a Homo habilis cranium against a dark background", "caption": "The fragmented Homo habilis record makes its locomotor anatomy difficult to reconstruct with confidence." },
+      "sources": [{ "label": "Prabhat et al., eLife (2021)", "url": "https://elifesciences.org/articles/65897" }]
+    },
+    {
+      "title": "A long-legged terrestrial walker",
+      "taxon": "Homo erectus",
+      "ottId": 3607671,
+      "age": "from about 1.9 million years ago",
+      "era": "Pleistocene",
+      "kind": "fossil evidence",
+      "summary": "Homo erectus had longer legs, shorter arms, and a body plan suited to sustained travel on the ground. Footprints preserve a pattern of foot motion broadly similar to ours.",
+      "evidence": "The Turkana Boy skeleton documents human-like limb proportions, while 1.5-million-year-old Ileret tracks record an arched foot and medial push-off.",
+      "uncertainty": "H. erectus varied across more than a million years and a vast range, so no single skeleton represents the entire lineage.",
+      "image": { "mediaId": "bipedalism-erectus", "alt": "Reconstruction of the Turkana Boy Homo erectus skeleton", "caption": "The Turkana Boy skeleton shows the long-legged body proportions associated with terrestrial travel." },
+      "sources": [{ "label": "Hatala et al., Scientific Reports (2016)", "url": "https://www.nature.com/articles/srep28766" }]
+    },
+    {
+      "title": "Different bodies, capable walkers",
+      "taxon": "Homo neanderthalensis",
+      "mapTaxon": "Homo sapiens neanderthalensis",
+      "ottId": 83926,
+      "age": "about 400,000–40,000 years ago",
+      "era": "Middle–Late Pleistocene",
+      "kind": "fossil evidence",
+      "summary": "Neanderthals were fully committed bipeds with broad trunks, robust joints, and relatively short distal limbs. Their build altered locomotor costs without making their gait primitive.",
+      "evidence": "Complete limb bones, joint surfaces, footprints, and pelvic anatomy show habitual upright walking adapted to a powerful Pleistocene body.",
+      "uncertainty": "Soft tissues and behavior do not fossilize directly, and biomechanical models disagree about the energetic consequences of Neanderthal proportions.",
+      "image": { "mediaId": "bipedalism-neanderthal", "alt": "Museum display of the La Ferrassie Neanderthal skeleton", "caption": "The La Ferrassie skeleton documents a robust but fully upright and habitual biped." },
+      "sources": [{ "label": "Bastir et al., Scientific Reports (2022)", "url": "https://www.nature.com/articles/s41598-022-15344-x" }]
+    },
+    {
+      "title": "An efficient modern stride",
+      "taxon": "Homo sapiens",
+      "ottId": 770315,
+      "age": "today",
+      "era": "Living species",
+      "kind": "living lineage",
+      "summary": "Modern human walking integrates an S-shaped spine, bowl-shaped pelvis, inward-angled knees, long legs, stiff arched feet, and aligned big toes into an economical stride.",
+      "evidence": "Motion capture and force measurements show how extended hips and knees, pelvic rotation, elastic arches, and toe-off limit muscular work during walking.",
+      "uncertainty": "Human populations and individuals vary, and our gait is one recent outcome among many successful forms of hominin bipedalism.",
+      "image": { "mediaId": "bipedalism-human", "alt": "People walking upright along a city street in Nairobi", "caption": "Modern walking is a coordinated whole-body system rather than the product of a single anatomical change." },
+      "sources": [{ "label": "Pontzer et al., Journal of Human Evolution (2009)", "url": "https://doi.org/10.1016/j.jhevol.2009.05.014" }]
+    }
+  ]
+}

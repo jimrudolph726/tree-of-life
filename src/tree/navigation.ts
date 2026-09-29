@@ -44,6 +44,11 @@ export function centeredFocusCamera(node: MapTreeNode, size: Size): Camera {
   return { ...fitted, target: [node.position[0], node.position[1], 0] };
 }
 
+export function zoomOutCamera(camera: Camera, levels: number, maximumZoom = camera.maxZoom): Camera {
+  return { ...camera, zoom: Math.max(camera.minZoom,
+    Math.min(maximumZoom, camera.zoom - Math.max(0, levels))) };
+}
+
 export function getLineage(node: MapTreeNode, nodeMap: Map<string, MapTreeNode>): MapTreeNode[] {
   const result: MapTreeNode[] = [];
   let current: MapTreeNode | undefined = node;

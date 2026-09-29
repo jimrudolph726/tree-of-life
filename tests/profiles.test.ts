@@ -11,11 +11,11 @@ const manifest = JSON.parse(readFileSync(join(root, 'manifest.json'), 'utf8'));
 test('scientific profiles are complete, correctly routed, and within the payload budget', () => {
   const published = readFileSync(join(root, manifest.version, 'manifest.json'), 'utf8');
   assert.deepEqual(JSON.parse(published), manifest);
-  assert.equal(manifest.profileCount, 1000);
+  assert.equal(manifest.profileCount, 10000);
   assert.equal(manifest.shardCount, 64);
   assert.ok(manifest.maxCompressedShardBytes <= 24 * 1024);
   assert.equal(manifest.searchFile, 'search.json');
-  assert.ok(manifest.compressedSearchBytes <= 64 * 1024);
+  assert.ok(manifest.compressedSearchBytes <= 256 * 1024);
   const searchRaw = readFileSync(join(root, manifest.version, manifest.searchFile));
   assert.ok(gzipSync(searchRaw, { level: 9 }).byteLength <= manifest.compressedSearchBytes);
   const search = JSON.parse(searchRaw.toString('utf8'));
@@ -45,11 +45,11 @@ test('scientific profiles are complete, correctly routed, and within the payload
       profiles.push(profile);
     }
   }
-  assert.equal(profiles.length, 1000);
-  assert.equal(new Set(profiles.map(profile => profile.ottId)).size, 1000);
+  assert.equal(profiles.length, 10000);
+  assert.equal(new Set(profiles.map(profile => profile.ottId)).size, 10000);
   assert.ok(compressedMaximum <= 24 * 1024);
-  assert.ok(compressedTotal <= 256 * 1024);
-  assert.ok(manifest.compressedPublicationBytes <= 256 * 1024);
+  assert.ok(compressedTotal <= 512 * 1024);
+  assert.ok(manifest.compressedPublicationBytes <= 512 * 1024);
   const names = new Set(profiles.map(profile => profile.scientificName));
   for (const required of ['Eukaryota', 'Archaea', 'Bacteria', 'Fungi', 'Opisthokonta', 'Bilateria',
     'Primates', 'Aves', 'Homo sapiens', 'Camarhynchus psittacula']) assert.ok(names.has(required), required);
@@ -60,7 +60,9 @@ test('profile provenance matches the normalized source snapshot', () => {
   assert.equal(createHash('sha256').update(snapshot).digest('hex'), manifest.sourceSnapshotSha256);
   assert.equal(manifest.openTree.synthId, 'opentree16.1');
   assert.equal(manifest.openTree.taxonomyVersion, '3.7draft3');
-  assert.equal(manifest.coverage.profiles, 1000);
+  assert.equal(manifest.coverage.profiles, 10000);
+  assert.equal(manifest.coverage.enriched, 1000);
+  assert.equal(manifest.coverage.treeWide, 9000);
   assert.ok(manifest.coverage.descriptions >= 900);
   assert.ok(manifest.coverage.commonNames >= 800);
   assert.equal(manifest.coverage.primates, 400);

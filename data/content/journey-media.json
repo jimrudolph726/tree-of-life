@@ -1,0 +1,221 @@
+{
+  "format": 1,
+  "media": {
+    "bipedalism-afarensis": {
+      "commonsTitle": "File:Australopithecus afarensis, \"Lucy\".jpg",
+      "credit": "Ryan Somma",
+      "license": "CC BY-SA 2.0",
+      "retrievedAt": "2026-09-28T17:32:02+00:00",
+      "sha256": "270b3f6730945f6bb0ebd7fec7397852cdc636fd405a92f0355be8dc77d6b167",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Australopithecus_afarensis,_%22Lucy%22.jpg",
+      "src": "images/journeys/bipedalism/afarensis.webp"
+    },
+    "bipedalism-ardipithecus": {
+      "commonsTitle": "File:Ardi.jpg",
+      "credit": "T. Michael Keesey",
+      "license": "CC BY 2.0",
+      "retrievedAt": "2026-09-28T17:32:03+00:00",
+      "sha256": "95c6190804b0ba2ebe72bf31f5f47912f5cf1fb46569bf7facdd16af080f4183",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ardi.jpg",
+      "src": "images/journeys/bipedalism/ardipithecus.webp"
+    },
+    "bipedalism-chimpanzee": {
+      "commonsTitle": "File:016 Alpha male chimpanzee walking at Kibale forest National Park Photo by Giles Laurent.jpg",
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "retrievedAt": "2026-09-28T17:32:04+00:00",
+      "sha256": "b655b60086ae90570b639f2067fab8d20bbb938e23756827abeeac1606d772ae",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:016_Alpha_male_chimpanzee_walking_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg",
+      "src": "images/journeys/bipedalism/chimpanzee.webp"
+    },
+    "bipedalism-erectus": {
+      "commonsTitle": "File:Turkana Boy.jpg",
+      "credit": "Claire Houck from New York City, USA",
+      "license": "CC BY-SA 2.0",
+      "retrievedAt": "2026-09-28T17:32:06+00:00",
+      "sha256": "287aefce613de39f6d3b3875e6ea8da218b4e0d21c609cdb373e3681ef792d46",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Turkana_Boy.jpg",
+      "src": "images/journeys/bipedalism/erectus.webp"
+    },
+    "bipedalism-habilis": {
+      "commonsTitle": "File:Homo Habilis-MGL 95213-P5030045-black.jpg",
+      "credit": "Rama",
+      "license": "CC BY-SA 3.0 fr",
+      "retrievedAt": "2026-09-28T17:32:07+00:00",
+      "sha256": "ba17eec5fc7c7e7c2e1a27dd025b321d72bad8733ab50637b3c79751c9d7ed88",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Homo_Habilis-MGL_95213-P5030045-black.jpg",
+      "src": "images/journeys/bipedalism/habilis.webp"
+    },
+    "bipedalism-human": {
+      "commonsTitle": "File:People walking on the street in Nairobi, Kenya.jpg",
+      "credit": "AEira-WMF",
+      "license": "CC BY 4.0",
+      "retrievedAt": "2026-09-28T17:32:08+00:00",
+      "sha256": "5012b98782310d01e24ec99d3b13afaaf2842ad7fe20d78473341ecfe770ea78",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:People_walking_on_the_street_in_Nairobi,_Kenya.jpg",
+      "src": "images/journeys/bipedalism/human-walking.webp"
+    },
+    "bipedalism-neanderthal": {
+      "commonsTitle": "File:La Ferrassie 1 MdlH 1 2018-10-20.jpg",
+      "credit": "Thilo Parg",
+      "license": "CC BY-SA 4.0",
+      "retrievedAt": "2026-09-28T17:32:09+00:00",
+      "sha256": "df632f08d1fe2cffe7d6b08fd254852fe6795714d61740de608ad7012c1f692f",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:La_Ferrassie_1_MdlH_1_2018-10-20.jpg",
+      "src": "images/journeys/bipedalism/neanderthal.webp"
+    },
+    "bipedalism-sahelanthropus": {
+      "commonsTitle": "File:Sahelanthropus tchadensis - TM 266-01-060-1.jpg",
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "retrievedAt": "2026-09-28T17:32:11+00:00",
+      "sha256": "2f592340c165afd28632c590d0ce72a750b5289228304e7941d7cc3bafa85344",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sahelanthropus_tchadensis_-_TM_266-01-060-1.jpg",
+      "src": "images/journeys/bipedalism/sahelanthropus.webp"
+    },
+    "flight-anchiornis": {
+      "credit": "Wang et al. and Scott Hartman",
+      "license": "CC BY 4.0",
+      "retrievedAt": "2026-09-27T00:00:00+00:00",
+      "sha256": "checked-in-existing-asset",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anchiornis_huxleyi_skel_hartman_2017.png",
+      "src": "images/journeys/birds-flight/anchiornis.webp"
+    },
+    "flight-archaeopteryx": {
+      "credit": "Shyamal",
+      "license": "CC BY-SA 3.0",
+      "retrievedAt": "2026-09-27T00:00:00+00:00",
+      "sha256": "checked-in-existing-asset",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Berlin_archaeopteryx.jpg",
+      "src": "images/journeys/birds-flight/archaeopteryx.webp"
+    },
+    "flight-aves": {
+      "credit": "Bengt Nyman",
+      "license": "CC BY 2.0",
+      "retrievedAt": "2026-09-27T00:00:00+00:00",
+      "sha256": "checked-in-existing-asset",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bird_in_flight_wings_spread.jpg",
+      "src": "images/journeys/birds-flight/aves.webp"
+    },
+    "flight-caudipteryx": {
+      "credit": "Gary Todd",
+      "license": "CC0",
+      "retrievedAt": "2026-09-27T00:00:00+00:00",
+      "sha256": "checked-in-existing-asset",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Caudipteryx.jpg",
+      "src": "images/journeys/birds-flight/caudipteryx.webp"
+    },
+    "flight-confuciusornis": {
+      "credit": "M.violante",
+      "license": "CC BY-SA 3.0",
+      "retrievedAt": "2026-09-27T00:00:00+00:00",
+      "sha256": "checked-in-existing-asset",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Confuciosornis.jpg",
+      "src": "images/journeys/birds-flight/confuciusornis.webp"
+    },
+    "flight-house-sparrow": {
+      "credit": "Jolanta Dyr",
+      "license": "CC BY-SA 3.0",
+      "retrievedAt": "2026-09-27T00:00:00+00:00",
+      "sha256": "checked-in-existing-asset",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Passer_domesticus_-_male.jpg",
+      "src": "images/journeys/birds-flight/house-sparrow.webp"
+    },
+    "flight-microraptor": {
+      "credit": "Entelognathus",
+      "license": "CC BY-SA 4.0",
+      "retrievedAt": "2026-09-27T00:00:00+00:00",
+      "sha256": "checked-in-existing-asset",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Microraptor_recon.png",
+      "src": "images/journeys/birds-flight/microraptor.webp"
+    },
+    "flight-sinosauropteryx": {
+      "credit": "Conty",
+      "license": "CC BY 3.0",
+      "retrievedAt": "2026-09-27T00:00:00+00:00",
+      "sha256": "checked-in-existing-asset",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sinosauropteryx_color_pattern_(feathers).JPG",
+      "src": "images/journeys/birds-flight/sinosauropteryx.webp"
+    },
+    "flight-yanornis": {
+      "credit": "Entelognathus",
+      "license": "CC BY-SA 4.0",
+      "retrievedAt": "2026-09-27T00:00:00+00:00",
+      "sha256": "checked-in-existing-asset",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Yanornis_recon.png",
+      "src": "images/journeys/birds-flight/yanornis.webp"
+    },
+    "vision-frog": {
+      "commonsTitle": "File:Xenopus laevis 02.jpg",
+      "credit": "Brian Gratwicke",
+      "license": "CC BY 2.0",
+      "retrievedAt": "2026-09-28T17:32:12+00:00",
+      "sha256": "27e5a41f9f668ca5d12f676f76d00ad617e3c471f438e2a1189cfd0272ec29c3",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Xenopus_laevis_02.jpg",
+      "src": "images/journeys/vision/frog.webp"
+    },
+    "vision-hagfish": {
+      "commonsTitle": "File:Eptatretus stoutii.jpg",
+      "credit": "Linda Snook, National Oceanic and Atmospheric Administration (NOAA) / Cordell Bank National Marine Sanctuary (CBNMS)",
+      "license": "Public domain",
+      "retrievedAt": "2026-09-28T17:32:14+00:00",
+      "sha256": "dca4b267180a10b21bd63878468ce270d2e90c89cab4b19a5553580801977f20",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Eptatretus_stoutii.jpg",
+      "src": "images/journeys/vision/hagfish.webp"
+    },
+    "vision-human": {
+      "commonsTitle": "File:Eye iris.jpg",
+      "credit": "che (Please credit as \"Petr Novák, Wikipedia\" in case you use this outside Wikimedia projects.)",
+      "license": "CC BY-SA 2.5",
+      "retrievedAt": "2026-09-28T17:33:02+00:00",
+      "sha256": "52732c11644c04060e546b3b6d9f3a7413801620f460af4b5f7756d55c4a5d48",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Eye_iris.jpg",
+      "src": "images/journeys/vision/human-eye.webp"
+    },
+    "vision-lamprey": {
+      "credit": "Michelle Campbell",
+      "gbifOccurrence": 6236548312,
+      "license": "CC0",
+      "retrievedAt": "2026-09-28T17:47:28+00:00",
+      "sha256": "92a50771469a55a8fc9afa2fbc11a2516dc75488e6dd1a138ca4c30dc90d2ae0",
+      "sourceUrl": "https://www.gbif.org/occurrence/6236548312",
+      "src": "images/journeys/vision/lamprey.webp"
+    },
+    "vision-lancelet": {
+      "credit": "Adi Peter",
+      "gbifOccurrence": 6452655365,
+      "license": "CC BY 4.0",
+      "retrievedAt": "2026-09-28T17:47:29+00:00",
+      "sha256": "0c91c07f2cc4ea20def413b4890e8e9208e7f153e7b2c768cb6a64377af2dd67",
+      "sourceUrl": "https://www.gbif.org/occurrence/6452655365",
+      "src": "images/journeys/vision/lancelet.webp"
+    },
+    "vision-mouse": {
+      "credit": "mbyhower",
+      "gbifOccurrence": 5938469279,
+      "license": "CC BY 4.0",
+      "retrievedAt": "2026-09-28T17:47:31+00:00",
+      "sha256": "50d262b37a98f1bdaaca5a70e027b25ed9baefd29de84600cb651a51434b05b2",
+      "sourceUrl": "https://www.gbif.org/occurrence/5938469279",
+      "src": "images/journeys/vision/mouse.webp"
+    },
+    "vision-tunicate": {
+      "credit": "Blake Ross",
+      "gbifOccurrence": 5938054000,
+      "license": "CC BY 4.0",
+      "retrievedAt": "2026-09-28T17:47:32+00:00",
+      "sha256": "dac2f1c6f55d0f159899846af728e8a9c0069ee3e06aaff086981158fc41fe72",
+      "sourceUrl": "https://www.gbif.org/occurrence/5938054000",
+      "src": "images/journeys/vision/tunicate.webp"
+    },
+    "vision-zebrafish": {
+      "credit": "Rainer Breitling",
+      "gbifOccurrence": 6470087815,
+      "license": "CC BY 4.0",
+      "retrievedAt": "2026-09-28T17:47:34+00:00",
+      "sha256": "63fefa589eabe13320fcf11aa7743fe3940d649219abf9bf87aec82e0786dd6b",
+      "sourceUrl": "https://www.gbif.org/occurrence/6470087815",
+      "src": "images/journeys/vision/zebrafish.webp"
+    }
+  }
+}

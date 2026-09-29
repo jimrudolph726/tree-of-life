@@ -2,7 +2,7 @@
 
 A React + TypeScript + deck.gl explorer inspired by [Lifemap](https://lifemap.cnrs.fr/). The default is the **complete OpenTree cellular-life synthesis**: **2,725,682 nodes, 2,599,664 named taxa and 2,385,875 tips**, from **opentree16.1**, taxonomy **3.7draft3**. Eukaryota, Archaea and Bacteria open together with visible subclades inviting exploration. Birds (32,055 nodes) and Primates (1,333 nodes) remain available in the dataset selector. Viruses are outside this source release.
 
-One thousand representative taxa also have compact scientific profiles: the opening clades, 400 Primates, 505 birds and 95 other familiar or foundational taxa. These add common names, synonyms, attributed introductory descriptions and canonical source links without increasing the initial tree payload.
+Ten thousand taxa have compact, lazily loaded scientific profiles. One thousand representative taxa—the opening clades, 400 Primates, 505 birds and 95 other familiar or foundational taxa—receive richer sourced records with common names, synonyms, attributed introductory descriptions and canonical links. Another 9,000 tree-wide records expose pinned OpenTree identity and provenance without inventing missing descriptions. None of this increases the initial tree payload.
 
 ## Run
 
@@ -38,9 +38,11 @@ The Aves checks exhaustively compare every published ID, name, source label, par
 4. **A Web Worker** fetches, decodes, searches and traverses visible clades. An LRU accounting budget bounds retained decoded pages: 64 MiB for the full release, 24 MiB for smaller datasets. Subtree bounds, projected size and a viewport margin prune invisible or subpixel content. Each dynamically assembled scene is capped at 12,000 visits and 4,000 named nodes. Immutable versioned responses can also use the browser HTTP cache.
 5. **React + deck.gl** draws the current scene using `OrthographicView`, transferable binary branch buffers, pickable nodes and a screen-space grid for label collisions. Scene requests are coalesced; camera animation does not rebuild the entire tree.
 
-Scientific profiles form a separate static data product. The public contract is [pipeline/profile-schema.json](pipeline/profile-schema.json). OpenTree supplies taxon identity and topology; exact accepted GBIF matches supply rank, English common names and synonyms; English Wikipedia supplies attributed introductory extracts only after the linked Wikidata item identifies a taxon or organism group. A normalized, date-stamped source snapshot lives in `data/processed/profiles/source-snapshot.json`. The ETL publishes 64 JSON shards by `ottId % 64`, plus a content-addressed manifest under `public/data/profiles/`.
+Scientific profiles form a separate static data product. The public contract is [pipeline/profile-schema.json](pipeline/profile-schema.json). OpenTree supplies taxon identity and topology; exact accepted GBIF matches supply rank, English common names and synonyms; English Wikipedia supplies attributed introductory extracts only after the linked Wikidata item identifies a taxon or organism group. A normalized, date-stamped source snapshot lives in `data/processed/profiles/source-snapshot.json`. The ETL publishes 64 JSON shards by `ottId % 64`, a compact search index and a content-addressed manifest under `public/data/profiles/`.
 
-The browser does not request the profile manifest on startup. Selection or intentional hover loads the manifest and one shard, then a 16-shard LRU serves repeat visits. Missing or failed enrichment never blocks topology, navigation or the base detail panel. The publication is under 225 KiB gzip in total; its largest shard is under 6 KiB gzip against a 24 KiB hard limit. Wikipedia text links to the exact revision and is attributed under CC BY-SA 4.0.
+The browser does not request the profile manifest on startup. Selection or intentional hover loads the manifest and one shard, then a 16-shard LRU serves repeat visits. Profile search also loads only after the user searches. Missing or failed enrichment never blocks topology, navigation or the base detail panel. The 10,000-profile publication is about 389 KiB gzip across its data shards; its largest shard is about 8 KiB gzip against a 24 KiB hard limit. The separate search index is about 162 KiB gzip against a 256 KiB budget. Wikipedia text links to the exact revision and is attributed under CC BY-SA 4.0.
+
+Guided Journeys are another independent, content-addressed static product. Editors write source-cited JSON under `data/content/journeys/`; [pipeline/build_journeys.py](pipeline/build_journeys.py) verifies the schema, prose limits, licenses, image checksums and every target against the pinned OpenTree snapshot. The browser loads the small Journey catalog only when its menu opens and fetches one full story when selected. The current library covers flight from feathered dinosaurs to birds, vertebrate vision and human bipedalism. Each story has eight or nine illustrated stops and remains under a 20 KiB compressed data budget; media uses separately cached, optimized WebP files.
 
 Clades with more than 64 immediate children have a paged spatial hierarchy over their child ranges. These index entries are routing data, never biological nodes. They prune offscreen and subpixel child circles without scanning all siblings. A 100,000-child regression verifies that late children are reachable and remain direct siblings. Collapsed broad clades retain a visible enclosing region. View budgets still limit the amount drawn in one frame.
 
@@ -77,9 +79,12 @@ Normal profile builds are deterministic and offline:
 
 ```sh
 npm run data:profiles
+npm run data:journeys
 ```
 
 `npm run data:profiles:refresh` deliberately queries the official GBIF, Wikipedia and Wikidata APIs, records the retrieval time and identifiers in the normalized snapshot, then republishes. `npm run data:profiles:audit` rechecks saved Wikipedia-to-Wikidata mappings. The CI data tests verify count, routing, required taxon coverage, provenance checksums, attribution fields and compressed payload limits.
+
+Journey builds are also deterministic and offline once their licensed source images have been recorded. `python pipeline/fetch_journey_images.py` is the deliberate network step for fetching and optimizing curated Commons or GBIF/iNaturalist media; it is not part of normal development or CI. Edit the authored JSON and media registry, then run `npm run data:journeys` to validate and publish a new immutable version.
 
 `data:import` is the only command here requiring OpenTree network access. It checks the synthesis version before and after downloading, checks source tip counts and sample API lineages, and records checksums and supporting studies. The API's documented 25,000-tip ceiling is enforced; larger imports should use release downloads. Raw Aves responses and Newick live in `data/raw/opentree/aves/opentree16.1/`; processed nodes and provenance live in `data/processed/opentree/aves/`. The footer links to the published version/provenance manifest. LF line endings are pinned for checksummed scientific files.
 

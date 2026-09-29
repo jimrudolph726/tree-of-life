@@ -1,0 +1,217 @@
+{
+  "id": "birds-flight",
+  "category": "Flight",
+  "title": "From Feathered Dinosaurs to Modern Birds",
+  "subtitle": "Follow the evidence for how feathers, wings, and flight accumulated across the dinosaur–bird transition.",
+  "duration": "8–10 min",
+  "introduction": "These fossils are evolutionary evidence, not a row of direct ancestors. Each is a relative that preserves a different combination of traits. Their ages can overlap because evolution branches; the map shows relationships, while dates come from the fossil record.",
+  "steps": [
+    {
+      "title": "Feathers before flight",
+      "taxon": "Sinosauropteryx",
+      "ottId": 4126504,
+      "age": "about 125 million years ago",
+      "era": "Early Cretaceous",
+      "kind": "fossil evidence",
+      "summary": "The small theropod Sinosauropteryx preserves a coat of simple filament-like feathers. They did not form wings, showing that feathers first served roles such as insulation, display, or signaling before they powered flight.",
+      "evidence": "Microscopic pigment-bearing structures support the interpretation that its body covering was feather-like and patterned. This places feather functions well outside flight.",
+      "uncertainty": "Sinosauropteryx is an evidence-bearing cousin, not a direct ancestor of birds.",
+      "image": {
+        "mediaId": "flight-sinosauropteryx",
+        "alt": "Scientific reconstruction of Sinosauropteryx with orange-and-white filamentous plumage",
+        "caption": "A reconstruction based on fossil plumage and preserved pigment patterns."
+      },
+      "sources": [
+        {
+          "label": "Zhang et al., Nature (2010)",
+          "url": "https://www.nature.com/articles/nature08740"
+        }
+      ]
+    },
+    {
+      "title": "Vaned feathers become versatile",
+      "taxon": "Caudipteryx",
+      "ottId": 4129551,
+      "age": "about 125 million years ago",
+      "era": "Early Cretaceous",
+      "kind": "fossil evidence",
+      "summary": "Caudipteryx carried large, symmetrical vaned feathers on its arms and tail, yet its proportions were poorly suited to flight. Complex feathers could evolve for display and other functions before becoming aerodynamic structures.",
+      "evidence": "Across maniraptoran dinosaurs, pennaceous feathers occur in body regions and forms that do not make a flight surface. Later lineages could recruit this existing structure for aerodynamics.",
+      "uncertainty": "The original functions of fossil feathers are inferred from anatomy and distribution; behavior itself is rarely preserved.",
+      "image": {
+        "mediaId": "flight-caudipteryx",
+        "alt": "Caudipteryx fossil displayed at the Henan Geological Museum",
+        "caption": "A Caudipteryx fossil preserving the proportions of its arms and feathered tail."
+      },
+      "sources": [
+        {
+          "label": "Foth et al., Nature (2014)",
+          "url": "https://www.nature.com/articles/nature13467"
+        }
+      ]
+    },
+    {
+      "title": "Four feathered limbs",
+      "taxon": "Anchiornis",
+      "ottId": 4947132,
+      "age": "about 160 million years ago",
+      "era": "Late Jurassic",
+      "kind": "fossil evidence",
+      "summary": "Anchiornis had long feathers on both forelimbs and hindlimbs. Its body plan shows that dinosaurs experimented with broad feathered surfaces before the modern bird wing appeared.",
+      "evidence": "Exceptionally preserved fossils reveal feathered arms, legs, a tail fan, and a soft leading-edge structure called a propatagium. Together they changed body shape and airflow.",
+      "uncertainty": "Researchers still debate whether Anchiornis could generate useful lift or used its elaborate plumage mainly for non-aerial functions.",
+      "image": {
+        "mediaId": "flight-anchiornis",
+        "alt": "Skeletal reconstruction of Anchiornis with fossil soft-tissue details",
+        "caption": "Fossil evidence reconstructs a feathered body with long feathers on all four limbs."
+      },
+      "sources": [
+        {
+          "label": "Wang et al., Nature Communications (2017)",
+          "url": "https://www.nature.com/articles/ncomms14576"
+        },
+        {
+          "label": "Kiat et al., Communications Biology (2025)",
+          "url": "https://www.nature.com/articles/s42003-025-09019-2"
+        }
+      ]
+    },
+    {
+      "title": "An aerodynamic experiment",
+      "taxon": "Microraptor",
+      "ottId": 4946091,
+      "age": "about 120 million years ago",
+      "era": "Early Cretaceous",
+      "kind": "fossil evidence",
+      "summary": "Microraptor formed lifting surfaces with long feathers on its arms, legs, and tail. It represents one of several aerial experiments close to the origin of birds rather than a required four-winged stage.",
+      "evidence": "Wind-tunnel models indicate stable, effective gliding at high lift even without a modern wing. Its tail and hindlimb feathers also helped control descent and landing.",
+      "uncertainty": "Its exact launch behavior and amount of powered flapping remain debated; aerodynamic models test plausible poses rather than observed behavior.",
+      "image": {
+        "mediaId": "flight-microraptor",
+        "alt": "Life reconstruction of the four-winged dinosaur Microraptor",
+        "caption": "Microraptor carried long flight feathers on its arms, legs, and tail."
+      },
+      "sources": [
+        {
+          "label": "Dyke et al., Nature Communications (2013)",
+          "url": "https://www.nature.com/articles/ncomms3489"
+        }
+      ]
+    },
+    {
+      "title": "Flight without the modern stroke",
+      "taxon": "Archaeopteryx",
+      "mapTaxon": "Anchiornis",
+      "ottId": 4947132,
+      "age": "by about 150 million years ago",
+      "era": "Late Jurassic",
+      "kind": "fossil evidence",
+      "summary": "Archaeopteryx combines toothed jaws, clawed fingers, and a long bony tail with feathered wings. It could actively take to the air, although its flight stroke differed from that of living birds.",
+      "evidence": "Wing-bone geometry falls with living birds that use short bursts of flapping flight. This makes powered flight at least Late Jurassic in age.",
+      "uncertainty": "Archaeopteryx is not positioned in this OpenTree synthesis, so the map remains on the nearby Anchiornis evidence branch for this stop.",
+      "image": {
+        "mediaId": "flight-archaeopteryx",
+        "alt": "Berlin Archaeopteryx fossil showing its skeleton and feather impressions",
+        "caption": "The Berlin specimen preserves a long bony tail, clawed fingers, and feathered wings."
+      },
+      "sources": [
+        {
+          "label": "Voeten et al., Nature Communications (2018)",
+          "url": "https://www.nature.com/articles/s41467-018-03296-8"
+        }
+      ]
+    },
+    {
+      "title": "A shorter, more integrated body",
+      "taxon": "Confuciusornis",
+      "ottId": 4132144,
+      "age": "about 125–120 million years ago",
+      "era": "Early Cretaceous",
+      "kind": "fossil evidence",
+      "summary": "Confuciusornis shows a bird body becoming more integrated: a toothless beak, a short fused tail, and a shoulder and forelimb devoted more strongly to flight. Long display feathers remained in some individuals.",
+      "evidence": "Tail reduction shifted the center of mass and reduced the muscular tail inherited from non-bird theropods. Preserved soft tissues also reveal a more derived ankle and crouched posture.",
+      "uncertainty": "Confuciusornis could fly, but its performance and takeoff style were unlike those of many living birds.",
+      "image": {
+        "mediaId": "flight-confuciusornis",
+        "alt": "Confuciusornis fossil with a compact skeleton and long display feathers",
+        "caption": "Confuciusornis combined a short fused tail with long display feathers in some individuals."
+      },
+      "sources": [
+        {
+          "label": "Falk et al., Nature Communications (2017)",
+          "url": "https://www.nature.com/articles/ncomms14779"
+        }
+      ]
+    },
+    {
+      "title": "A stronger flight apparatus",
+      "taxon": "Yanornis",
+      "ottId": 3604301,
+      "age": "about 120 million years ago",
+      "era": "Early Cretaceous",
+      "kind": "fossil evidence",
+      "summary": "Yanornis belonged to a lineage closer to modern birds than many famous early flyers. Its breastbone, shoulder, and flight feathers supported more capable flapping, while its skeleton still retained primitive features.",
+      "evidence": "Early ornithuromorph birds document increasingly specialized flight anatomy alongside ecological variety, including perching, wading, swimming, and sustained aerial movement.",
+      "uncertainty": "Early-bird relationships continue to change as new fossils and analyses are published; Yanornis is a representative evidence point.",
+      "image": {
+        "mediaId": "flight-yanornis",
+        "alt": "Life reconstruction of the early bird Yanornis",
+        "caption": "Yanornis represents an early bird lineage with a more capable flapping apparatus."
+      },
+      "sources": [
+        {
+          "label": "O’Connor et al., Nature Communications (2022)",
+          "url": "https://www.nature.com/articles/s41467-022-35039-1"
+        }
+      ]
+    },
+    {
+      "title": "The crown-bird lineage",
+      "taxon": "Aves",
+      "ottId": 81461,
+      "age": "present by the Late Cretaceous",
+      "era": "Cretaceous–present",
+      "kind": "living lineage",
+      "summary": "Crown birds are the shared lineage containing every living bird. Their flight system combines an enlarged keeled breastbone, fused hand and tail bones, efficient lungs, rapid growth, and precisely controlled feathers.",
+      "evidence": "Fossils and molecular clocks place the origin and early diversification of major living-bird lineages around the end of the Cretaceous, with rapid expansion after the mass extinction.",
+      "uncertainty": "The exact timing and branching order of the earliest crown birds remain active research questions.",
+      "image": {
+        "mediaId": "flight-aves",
+        "alt": "A gull in flight with both wings fully extended",
+        "caption": "Living birds integrate feathers, skeleton, muscles, and respiration into one flight system."
+      },
+      "sources": [
+        {
+          "label": "Field et al., Current Biology (2017)",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5544281/"
+        }
+      ]
+    },
+    {
+      "title": "Flight in a living dinosaur",
+      "taxon": "Passer domesticus",
+      "ottId": 745175,
+      "age": "today",
+      "era": "Living species",
+      "kind": "living lineage",
+      "summary": "The house sparrow inherits the result of this long, branching history: a compact skeleton, asymmetric flight feathers, powerful breast muscles, and continuous fine control of each wingbeat.",
+      "evidence": "Every living bird is a theropod dinosaur. Modern flight is a refined combination of traits that appeared at different times and originally served different functions.",
+      "uncertainty": "The sparrow is one contemporary example, not an endpoint or “most evolved” bird. Evolution continues across every living lineage.",
+      "image": {
+        "mediaId": "flight-house-sparrow",
+        "alt": "A living house sparrow perched against dark green foliage",
+        "caption": "The house sparrow is one living expression of a flight system assembled over millions of years."
+      },
+      "sources": [
+        {
+          "label": "Kiat & O’Connor, Communications Biology (2023)",
+          "url": "https://www.nature.com/articles/s42003-023-05048-x"
+        }
+      ]
+    }
+  ],
+  "completion": {
+    "title": "A living dinosaur takes flight",
+    "summary": "You followed nine evidence points from feathers with non-flight roles to the integrated flight system of modern birds."
+  }
+}
