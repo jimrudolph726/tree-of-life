@@ -129,6 +129,14 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid 
 .detail-panel section { margin-top: 28px; }
 .detail-panel h2 { margin: 0 0 12px; color: #7d8e7d; text-transform: uppercase; font-size: 10px; font-weight: 700; letter-spacing: 1.3px; }
 .profile-about { padding: 18px; border: 1px solid #e1e9dd; border-radius: 10px; background: #f7f9f4; }
+.conservation-status { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 17px; padding: 11px 12px; border: 1px solid #dce6d8; border-radius: 9px; background: #f7faf4; color: #405b49; text-decoration: none; }
+.conservation-status:hover { border-color: #acc6ae; background: #f1f7ee; }
+.conservation-status span, .conservation-status small, .conservation-status strong { display: block; }
+.conservation-status small { margin-bottom: 3px; color: #7b8b7b; font-size: 9px; font-weight: 700; letter-spacing: .65px; text-transform: uppercase; }
+.conservation-status strong { font-family: Georgia, serif; font-size: 13px; font-weight: 400; }
+.conservation-status b { min-width: 29px; padding: 5px 6px; border-radius: 5px; background: #dfeade; color: #345e47; font-size: 10px; text-align: center; }
+.conservation-status.status-cr b, .conservation-status.status-en b, .conservation-status.status-ex b, .conservation-status.status-ew b { background: #f3dfd9; color: #8b4538; }
+.conservation-status.status-vu b, .conservation-status.status-nt b { background: #f2e9d3; color: #7b6331; }
 .profile-about p { margin: 0; color: #435749; font-family: Georgia, serif; font-size: 14px; line-height: 1.65; }
 .profile-attribution { display: inline-block; margin-top: 13px; color: #6d8372; font-size: 10px; line-height: 1.5; text-decoration: none; }
 .profile-attribution:hover { color: #246f53; text-decoration: underline; }

@@ -2,8 +2,9 @@
 
 The checked-in source snapshot makes normal builds deterministic and offline.
 Use --refresh deliberately to resolve current Wikipedia articles and GBIF names,
-ranks, and synonyms. Use --expand to add validated Wikipedia/Wikidata profiles
-until the source snapshot contains the full field-guide set.
+ranks, and synonyms. Use --expand to maintain the 10,000 externally enriched
+records. Publication adds a deterministic, topology-aware OpenTree sample to
+produce 50,000 searchable profiles without adding runtime network dependencies.
 """
 
 from __future__ import annotations
@@ -14,6 +15,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 import gzip
 import hashlib
+import heapq
 import json
 from pathlib import Path
 import re
@@ -29,11 +31,13 @@ ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT = ROOT / 'data/processed/profiles/source-snapshot.json'
 OUTPUT = ROOT / 'public/data/profiles'
 GBIF_ENRICHED_COUNT = 1000
-COUNT = 10000
-SHARDS = 128
+EXTERNAL_PROFILE_COUNT = 10000
+COUNT = 50000
+SHARDS = 256
 MAX_GZIP_SHARD_BYTES = 64 * 1024
-MAX_GZIP_SEARCH_BYTES = 512 * 1024
-MAX_GZIP_PUBLICATION_BYTES = 8 * 1024 * 1024
+MAX_GZIP_SEARCH_BYTES = 2 * 1024 * 1024
+MAX_GZIP_CROSSWALK_BYTES = 1024 * 1024
+MAX_GZIP_PUBLICATION_BYTES = 16 * 1024 * 1024
 MAX_PROFILE_IMAGE_BYTES = 512 * 1024
 WIKIDATA_CANDIDATE_LIMIT = 60000
 USER_AGENT = 'TreeOfLifeExplorer/0.1 scientific-profile-etl'
@@ -43,10 +47,16 @@ SOURCE_PRIORITY = {
     'rankAndSynonyms': 'GBIF accepted exact match, then OpenTree',
     'commonNames': 'GBIF English preferred names, then other GBIF English names, then canonical Wikipedia title',
     'description': 'English Wikipedia introductory extract whose Wikidata item is a taxon or organism group or has a matching scientific-name property; never generated or treated as taxonomic authority',
+    'conservation': 'IUCN Red List category exposed by the GBIF Species API for an exact accepted GBIF match',
     'fieldNotes': 'Peer-reviewed sources selected for the guided Journeys; each displayed fact carries its own citation',
     'media': 'Locally hosted Wikimedia Commons media with creator, license, source URL, and integrity metadata',
 }
 WIKIDATA_TAXON_CLASSES = {'Q16521', 'Q55983715'}  # taxon; organisms known by a particular common name
+IUCN_CATEGORIES = {
+    'EX': 'Extinct', 'EW': 'Extinct in the Wild', 'CR': 'Critically Endangered',
+    'EN': 'Endangered', 'VU': 'Vulnerable', 'NT': 'Near Threatened',
+    'LC': 'Least Concern', 'DD': 'Data Deficient',
+}
 
 ESSENTIAL = [
     'cellular organisms', 'Eukaryota', 'Archaea', 'Bacteria', 'Opisthokonta', 'Fungi', 'Metazoa',
@@ -163,6 +173,61 @@ def request_json(url, *, params=None, data=None, attempts=8):
             retry_after = getattr(getattr(error, 'response', None), 'headers', {}).get('Retry-After')
             delay = float(retry_after) if retry_after and retry_after.isdigit() else min(30, 1.5 * 2 ** attempt)
             time.sleep(delay)
+
+
+def conservation_record(profile, attempts=5):
+    """Read the GBIF projection of IUCN status for an exact GBIF identity."""
+    usage_key = profile['gbif']['usageKey']
+    url = f'https://api.gbif.org/v1/species/{usage_key}/iucnRedListCategory'
+    for attempt in range(attempts):
+        try:
+            response = requests.get(url, headers={'User-Agent': USER_AGENT}, timeout=45)
+            if response.status_code == 204:
+                return None
+            if response.status_code == 429 or response.status_code >= 500:
+                raise requests.HTTPError(f'HTTP {response.status_code}', response=response)
+            response.raise_for_status()
+            value = response.json()
+            code = value.get('code')
+            if code not in IUCN_CATEGORIES:
+                return None
+            record = {
+                'code': code,
+                'category': IUCN_CATEGORIES[code],
+                'system': 'IUCN Red List',
+                'source': {'label': 'GBIF Species API · IUCN Red List category', 'url': url},
+            }
+            taxon_id = value.get('iucnTaxonID')
+            if isinstance(taxon_id, str) and taxon_id:
+                record['iucnTaxonId'] = taxon_id
+            return record
+        except (requests.RequestException, ValueError) as error:
+            if attempt + 1 == attempts:
+                raise
+            retry_after = getattr(getattr(error, 'response', None), 'headers', {}).get('Retry-After')
+            delay = float(retry_after) if retry_after and retry_after.isdigit() else min(20, 1.5 * 2 ** attempt)
+            time.sleep(delay)
+
+
+def refresh_conservation(snapshot):
+    profiles = [profile for profile in snapshot.get('profiles', []) if profile.get('gbif')]
+    completed = 0
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = {executor.submit(conservation_record, profile): profile for profile in profiles}
+        for future in as_completed(futures):
+            profile = futures[future]
+            record = future.result()
+            if record:
+                profile['conservation'] = record
+            else:
+                profile.pop('conservation', None)
+            completed += 1
+            if completed % 100 == 0 or completed == len(profiles):
+                print(f'Resolved conservation status {completed}/{len(profiles)}', flush=True)
+    snapshot['conservationRetrievedAt'] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    snapshot['sourcePriority'] = SOURCE_PRIORITY
+    SNAPSHOT.write_text(compact_json(snapshot, pretty=True) + '\n', encoding='utf-8', newline='\n')
+    return snapshot
 
 
 def wikipedia_batch(rows):
@@ -520,7 +585,7 @@ def journey_profile_overlays():
 def expand(snapshot):
     """Expand the 1,000-record GBIF snapshot to 10,000 sourced profiles."""
     existing = list(snapshot.get('profiles', []))
-    if len(existing) == COUNT:
+    if len(existing) == EXTERNAL_PROFILE_COUNT:
         return snapshot
     if len(existing) != GBIF_ENRICHED_COUNT:
         raise ValueError(f'Expansion expects {GBIF_ENRICHED_COUNT} starting profiles, found {len(existing)}')
@@ -549,7 +614,7 @@ def expand(snapshot):
         if row['ottId'] in seen_ids or row['ottId'] in pool_ids or row['scientificName'].casefold() in seen_names:
             continue
         pool_ids.add(row['ottId']); pool.append(row)
-    needed = COUNT - len(existing)
+    needed = EXTERNAL_PROFILE_COUNT - len(existing)
     if len(pool) < needed:
         raise ValueError(f'Only {len(pool):,} new OpenTree/Wikidata matches were available; need {needed:,}')
     selected = pool[:needed]
@@ -563,14 +628,14 @@ def expand(snapshot):
                    'synonyms': [], 'wikidata': {'itemId': row['wikidataId'],
                    'articleTitle': title, 'articleUrl': article_url}}
         existing.append(profile)
-    if len(existing) != COUNT or len({item['ottId'] for item in existing}) != COUNT:
+    if len(existing) != EXTERNAL_PROFILE_COUNT or len({item['ottId'] for item in existing}) != EXTERNAL_PROFILE_COUNT:
         raise ValueError('Expanded profile snapshot is incomplete or contains duplicate OTT IDs')
     snapshot = {**snapshot, 'format': 2,
                 'retrievedAt': datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
                 'sourcePriority': SOURCE_PRIORITY,
                 'profiles': sorted(existing, key=lambda item: item['ottId'])}
     SNAPSHOT.write_text(compact_json(snapshot, pretty=True) + '\n', encoding='utf-8', newline='\n')
-    print(f'Wrote {COUNT:,} source-backed profiles to {SNAPSHOT}', flush=True)
+    print(f'Wrote {EXTERNAL_PROFILE_COUNT:,} externally enriched profiles to {SNAPSHOT}', flush=True)
     return snapshot
 
 
@@ -581,6 +646,11 @@ def validate_profile(profile):
         raise ValueError('Profile has no scientific name')
     if len(profile.get('commonNames', [])) > 6 or len(profile.get('synonyms', [])) > 8:
         raise ValueError('Profile exceeds compact-list limits')
+    gbif = profile.get('gbif')
+    if gbif and (not isinstance(gbif.get('usageKey'), int) or gbif.get('usageKey') <= 0 or
+                 gbif.get('canonicalName', '').casefold() != profile['scientificName'].casefold() or
+                 not isinstance(gbif.get('confidence'), int) or not 0 <= gbif['confidence'] <= 100):
+        raise ValueError(f"GBIF identity is not an exact canonical match for {profile['scientificName']}")
     article = profile.get('wikipedia')
     if article and (not article.get('url', '').startswith('https://en.wikipedia.org/wiki/') or
                     not isinstance(article.get('revisionId'), int) or not article.get('extract') or
@@ -591,6 +661,17 @@ def validate_profile(profile):
                      not wikidata.get('articleTitle') or
                      not wikidata.get('articleUrl', '').startswith('https://en.wikipedia.org/wiki/')):
         raise ValueError(f"Invalid Wikidata identity for {profile['scientificName']}")
+    conservation = profile.get('conservation')
+    if conservation:
+        source = conservation.get('source', {})
+        expected_url = f"https://api.gbif.org/v1/species/{gbif['usageKey']}/iucnRedListCategory" if gbif else ''
+        if (conservation.get('code') not in IUCN_CATEGORIES or
+                conservation.get('category') != IUCN_CATEGORIES[conservation['code']] or
+                conservation.get('system') != 'IUCN Red List' or
+                (conservation.get('iucnTaxonId') is not None and
+                 not re.fullmatch(r'\d+(?:_\d+)?', conservation['iucnTaxonId'])) or
+                not source.get('label') or source.get('url') != expected_url):
+            raise ValueError(f"Invalid conservation evidence for {profile['scientificName']}")
     image = profile.get('image')
     if image and (not image.get('src', '').startswith('images/') or
                   not image.get('sourceUrl', '').startswith('https://') or
@@ -658,11 +739,12 @@ def search_profile(profile):
 
 
 def tree_wide_profiles(existing, target_count):
-    """Add deterministic OpenTree identity profiles without external requests.
+    """Add a deterministic, topology-aware sample from the pinned OpenTree release.
 
-    Rich source-backed enrichment remains explicit in the saved snapshot. These
-    lightweight records extend lazy profile routing and discovery across a
-    reproducible sample of the complete tree without inventing descriptions.
+    Sixty percent of the added records prioritize shallow named internal clades,
+    then broad immediate radiations. The remainder is a stable hash sample of
+    named terminal taxa. This makes profile coverage useful across the tree while
+    keeping OpenTree-only identities distinct from external enrichment.
     """
     if len(existing) >= target_count:
         return []
@@ -672,45 +754,98 @@ def tree_wide_profiles(existing, target_count):
     with (folder / 'labels.u32').open('rb') as stream:
         offsets.fromfile(stream, (folder / 'labels.u32').stat().st_size // offsets.itemsize)
     labels = (folder / 'labels.utf8').read_bytes()
+    parents = array('i')
+    with (folder / 'parents.i32').open('rb') as stream:
+        parents.fromfile(stream, (folder / 'parents.i32').stat().st_size // parents.itemsize)
+    node_count = len(offsets) // 2
+    if len(parents) != node_count:
+        raise ValueError('OpenTree parent and label indexes have different lengths')
+    children = array('I', [0]) * node_count
+    depths = array('B', [0]) * node_count
+    for index, parent in enumerate(parents):
+        if parent < 0:
+            continue
+        if parent >= index:
+            raise ValueError('OpenTree compact graph is not parent-before-child ordered')
+        children[parent] += 1
+        depth = depths[parent] + 1
+        if depth > 255:
+            raise ValueError('OpenTree depth exceeds the profile selector format')
+        depths[index] = depth
     seen = {item['ottId'] for item in existing}
     needed = target_count - len(existing)
-    result = []
+    internal_limit = min(needed, round(needed * 0.60))
+    terminal_limit = needed - internal_limit
+    internal_heap, terminal_heap = [], []
 
-    def consider(index):
+    def retain(heap, limit, quality, index, profile):
+        entry = (quality, index, profile)
+        if len(heap) < limit:
+            heapq.heappush(heap, entry)
+        elif quality > heap[0][0]:
+            heapq.heapreplace(heap, entry)
+
+    for index in range(node_count):
         offset, length = offsets[index * 2], offsets[index * 2 + 1]
         label = labels[offset:offset + length].decode('utf-8')
         match = re.fullmatch(r'(.+)_ott(\d+)', label)
         if not match:
-            return
+            continue
         name = match.group(1).replace('_', ' ').strip()
         ott_id = int(match.group(2))
         if ott_id in seen or not re.search(r'[A-Za-z]', name) or name.casefold().startswith('mrca'):
-            return
-        seen.add(ott_id)
-        result.append({'ottId': ott_id, 'scientificName': name, 'selection': 'tree-wide',
-                       'commonNames': [], 'synonyms': []})
-
-    node_count = len(offsets) // 2
-    stride = max(1, node_count // (needed * 2))
-    for index in range(0, node_count, stride):
-        consider(index)
-        if len(result) == needed:
-            break
-    if len(result) < needed:
-        for index in range(node_count):
-            consider(index)
-            if len(result) == needed:
-                break
+            continue
+        digest = int.from_bytes(hashlib.sha256(f'{ott_id}:{name}'.encode()).digest()[:8], 'big')
+        if children[index]:
+            profile = {'ottId': ott_id, 'scientificName': name, 'selection': 'tree-wide-clade',
+                       'commonNames': [], 'synonyms': []}
+            # Larger tuple means more useful: shallower, broader, then stable hash.
+            retain(internal_heap, internal_limit, (-depths[index], children[index], -digest), index, profile)
+        else:
+            profile = {'ottId': ott_id, 'scientificName': name, 'selection': 'tree-wide-terminal',
+                       'commonNames': [], 'synonyms': []}
+            retain(terminal_heap, terminal_limit, (-digest,), index, profile)
+    result = [entry[2] for entry in sorted(internal_heap, reverse=True)]
+    result.extend(entry[2] for entry in sorted(terminal_heap, reverse=True))
     if len(result) != needed:
         raise ValueError(f'Only {len(result):,} tree-wide profiles were available; needed {needed:,}')
     return result
 
 
+def identity_crosswalk(profiles):
+    """Build a compact OTT-to-external-ID crosswalk and report ambiguous reuse."""
+    rows, gbif_ids, wikidata_ids = [], {}, {}
+    for profile in profiles:
+        gbif_key = (profile.get('gbif') or {}).get('usageKey')
+        wikipedia = profile.get('wikipedia') or {}
+        wikidata = profile.get('wikidata') or {}
+        wikidata_id = wikipedia.get('wikidataId') or wikidata.get('itemId')
+        wikipedia_title = wikipedia.get('title') or wikidata.get('articleTitle')
+        if wikipedia.get('wikidataId') and wikidata.get('itemId') and wikipedia['wikidataId'] != wikidata['itemId']:
+            raise ValueError(f"Conflicting Wikidata identities for OTT {profile['ottId']}")
+        rows.append([profile['ottId'], gbif_key, wikidata_id, wikipedia_title])
+        if gbif_key:
+            gbif_ids.setdefault(gbif_key, []).append(profile['ottId'])
+        if wikidata_id:
+            wikidata_ids.setdefault(wikidata_id, []).append(profile['ottId'])
+    return rows, {
+        'openTree': len(rows),
+        'gbif': sum(bool(row[1]) for row in rows),
+        'wikidata': sum(bool(row[2]) for row in rows),
+        'wikipedia': sum(bool(row[3]) for row in rows),
+        'gbifIdentifierCollisions': sum(len(ids) > 1 for ids in gbif_ids.values()),
+        # One article can legitimately cover a genus and one or more subtaxa.
+        'wikidataIdentifierCollisions': sum(len(ids) > 1 for ids in wikidata_ids.values()),
+    }
+
+
 def publish(snapshot):
     source_profiles = snapshot.get('profiles', [])
-    if len(source_profiles) != COUNT or len({item['ottId'] for item in source_profiles}) != COUNT:
-        raise ValueError(f'Profile snapshot must contain exactly {COUNT} unique sourced taxa; run with --expand')
+    if (len(source_profiles) != EXTERNAL_PROFILE_COUNT or
+            len({item['ottId'] for item in source_profiles}) != EXTERNAL_PROFILE_COUNT):
+        raise ValueError(f'Profile snapshot must contain exactly {EXTERNAL_PROFILE_COUNT} unique enriched taxa; run with --expand')
     profiles = apply_profile_overlays(source_profiles)
+    profiles.extend(tree_wide_profiles(profiles, COUNT))
     for profile in profiles:
         validate_profile(profile)
     required = {'Eukaryota', 'Archaea', 'Bacteria', 'Fungi', 'Opisthokonta', 'Bilateria',
@@ -727,21 +862,33 @@ def publish(snapshot):
     search_compressed = len(gzip.compress(search_text.encode(), compresslevel=9, mtime=0))
     if search_compressed > MAX_GZIP_SEARCH_BYTES:
         raise ValueError(f'Compressed profile search index exceeds {MAX_GZIP_SEARCH_BYTES} bytes')
+    crosswalk, identity_coverage = identity_crosswalk(profiles)
+    crosswalk_text = compact_json({'format': 1,
+                                   'fields': ['ottId', 'gbifUsageKey', 'wikidataItemId', 'wikipediaTitle'],
+                                   'records': crosswalk}) + '\n'
+    crosswalk_compressed = len(gzip.compress(crosswalk_text.encode(), compresslevel=9, mtime=0))
+    if crosswalk_compressed > MAX_GZIP_CROSSWALK_BYTES:
+        raise ValueError(f'Compressed identity crosswalk exceeds {MAX_GZIP_CROSSWALK_BYTES} bytes')
     hash_value = hashlib.sha256()
     for index, text in enumerate(shard_text):
         hash_value.update(f'{index:02d}.json'.encode()); hash_value.update(text.encode())
     hash_value.update(b'search.json'); hash_value.update(search_text.encode())
+    hash_value.update(b'crosswalk.json'); hash_value.update(crosswalk_text.encode())
     hash_value.update(sha256(SNAPSHOT).encode())
     hash_value.update(curation_sha256().encode())
     version = hash_value.hexdigest()[:16]
     coverage = {
         'profiles': len(profiles),
         'enriched': sum(bool(item.get('wikipedia') or item.get('wikidata') or item.get('gbif') or item.get('facts')) for item in profiles),
-        'treeWide': 0,
+        'externallyEnriched': len(source_profiles),
+        'openTreeOnly': len(profiles) - len(source_profiles),
+        'treeWideClades': sum(item.get('selection') == 'tree-wide-clade' for item in profiles),
+        'treeWideTerminals': sum(item.get('selection') == 'tree-wide-terminal' for item in profiles),
         'descriptions': sum('wikipedia' in item for item in public_profiles),
         'commonNames': sum(bool(item.get('commonNames')) for item in public_profiles),
         'synonyms': sum(bool(item.get('synonyms')) for item in public_profiles),
         'fieldNotes': sum(bool(item.get('facts')) for item in public_profiles),
+        'conservation': sum(bool(item.get('conservation')) for item in public_profiles),
         'media': sum(bool(item.get('image')) for item in public_profiles),
         'wikidata': sum(item.get('selection') == 'wikidata' for item in profiles),
         'primates': sum(item.get('selection') == 'primates' for item in profiles),
@@ -754,17 +901,20 @@ def publish(snapshot):
     if sum(compressed) > MAX_GZIP_PUBLICATION_BYTES:
         raise ValueError(f'Compressed profile publication exceeds {MAX_GZIP_PUBLICATION_BYTES} bytes')
     manifest = {
-        'format': 2, 'version': version, 'profileCount': COUNT, 'shardCount': SHARDS,
+        'format': 3, 'version': version, 'profileCount': COUNT, 'shardCount': SHARDS,
         'shardPattern': 'shards/{shard}.json', 'routing': 'ottId modulo shardCount',
         'maxCompressedShardBytes': max(compressed), 'compressedPublicationBytes': sum(compressed),
         'searchFile': 'search.json', 'compressedSearchBytes': search_compressed,
+        'crosswalkFile': 'crosswalk.json', 'crosswalkCount': len(crosswalk),
+        'compressedCrosswalkBytes': crosswalk_compressed, 'identityCoverage': identity_coverage,
         'retrievedAt': snapshot['retrievedAt'], 'openTree': snapshot['openTree'],
         'sourcePriority': {**snapshot['sourcePriority'],
-                           'coverage': 'Every published profile has OpenTree identity plus at least one independently sourced field'},
+                           'coverage': 'Every profile has pinned OpenTree identity; externallyEnriched counts records with independently sourced fields'},
         'coverage': coverage,
         'sources': [
             {'name': 'Open Tree of Life', 'url': 'https://tree.opentreeoflife.org/', 'role': 'taxon identity and topology'},
-            {'name': 'GBIF Species API', 'url': 'https://techdocs.gbif.org/en/openapi/v1/species', 'role': 'rank, common names and synonyms'},
+            {'name': 'GBIF Species API', 'url': 'https://techdocs.gbif.org/en/openapi/v1/species',
+             'role': 'rank, common names, synonyms and IUCN Red List category'},
             {'name': 'English Wikipedia', 'url': 'https://en.wikipedia.org/', 'role': 'attributed introductory descriptions',
              'license': 'CC BY-SA 4.0'},
             {'name': 'Wikidata', 'url': 'https://www.wikidata.org/', 'role': 'article-to-taxon validation'},
@@ -774,6 +924,8 @@ def publish(snapshot):
         'sourceSnapshotSha256': sha256(SNAPSHOT),
         'curationSha256': curation_sha256(),
     }
+    if snapshot.get('conservationRetrievedAt'):
+        manifest['conservationRetrievedAt'] = snapshot['conservationRetrievedAt']
     stage = OUTPUT / '.build-stage'
     if stage.exists():
         shutil.rmtree(stage)
@@ -783,6 +935,7 @@ def publish(snapshot):
         for index, text in enumerate(shard_text):
             (folder / f'{index:02d}.json').write_text(text, encoding='utf-8', newline='\n')
         (stage / version / 'search.json').write_text(search_text, encoding='utf-8', newline='\n')
+        (stage / version / 'crosswalk.json').write_text(crosswalk_text, encoding='utf-8', newline='\n')
         manifest_text = compact_json(manifest, pretty=True) + '\n'
         (stage / version / 'manifest.json').write_text(manifest_text, encoding='utf-8', newline='\n')
         destination = OUTPUT / version
@@ -801,7 +954,8 @@ def publish(snapshot):
     print(compact_json({'version': version, **coverage,
                         'maxCompressedShardBytes': max(compressed),
                         'compressedPublicationBytes': sum(compressed),
-                        'compressedSearchBytes': search_compressed}, pretty=True))
+                        'compressedSearchBytes': search_compressed,
+                        'compressedCrosswalkBytes': crosswalk_compressed}, pretty=True))
     return manifest
 
 
@@ -810,6 +964,8 @@ def main():
     parser.add_argument('--refresh', action='store_true', help='Fetch a new official-source snapshot before publishing')
     parser.add_argument('--expand', action='store_true', help='Expand the saved source snapshot to the full field-guide set')
     parser.add_argument('--audit-snapshot', action='store_true', help='Revalidate saved Wikipedia articles using Wikidata')
+    parser.add_argument('--refresh-conservation', action='store_true',
+                        help='Refresh IUCN Red List categories exposed by GBIF for exact GBIF matches')
     args = parser.parse_args()
     if args.refresh:
         snapshot = expand(refresh())
@@ -819,6 +975,8 @@ def main():
         parser.error('Missing profile source snapshot. Run with --refresh once.')
     if args.expand:
         snapshot = expand(snapshot)
+    if args.refresh_conservation:
+        snapshot = refresh_conservation(snapshot)
     if args.audit_snapshot:
         articles = {profile['ottId']: profile.get('wikipedia') for profile in snapshot['profiles']}
         rows = [{'ottId': profile['ottId'], 'scientificName': profile['scientificName']}

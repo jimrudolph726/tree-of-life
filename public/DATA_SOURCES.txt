@@ -13,6 +13,10 @@ English Wikipedia extracts after Wikidata taxon checks. The other tree-wide
 records intentionally contain OpenTree identity and provenance only. Versioned
 source identifiers, retrieval dates and checksums are recorded under
 /data/profiles/.
+Evaluated IUCN Red List categories are retrieved through the official GBIF
+Species API and retain the exact evidence URL. The versioned identity crosswalk
+maps OTT IDs to validated GBIF, Wikidata and Wikipedia identifiers. Missing
+fields are left absent rather than inferred.
 
 Guided Journeys: editorial text and step-level scientific sources are recorded
 in each versioned file under /data/journeys/. Illustrations use curated,

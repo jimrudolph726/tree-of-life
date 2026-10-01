@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tree-of-life.example/schemas/scientific-profile-crosswalk-v1.json",
+  "title": "Scientific profile identity crosswalk",
+  "type": "object",
+  "required": ["format", "fields", "records"],
+  "additionalProperties": false,
+  "properties": {
+    "format": { "const": 1 },
+    "fields": {
+      "const": ["ottId", "gbifUsageKey", "wikidataItemId", "wikipediaTitle"]
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "prefixItems": [
+          { "type": "integer", "minimum": 1 },
+          { "type": ["integer", "null"], "minimum": 1 },
+          { "type": ["string", "null"], "pattern": "^Q[0-9]+$" },
+          { "type": ["string", "null"], "minLength": 1 }
+        ],
+        "minItems": 4,
+        "maxItems": 4
+      }
+    }
+  }
+}

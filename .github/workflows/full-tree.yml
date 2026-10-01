@@ -46,12 +46,13 @@ jobs:
       - run: npm test
       - run: npm run data:test
       - run: npm run lint
-      - run: npm run build
-      - run: python pipeline/deploy_cloud.py preflight
+      - run: node pipeline/check-publication.mjs
+      - run: npm run build:app
+      - run: python pipeline/deploy_cloud.py preflight --data-root public
       - name: Record previous release
         run: python pipeline/deploy_cloud.py status --distribution "$STAGING_DISTRIBUTION" > staging-before.json
       - name: Publish datasets and activate the matching app release
-        run: python pipeline/deploy_cloud.py deploy --bucket "$STAGING_BUCKET" --distribution "$STAGING_DISTRIBUTION"
+        run: python pipeline/deploy_cloud.py deploy --data-root public --bucket "$STAGING_BUCKET" --distribution "$STAGING_DISTRIBUTION"
       - name: Verify hosted app and all datasets
         run: node pipeline/cloud-smoke.ts "$STAGING_URL" staging-smoke.json
       - uses: actions/upload-artifact@v4

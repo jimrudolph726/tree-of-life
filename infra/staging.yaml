@@ -46,6 +46,10 @@ Resources:
           - Id: AbortIncompleteUploads
             Status: Enabled
             AbortIncompleteMultipartUpload: {DaysAfterInitiation: 7}
+          - Id: ExpireSupersededObjectVersions
+            Status: Enabled
+            NoncurrentVersionExpiration: {NoncurrentDays: 30}
+            ExpiredObjectDeleteMarker: true
   OriginAccess:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:

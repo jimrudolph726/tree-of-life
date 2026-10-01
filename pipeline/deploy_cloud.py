@@ -67,18 +67,24 @@ def app_sources(folder):
     profile_version = profile_manifest.get('version', '')
     shard_count = profile_manifest.get('shardCount', 0)
     if (not re.fullmatch(r'[0-9a-f]{16}', profile_version) or
-            not isinstance(shard_count, int) or not 1 <= shard_count <= 256 or
-            profile_manifest.get('profileCount') != 10000 or
-            profile_manifest.get('maxCompressedShardBytes', 10**9) > 24 * 1024):
+            profile_manifest.get('format') != 3 or
+            not isinstance(shard_count, int) or not 1 <= shard_count <= 512 or
+            profile_manifest.get('profileCount') != 50000 or
+            profile_manifest.get('maxCompressedShardBytes', 10**9) > 64 * 1024):
         raise ValueError('Invalid scientific-profile manifest')
     profile_folder = profile_pointer.parent / profile_version
     published = json.loads((profile_folder / 'manifest.json').read_text(encoding='utf-8'))
     if published != profile_manifest:
         raise ValueError('Scientific-profile pointer does not match version manifest')
     search_file = profile_manifest.get('searchFile')
-    if search_file != 'search.json' or profile_manifest.get('compressedSearchBytes', 10**9) > 256 * 1024:
+    if search_file != 'search.json' or profile_manifest.get('compressedSearchBytes', 10**9) > 2 * 1024 * 1024:
         raise ValueError('Invalid scientific-profile search publication')
-    profile_files = [profile_folder / 'manifest.json', profile_folder / search_file]
+    crosswalk_file = profile_manifest.get('crosswalkFile')
+    if (crosswalk_file != 'crosswalk.json' or profile_manifest.get('crosswalkCount') != 50000 or
+            profile_manifest.get('compressedCrosswalkBytes', 10**9) > 1024 * 1024):
+        raise ValueError('Invalid scientific identity crosswalk')
+    profile_files = [profile_folder / 'manifest.json', profile_folder / search_file,
+                     profile_folder / crosswalk_file]
     for shard in range(shard_count):
         path = profile_folder / 'shards' / f'{shard:02d}.json'
         if not path.is_file():
@@ -132,8 +138,9 @@ def release_identity(root, app_files, assets, pointers):
     return identity.hexdigest()[:24]
 
 
-def prepare(folder):
+def prepare(folder, data_folder=None):
     root, app_files, assets = app_sources(folder)
+    data_root = Path(data_folder).resolve() if data_folder else root
     versions, files, pointers = {}, [], {}
     for path in assets:
         if path.is_file() and path.suffix in TYPES:
@@ -145,26 +152,27 @@ def prepare(folder):
         if not re.fullmatch(r'[0-9a-f]{16}', version):
             raise ValueError('Invalid dataset version')
         versions[dataset] = version
-        folder = pointer.parent / version
-        published = json.loads((folder / 'manifest.json').read_text(encoding='utf-8'))
+        dataset_folder = data_root / 'data' / dataset / version
+        published = json.loads((dataset_folder / 'manifest.json').read_text(encoding='utf-8'))
         if comparable_manifest(published) != comparable_manifest(manifest):
             raise ValueError(f'{dataset}: pointer does not match version manifest')
         for page in range(manifest['pageCount']):
-            if not (folder / 'pages' / f'{page}.bin').is_file():
+            if not (dataset_folder / 'pages' / f'{page}.bin').is_file():
                 raise ValueError(f'{dataset}: missing geometry page {page}')
         for required in (['search-top.json', 'overview.json'] if dataset == 'life' else ['search.json']):
             # Older formats expose their own search directory name.
             if required == 'search.json':
                 required = manifest.get('searchDirectory', 'search.json')
-            if not (folder / required).is_file():
+            if not (dataset_folder / required).is_file():
                 raise ValueError(f'{dataset}: missing {required}')
-        for path in sorted(folder.rglob('*')):
+        for path in sorted(dataset_folder.rglob('*')):
             if path.is_file():
-                if path.is_symlink() or not path.resolve().is_relative_to(root):
+                if path.is_symlink() or not path.resolve().is_relative_to(data_root):
                     raise ValueError('Publication contains a symlink/outside file')
                 if path.suffix not in ('.json', '.bin'):
                     raise ValueError(f'Unexpected dataset file: {path}')
-                files.append((path, path.relative_to(root).as_posix(), path == folder / 'manifest.json'))
+                key = (Path('data') / dataset / version / path.relative_to(dataset_folder)).as_posix()
+                files.append((path, key, path == dataset_folder / 'manifest.json'))
         app_files.append(pointer)
         pointers[pointer.relative_to(root).as_posix()] = content(pointer)
     release = release_identity(root, app_files, assets, pointers)
@@ -328,8 +336,8 @@ def activate(s3, cf, bucket, distribution, release):
                       'rollback': None if previous == 'unpublished' else f'python pipeline/deploy_cloud.py activate --bucket {bucket} --distribution {distribution} --release {previous}'}, indent=2))
 
 
-def deploy(s3, cf, bucket, distribution, folder):
-    release, versions, files = prepare(folder)
+def deploy(s3, cf, bucket, distribution, folder, data_folder=None):
+    release, versions, files = prepare(folder, data_folder)
     existing = listing(s3, bucket, ['data/', 'assets/', f'releases/{release}/'])
     inventory = {}
     with ThreadPoolExecutor(max_workers=12) as executor:
@@ -374,6 +382,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=['preflight', 'deploy', 'deploy-app', 'activate', 'status'])
     parser.add_argument('--dist', default='dist')
+    parser.add_argument('--data-root', help='Root containing data/<dataset>/<version>; defaults to --dist')
     parser.add_argument('--bucket')
     parser.add_argument('--distribution')
     parser.add_argument('--release')
@@ -381,7 +390,7 @@ def main():
     parser.add_argument('--region', default='us-east-1')
     args = parser.parse_args()
     if args.command == 'preflight':
-        release, versions, files = prepare(args.dist)
+        release, versions, files = prepare(args.dist, args.data_root)
         print(json.dumps({'release': release, 'datasets': versions, 'files': len(files),
                           'sourceBytes': sum(p.stat().st_size for p, _, _ in files)}, indent=2))
         return
@@ -404,7 +413,7 @@ def main():
     elif args.command == 'deploy-app':
         deploy_app(s3, cf, args.bucket, args.distribution, args.dist)
     else:
-        deploy(s3, cf, args.bucket, args.distribution, args.dist)
+        deploy(s3, cf, args.bucket, args.distribution, args.dist, args.data_root)
 
 
 if __name__ == '__main__':

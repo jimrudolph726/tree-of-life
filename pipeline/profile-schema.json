@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://tree-of-life.example/schemas/scientific-profile-v2.json",
+  "$id": "https://tree-of-life.example/schemas/scientific-profile-v3.json",
   "title": "Scientific profile shard",
   "type": "object",
   "required": ["profiles"],
@@ -73,6 +73,26 @@
             "itemId": { "type": "string", "pattern": "^Q[0-9]+$" },
             "articleTitle": { "type": "string", "minLength": 1 },
             "articleUrl": { "type": "string", "pattern": "^https://en\\.wikipedia\\.org/wiki/" }
+          }
+        },
+        "conservation": {
+          "type": "object",
+          "required": ["code", "category", "system", "source"],
+          "additionalProperties": false,
+          "properties": {
+            "code": { "enum": ["EX", "EW", "CR", "EN", "VU", "NT", "LC", "DD"] },
+            "category": { "type": "string", "minLength": 1 },
+            "system": { "const": "IUCN Red List" },
+            "iucnTaxonId": { "type": "string", "pattern": "^[0-9]+(?:_[0-9]+)?$" },
+            "source": {
+              "type": "object",
+              "required": ["label", "url"],
+              "additionalProperties": false,
+              "properties": {
+                "label": { "type": "string", "minLength": 1 },
+                "url": { "type": "string", "pattern": "^https://api\\.gbif\\.org/" }
+              }
+            }
           }
         },
         "image": {

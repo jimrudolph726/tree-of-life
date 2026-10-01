@@ -4,7 +4,7 @@ No custom domain, backend or database is required. The CloudFront HTTPS hostname
 
 ## Architecture
 
-- S3 blocks public access, uses SSE-S3 encryption and bucket versioning, and is retained on stack deletion.
+- S3 blocks public access, uses SSE-S3 encryption and bucket versioning, and is retained on stack deletion. Incomplete multipart uploads expire after seven days and superseded object versions after 30 days; distinct immutable releases remain available for rollback.
 - CloudFront signs S3 requests with Origin Access Control. Only GET/HEAD are allowed; HTTP redirects to HTTPS.
 - `/data/<dataset>/<version>/...` and hashed `/assets/...` are shared immutable objects. Unchanged data is reused across app releases.
 - HTML, attribution, the three tree manifest pointers, profile/Journey pointers and Journey images live under `/releases/<release-id>/` in S3. CloudFront's `AppOrigin.OriginPath` selects the active release. Content-addressed profile and Journey JSON files are shared immutable objects under their versioned `/data/` paths; HTML and manifest pointers disable caching. There is no HTML fallback for missing binary/JSON pages.
@@ -27,8 +27,8 @@ npm run data:build
 npm test
 npm run data:test
 npm run lint
-npm run build
-python pipeline/deploy_cloud.py preflight
+npm run build:app
+python pipeline/deploy_cloud.py preflight --data-root public
 ```
 
 The preflight is local and read-only. It selects only active dataset versions, app assets and explicitly allowed public files. Missing geometry pages, inconsistent manifests and unexpected dataset file types fail before uploading. Full source/routing validation remains a separate required build check.
@@ -91,9 +91,10 @@ npm run data:build
 npm test
 npm run data:test
 npm run lint
-npm run build
-python pipeline/deploy_cloud.py preflight
-python pipeline/deploy_cloud.py deploy --bucket BUCKET --distribution DISTRIBUTION
+node pipeline/check-publication.mjs
+npm run build:app
+python pipeline/deploy_cloud.py preflight --data-root public
+python pipeline/deploy_cloud.py deploy --data-root public --bucket BUCKET --distribution DISTRIBUTION
 node pipeline/cloud-smoke.ts https://DISTRIBUTION.cloudfront.net .deploy/staging-smoke.json
 python pipeline/deploy_cloud.py status --distribution DISTRIBUTION
 ```

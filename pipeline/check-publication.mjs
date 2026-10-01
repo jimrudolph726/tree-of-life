@@ -19,15 +19,21 @@ const profileRoot = 'public/data/profiles';
 const profilePointer = join(profileRoot, 'manifest.json');
 if (!existsSync(profilePointer)) throw new Error('Scientific profiles have not been prepared. Run npm run data:profiles.');
 const profiles = JSON.parse(readFileSync(profilePointer, 'utf8'));
-if (profiles.format !== 2 || !/^[a-f0-9]{16}$/.test(profiles.version) || profiles.profileCount !== 10000 ||
-    profiles.shardCount !== 128 || profiles.maxCompressedShardBytes > 64 * 1024 ||
-    profiles.compressedPublicationBytes > 8 * 1024 * 1024 ||
-    profiles.searchFile !== 'search.json' || profiles.compressedSearchBytes > 512 * 1024) {
+if (profiles.format !== 3 || !/^[a-f0-9]{16}$/.test(profiles.version) || profiles.profileCount !== 50000 ||
+    profiles.shardCount !== 256 || profiles.maxCompressedShardBytes > 64 * 1024 ||
+    profiles.compressedPublicationBytes > 16 * 1024 * 1024 ||
+    profiles.searchFile !== 'search.json' || profiles.compressedSearchBytes > 2 * 1024 * 1024 ||
+    profiles.crosswalkFile !== 'crosswalk.json' || profiles.crosswalkCount !== 50000 ||
+    profiles.compressedCrosswalkBytes > 1024 * 1024) {
   throw new Error('Invalid scientific-profile publication. Run npm run data:profiles.');
 }
 const searchPath = join(profileRoot, profiles.version, profiles.searchFile);
 if (!existsSync(searchPath) || gzipSync(readFileSync(searchPath), { level: 9 }).byteLength > profiles.compressedSearchBytes) {
   throw new Error('Scientific-profile search index is missing or exceeds its published budget.');
+}
+const crosswalkPath = join(profileRoot, profiles.version, profiles.crosswalkFile);
+if (!existsSync(crosswalkPath) || gzipSync(readFileSync(crosswalkPath), { level: 9 }).byteLength > profiles.compressedCrosswalkBytes) {
+  throw new Error('Scientific identity crosswalk is missing or exceeds its published budget.');
 }
 const profileManifest = join(profileRoot, profiles.version, 'manifest.json');
 if (!existsSync(profileManifest) || readFileSync(profileManifest, 'utf8') !== readFileSync(profilePointer, 'utf8')) {

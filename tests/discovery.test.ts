@@ -10,6 +10,8 @@ import type { ProfileSearchRecord } from '../src/profiles/types.ts';
 const records: ProfileSearchRecord[] = [
   [153563, 'Gallus gallus', 'species', ['Red junglefowl'], ['Gallus domesticus']],
   [81461, 'Aves', 'class', ['Birds'], []],
+  [463546, 'Aepyornis', 'genus', ['Elephant Bird'], []],
+  [999001, 'Birdantis bloetei', null, [], []],
 ];
 
 test('scientific discovery ranks common names, synonyms, and scientific names', () => {
@@ -20,6 +22,7 @@ test('scientific discovery ranks common names, synonyms, and scientific names', 
   assert.equal(searchProfiles(records, 'domesticus')[0].matchKind, 'synonym');
   assert.equal(searchProfiles(records, 'gallus')[0].matchKind, 'scientific name');
   assert.equal(searchProfiles(records, 'birds')[0].scientificName, 'Aves');
+  assert.deepEqual(searchProfiles(records, 'bird').slice(0, 2).map(item => item.scientificName), ['Aves', 'Aepyornis']);
   assert.deepEqual(searchProfiles(records, 'no match'), []);
 });
 

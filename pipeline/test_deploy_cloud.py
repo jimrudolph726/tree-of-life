@@ -2,6 +2,7 @@ import gzip
 import io
 import json
 from pathlib import Path
+import shutil
 import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
@@ -36,14 +37,17 @@ class DeploymentTests(unittest.TestCase):
                 self.write(f'data/{dataset}/0123456789abcdef/search-top.json', '[]')
 
     def profile_fixture(self):
-        value = json.dumps({'format': 1, 'version': 'fedcba9876543210', 'profileCount': 10000,
+        value = json.dumps({'format': 3, 'version': 'fedcba9876543210', 'profileCount': 50000,
                             'shardCount': 2, 'maxCompressedShardBytes': 100,
-                            'searchFile': 'search.json', 'compressedSearchBytes': 100})
+                            'searchFile': 'search.json', 'compressedSearchBytes': 100,
+                            'crosswalkFile': 'crosswalk.json', 'crosswalkCount': 50000,
+                            'compressedCrosswalkBytes': 100})
         self.write('data/profiles/manifest.json', value)
         self.write('data/profiles/fedcba9876543210/manifest.json', value)
         self.write('data/profiles/fedcba9876543210/shards/00.json', '{"profiles":[]}')
         self.write('data/profiles/fedcba9876543210/shards/01.json', '{"profiles":[]}')
         self.write('data/profiles/fedcba9876543210/search.json', '{"profiles":[]}')
+        self.write('data/profiles/fedcba9876543210/crosswalk.json', '{"records":[]}')
         self.journey_fixture()
 
     def journey_fixture(self):
@@ -79,6 +83,20 @@ class DeploymentTests(unittest.TestCase):
         (self.root / 'data/life/0123456789abcdef/pages/0.bin').unlink()
         with self.assertRaisesRegex(ValueError, 'missing geometry'):
             cloud.prepare(self.root)
+
+    def test_full_release_reads_immutable_datasets_from_separate_root(self):
+        self.fixture()
+        data_root = self.root / 'generated-data'
+        for dataset in cloud.DATASETS:
+            source = self.root / 'data' / dataset / '0123456789abcdef'
+            destination = data_root / 'data' / dataset / '0123456789abcdef'
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(source, destination)
+        release, versions, files = cloud.prepare(self.root, data_root)
+        keys = [key for _, key, _ in files]
+        self.assertEqual(versions, {dataset: '0123456789abcdef' for dataset in cloud.DATASETS})
+        self.assertIn('data/life/0123456789abcdef/pages/0.bin', keys)
+        self.assertIn(f'releases/{release}/data/life/manifest.json', keys)
 
     def test_app_release_reuses_remote_dataset_pointers_without_local_data(self):
         self.write('index.html', '<script src="/assets/app-123.js"></script>')

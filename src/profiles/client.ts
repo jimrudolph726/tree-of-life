@@ -3,15 +3,25 @@ import { validateProfileManifest, validateProfileSearch, validateProfileShard, t
 import { searchProfiles } from './search.ts';
 
 const MAX_CACHED_SHARDS = 16;
+type ProfileContentCache = 'reload' | 'force-cache';
+
+export function profileContentCache(manifestUrl: string): ProfileContentCache {
+  const hostname = new URL(manifestUrl).hostname;
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]' ? 'reload' : 'force-cache';
+}
 
 export class ProfileClient {
   private readonly manifestUrl: string;
+  private readonly contentCache: ProfileContentCache;
   private manifest?: Promise<ProfileManifest>;
   private shards = new Map<number, Map<number, ScientificProfile>>();
   private requests = new Map<number, Promise<Map<number, ScientificProfile>>>();
   private searchIndex?: Promise<ProfileSearchRecord[]>;
 
-  constructor(manifestUrl: string) { this.manifestUrl = manifestUrl; }
+  constructor(manifestUrl: string) {
+    this.manifestUrl = manifestUrl;
+    this.contentCache = profileContentCache(manifestUrl);
+  }
 
   private getManifest() {
     if (!this.manifest) {
@@ -33,7 +43,7 @@ export class ProfileClient {
     if (!request) {
       const name = shard.toString().padStart(2, '0');
       const relative = `${manifest.version}/${manifest.shardPattern.replace('{shard}', name)}`;
-      request = fetch(new URL(relative, this.manifestUrl).href, { cache: 'force-cache' }).then(async response => {
+      request = fetch(new URL(relative, this.manifestUrl).href, { cache: this.contentCache }).then(async response => {
         if (!response.ok) throw new Error(`Scientific profiles could not be loaded (${response.status}).`);
         const profiles = validateProfileShard(await response.json());
         if (profiles.some(profile => profile.ottId % manifest.shardCount !== shard)) {
@@ -66,7 +76,7 @@ export class ProfileClient {
     const manifest = await this.withSignal(this.getManifest(), signal);
     if (!this.searchIndex) {
       this.searchIndex = fetch(new URL(`${manifest.version}/${manifest.searchFile}`, this.manifestUrl).href,
-        { cache: 'force-cache' }).then(async response => {
+        { cache: this.contentCache }).then(async response => {
           if (!response.ok) throw new Error(`Scientific search could not be loaded (${response.status}).`);
           return validateProfileSearch(await response.json());
         }).catch(error => { this.searchIndex = undefined; throw error; });

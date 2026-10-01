@@ -16,6 +16,7 @@ import type { ScientificProfile } from './profiles/types';
 import type { ProfileSearchHit } from './profiles/types';
 import { JourneyClient } from './journeys/client';
 import type { Journey, JourneySummary } from './journeys/types';
+import { treeDataUrl } from './data/urls';
 import './App.css';
 
 const JourneyPanel = lazy(() => import('./journeys/JourneyPanel.tsx'));
@@ -66,6 +67,11 @@ function waitForSignal<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> 
 
 function isPositioned(node: Summary): node is StreamNode {
   return 'bounds' in node && 'position' in node && 'radius' in node;
+}
+
+function terminalTaxaLabel(node: Summary) {
+  const count = node.isTerminal ? 1 : node.leafCount;
+  return `${count.toLocaleString()} terminal ${count === 1 ? 'taxon' : 'taxa'}`;
 }
 
 function rootNode(manifest: Manifest): StreamNode {
@@ -143,11 +149,6 @@ function TreeMap({ client, profileClient, journeyClient, manifest }: { client: T
     const started = performance.now();
     const timer = setTimeout(() => {
       const directRequest = client.search(query, controller.signal);
-      void directRequest.then(direct => {
-        setSearchState({ query: query.trim(), results: direct.map(node => ({ node,
-          matchKind: /^(?:ott)?\d+$/i.test(query.trim()) ? 'OpenTree ID' : undefined })) });
-        if (query.trim()) recordSearch(performance.now() - started);
-      }).catch(error => { if (!controller.signal.aborted) setNavigationError(error.message); });
       const profileRequest = profileClient.search(query, controller.signal).catch(error => {
         if (controller.signal.aborted) throw error;
         return [] as ProfileSearchHit[];
@@ -173,6 +174,7 @@ function TreeMap({ client, profileClient, journeyClient, manifest }: { client: T
           return Number(!aHit) - Number(!bHit) || a.node.scientificName.localeCompare(b.node.scientificName);
         }).slice(0, 12);
         setSearchState({ query: query.trim(), results });
+        if (query.trim()) recordSearch(performance.now() - started);
       }).catch(error => { if (!controller.signal.aborted) setNavigationError(error.message); });
     }, 160);
     return () => { clearTimeout(timer); controller.abort(); };
@@ -435,7 +437,7 @@ function TreeMap({ client, profileClient, journeyClient, manifest }: { client: T
               <span className="search-result-title"><strong><span>{result.node.scientificName}</span></strong>{result.commonName && <em>{result.commonName}</em>}</span>
               <small><span>{result.rank ?? (result.node.isTerminal ? 'Terminal taxon' : 'Clade')}</span>
                 <span>{result.matchKind && result.matchedName && result.matchedName.localeCompare(result.node.scientificName, undefined, { sensitivity: 'base' }) !== 0
-                  ? `Matched ${result.matchKind}: ${result.matchedName}` : result.node.isTerminal ? '1 terminal taxon' : `${result.node.leafCount.toLocaleString()} terminal taxa`}</span></small>
+                  ? `Matched ${result.matchKind}: ${result.matchedName}` : terminalTaxaLabel(result.node)}</span></small>
             </button>) : <p role="status">{searching ? 'Searching…' : 'No matching taxa in this dataset.'}</p>}
           </div>}
         </div>
@@ -485,7 +487,7 @@ function TreeMap({ client, profileClient, journeyClient, manifest }: { client: T
         </span>)}
       </nav>}
       <footer className="map-footer"><span><strong>{manifest.namedCount.toLocaleString()}</strong> named taxa · {root.leafCount} tips<span className="desktop-hint"> · Drag to pan · Scroll to zoom</span></span>
-        <span className="attribution">{manifest.synthetic ? 'Generated benchmark data · ' : 'Data: Open Tree of Life · '}{manifest.provenance && <><a href={`${import.meta.env.BASE_URL}data/${manifest.presentation === 'life' ? 'life' : 'aves'}/${manifest.version}/manifest.json`} target="_blank" rel="noreferrer">{manifest.provenance.synthId}</a> · </>}<a href="https://lifemap.cnrs.fr/" target="_blank" rel="noreferrer">Inspired by Lifemap</a></span>
+        <span className="attribution">{manifest.synthetic ? 'Generated benchmark data · ' : 'Data: Open Tree of Life · '}{manifest.provenance && <><a href={treeDataUrl(`data/${manifest.presentation === 'life' ? 'life' : 'aves'}/${manifest.version}/manifest.json`)} target="_blank" rel="noreferrer">{manifest.provenance.synthId}</a> · </>}<a href="https://lifemap.cnrs.fr/" target="_blank" rel="noreferrer">Inspired by Lifemap</a></span>
       </footer>
       {selected && !['library', 'playing', 'complete'].includes(journeyState.view) && <aside className="detail-panel" aria-label="Taxon details">
         <button className="close-button" onClick={() => { focusRequest.current?.abort(); setPendingTaxon(null); setPendingNode(null); setDetails(null); }} aria-label="Close details">×</button>
@@ -493,6 +495,11 @@ function TreeMap({ client, profileClient, journeyClient, manifest }: { client: T
         <h1>{selected.scientificName}</h1>
         {primaryCommonName && <p className="common-name">{primaryCommonName}</p>}
         <div className="taxon-stat"><strong>{selected.leafCount.toLocaleString()}</strong><span>terminal {selected.leafCount === 1 ? 'taxon' : 'taxa'} in this subtree</span></div>
+        {profile?.conservation && <a className={`conservation-status status-${profile.conservation.code.toLocaleLowerCase()}`}
+          href={profile.conservation.source.url} target="_blank" rel="noreferrer">
+          <span><small>{profile.conservation.system}</small><strong>{profile.conservation.category}</strong></span>
+          <b>{profile.conservation.code}</b>
+        </a>}
         {profile?.image && profileImageUrl && <figure className="profile-image">
           <img src={profileImageUrl} alt={profile.image.alt} loading="lazy" decoding="async" />
           <figcaption>{profile.image.caption}<a href={profile.image.sourceUrl} target="_blank" rel="noreferrer">
@@ -577,7 +584,7 @@ function App() {
     const fixture = new URLSearchParams(window.location.search).get('dataset');
     const path = fixture && /^(balanced|unbalanced)-(10000|100000|1000000)$/.test(fixture)
       ? `${import.meta.env.BASE_URL}benchmarks/${fixture}/manifest.json`
-      : `${import.meta.env.BASE_URL}data/${fixture === 'primates' ? 'primates' : fixture === 'aves' ? 'aves' : 'life'}/manifest.json`;
+      : treeDataUrl(`data/${fixture === 'primates' ? 'primates' : fixture === 'aves' ? 'aves' : 'life'}/manifest.json`);
     void client.init(new URL(path, window.location.href).href, controller.signal)
       .then(manifest => setLoaded({ client, manifest }))
       .catch(cause => { if (!controller.signal.aborted) setError(cause.message); });

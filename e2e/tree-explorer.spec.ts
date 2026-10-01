@@ -118,9 +118,30 @@ test('common names discover the corresponding scientific taxon', async ({ page }
   const result = page.getByRole('option').filter({ hasText: 'Gallus gallus' });
   await expect(result).toContainText('Matched common name: Red Junglefowl');
   await search.press('Enter');
-  await expect(page.getByRole('complementary', { name: 'Taxon details' })
-    .getByRole('heading', { name: 'Gallus gallus' })).toBeVisible();
+  const details = page.getByRole('complementary', { name: 'Taxon details' });
+  await expect(details.getByRole('heading', { name: 'Gallus gallus' })).toBeVisible();
+  await expect(details.getByRole('link', { name: /IUCN Red List Least Concern LC/ })).toBeVisible();
   expect(browserErrors).toEqual([]);
+});
+
+test('search waits for common-name ranking instead of flashing raw terminal matches', async ({ page }) => {
+  test.skip(hosted, 'This assertion controls the checked-in profile search response.');
+  let releaseSearch = () => {};
+  const searchGate = new Promise<void>(resolve => { releaseSearch = resolve; });
+  await page.route(/\/data\/profiles\/[a-f0-9]{16}\/search\.json$/, async route => {
+    await searchGate;
+    await route.continue();
+  });
+  try {
+    await openTree(page);
+    const search = page.getByRole('combobox', { name: 'Search taxa' });
+    await search.fill('bird');
+    await expect(page.locator('.search-results [role="status"]')).toHaveText('Searching…');
+    await expect(page.getByRole('option')).toHaveCount(0);
+    releaseSearch();
+    await expect(page.getByRole('option').filter({ hasText: 'Elephant Bird' })).toBeVisible();
+    await expect(page.getByRole('option').filter({ hasText: 'Bald Eagle' })).toBeVisible();
+  } finally { releaseSearch(); }
 });
 
 test('bird-flight journey navigates real OpenTree evidence and can be paused', async ({ page, browserName }) => {

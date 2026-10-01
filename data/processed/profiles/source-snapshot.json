@@ -1,4 +1,5 @@
 {
+  "conservationRetrievedAt": "2026-10-01T01:05:31+00:00",
   "format": 2,
   "openTree": {
     "synthId": "opentree16.1",
@@ -52,6 +53,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "39827",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267165/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pygathrix cinerea",
         "confidence": 99,
@@ -297,6 +308,16 @@
           "source": "Integrated Taxonomic Information System (ITIS)"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "136491",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786437/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur jamesorum",
         "confidence": 98,
@@ -528,6 +549,16 @@
           "source": "EUNIS Biodiversity Database"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "22728245",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2474864/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Chlamydotis undulata",
         "confidence": 99,
@@ -650,6 +681,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "16971364",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8235495/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus margotmarshae",
         "confidence": 99,
@@ -694,6 +735,16 @@
           "source": "Cheirogaleidae"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "16971390",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8219027/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus arnholdi",
         "confidence": 99,
@@ -1001,6 +1052,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "136419",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786471/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cacajao ayresi",
         "confidence": 99,
@@ -1074,6 +1135,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "3422_2",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266957/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cacajao calvus rubicundus",
         "confidence": 98,
@@ -1650,6 +1721,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "22823",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2433451/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Ursus maritimus",
         "confidence": 98,
@@ -2324,6 +2405,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "13584",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266974/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Mirza coquereli",
         "confidence": 99,
@@ -2841,6 +2932,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "16971425",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7868037/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus macarthurii",
         "confidence": 99,
@@ -3033,6 +3134,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "8209",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266934/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Eulemur rufus",
         "confidence": 99,
@@ -3779,6 +3890,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "136771_2",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786420/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur manasamody",
         "confidence": 98,
@@ -4542,6 +4663,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "127530593",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9634081/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Plecturocebus cupreus",
         "confidence": 99,
@@ -4791,6 +4922,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "45433088",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2441341/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Crocodylus niloticus",
         "confidence": 99,
@@ -5504,6 +5645,16 @@
           "source": "Felidae"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "15955",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219416/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Panthera tigris",
         "confidence": 99,
@@ -5786,6 +5937,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "22039",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436535/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus obscurus",
         "confidence": 99,
@@ -5843,6 +6004,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "39853",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436539/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus francoisi",
         "confidence": 99,
@@ -6511,6 +6682,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "22043",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267062/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus delacouri",
         "confidence": 99,
@@ -6685,6 +6866,16 @@
           "source": "The Paleobiology Database"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "6302",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219587/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Daubentonia madagascariensis",
         "confidence": 99,
@@ -8350,6 +8541,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "13325",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266979/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus myoxinus",
         "confidence": 99,
@@ -9306,6 +9507,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "19597",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267007/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Rhinopithecus bieti",
         "confidence": 99,
@@ -9363,6 +9574,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "19596",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7262005/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Rhinopithecus roxellana",
         "confidence": 99,
@@ -9621,6 +9842,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "92411527",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219574/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercopithecus pogonias",
         "confidence": 99,
@@ -10972,6 +11203,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22690206",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5231838/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Columba janthina",
         "confidence": 99,
@@ -11907,6 +12148,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "39879",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5707402/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Hylobates albibarbis",
         "confidence": 99,
@@ -13680,6 +13931,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "162571",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2289671/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Octopus vulgaris",
         "confidence": 98,
@@ -13845,6 +14106,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "12556",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436616/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca nigra",
         "confidence": 99,
@@ -13901,6 +14172,16 @@
           "source": "Cercopithecidae"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "12559",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436617/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca silenus",
         "confidence": 99,
@@ -14066,6 +14347,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136761",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786427/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur hubbardorum",
         "confidence": 98,
@@ -14270,6 +14561,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "8211",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7874997/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Eulemur flavifrons",
         "confidence": 99,
@@ -14434,6 +14735,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "39792",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267148/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca leonina",
         "confidence": 99,
@@ -14521,6 +14832,16 @@
           "source": "Cercopithecidae"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "12549",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436610/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca assamensis",
         "confidence": 99,
@@ -15161,6 +15482,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "22037",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436536/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus geei",
         "confidence": 99,
@@ -15219,6 +15550,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "22041",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436538/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus pileatus",
         "confidence": 99,
@@ -17212,6 +17553,16 @@
           "source": "Martha's Vineyard species checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22679946",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5232446/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Branta bernicla",
         "confidence": 99,
@@ -17690,6 +18041,16 @@
           "source": "Martha's Vineyard species checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22706068",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2482492/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Corvus corax",
         "confidence": 99,
@@ -18450,6 +18811,16 @@
           "source": "The Clements Checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22725264",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2495266/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Patagioenas fasciata",
         "confidence": 99,
@@ -18518,6 +18889,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "59544947",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436448/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus rufus",
         "confidence": 98,
@@ -18569,6 +18950,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "11617",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436494/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur edwardsi",
         "confidence": 99,
@@ -18611,6 +19002,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "39751",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266976/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus ravelobensis",
         "confidence": 99,
@@ -19015,6 +19416,16 @@
           "source": "ENVIRONMENTAL IMPACT ASSESSMENT (EIA) OF WORLD BANK FINANCED SIDDHIRGANJ 450 MW COMBINED CYCLE POWER PLANT (CCPP) PROJECT SIDDHIRGANJ, NARAYANGAJ"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22679199",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9326020/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Gallus gallus",
         "confidence": 99,
@@ -19494,6 +19905,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "160901052",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266893/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Saguinus niger",
         "confidence": 99,
@@ -19552,6 +19973,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "42695",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7261987/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Saguinus martinsi",
         "confidence": 99,
@@ -19713,6 +20144,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "15932",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219533/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pan paniscus",
         "confidence": 99,
@@ -19856,6 +20297,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22682577",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5228440/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Bycanistes subcylindricus",
         "confidence": 99,
@@ -20401,6 +20852,16 @@
           "source": "Phthiraptera.myspecies.info"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "10543",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219550/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Hylobates agilis",
         "confidence": 99,
@@ -20830,6 +21291,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "12568",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267157/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca nigrescens",
         "confidence": 99,
@@ -20864,6 +21335,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "12553",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436606/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca maura",
         "confidence": 99,
@@ -20981,6 +21462,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22696702",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2482082/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Anhinga anhinga",
         "confidence": 99,
@@ -21257,6 +21748,16 @@
           "source": "Integrated Taxonomic Information System (ITIS)"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "8785_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436523/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Galago alleni",
         "confidence": 98,
@@ -23167,6 +23668,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22703621",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2494802/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Ailuroedus melanotis",
         "confidence": 99,
@@ -23427,6 +23938,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "159971",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5133088/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Danaus plexippus",
         "confidence": 99,
@@ -24321,6 +24842,16 @@
           "source": "Cebidae"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "39951",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436636/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cebus albifrons",
         "confidence": 99,
@@ -24488,6 +25019,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "136885",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5707353/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercopithecus denti",
         "confidence": 99,
@@ -24984,6 +25525,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "4224",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219573/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercopithecus nictitans",
         "confidence": 99,
@@ -25041,6 +25592,16 @@
           "source": "Cercopithecidae"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "16022",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7262029/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Papio ursinus",
         "confidence": 99,
@@ -25083,6 +25644,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "4245",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219576/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercopithecus diana",
         "confidence": 99,
@@ -25142,6 +25713,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "4221",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219578/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercopithecus mitis",
         "confidence": 99,
@@ -25971,6 +26552,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "39954",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436383/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callicebus coimbrai",
         "confidence": 99,
@@ -26020,6 +26611,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41552",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9393257/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Plecturocebus caligatus",
         "confidence": 99,
@@ -26109,6 +26710,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "39943",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436404/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callicebus nigrifrons",
         "confidence": 99,
@@ -27001,6 +27612,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "81257277",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436637/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cebus capucinus",
         "confidence": 99,
@@ -28054,6 +28675,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "2477",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2440735/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Balaenoptera musculus",
         "confidence": 99,
@@ -28569,6 +29200,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "210368667",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436496/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur dorsalis",
         "confidence": 99,
@@ -29086,6 +29727,16 @@
           "source": "GBIF"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "41522_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436466/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Saguinus geoffroyi",
         "confidence": 99,
@@ -29548,6 +30199,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "63532",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2878688/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Quercus robur",
         "confidence": 97,
@@ -29623,6 +30284,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "39848",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9204783/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus auratus",
         "confidence": 99,
@@ -30504,6 +31175,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "3746",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219173/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Canis lupus",
         "confidence": 99,
@@ -30764,6 +31445,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "39871",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7262019/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus poliocephalus",
         "confidence": 98,
@@ -30821,6 +31512,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "22044",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267078/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus laotum",
         "confidence": 99,
@@ -30880,6 +31581,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "136291",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267119/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Chlorocebus cynosuros",
         "confidence": 99,
@@ -32605,6 +33316,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "174391079",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436548/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Erythrocebus patas",
         "confidence": 99,
@@ -32981,6 +33702,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "61855318",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7340196/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Otus lettia",
         "confidence": 99,
@@ -33061,6 +33792,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "8787",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436519/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Galago matschiei",
         "confidence": 99,
@@ -36176,6 +36917,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "39953",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786070/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Aotus zonalis",
         "confidence": 99,
@@ -36276,6 +37027,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136253",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7669874/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Sapajus flavius",
         "confidence": 99,
@@ -36710,6 +37471,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "22693158",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2481681/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Limosa lapponica",
         "confidence": 99,
@@ -37642,6 +38413,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "18352",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219528/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Propithecus tattersalli",
         "confidence": 99,
@@ -37696,6 +38477,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "163314248",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436447/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus murinus",
         "confidence": 99,
@@ -39023,6 +39814,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Data Deficient",
+        "code": "DD",
+        "iucnTaxonId": "136319",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786490/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Tarsius lariang",
         "confidence": 99,
@@ -39441,6 +40242,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "2054",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436632/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Arctocebus calabarensis",
         "confidence": 99,
@@ -39478,6 +40289,16 @@
           "source": "Integrated Taxonomic Information System (ITIS)"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "91970347_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267280/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Galago granti",
         "confidence": 98,
@@ -40263,6 +41084,16 @@
           "source": "The Clements Checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22733989",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5229158/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pelecanus occidentalis",
         "confidence": 99,
@@ -40452,6 +41283,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "4074",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7549160/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Sapajus xanthosternos",
         "confidence": 99,
@@ -41326,6 +42167,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "39915",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219593/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Aotus brumbacki",
         "confidence": 99,
@@ -41574,6 +42425,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "70609726",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436375/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pithecia monachus",
         "confidence": 99,
@@ -41686,6 +42547,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22679603",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5228080/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callipepla californica",
         "confidence": 99,
@@ -41878,6 +42749,16 @@
           "source": "Catálogo Taxonômico da Fauna do Brasil"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41583",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786464/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Mico mauesi",
         "confidence": 99,
@@ -41929,6 +42810,16 @@
           "source": "GBIF"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "3570",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8827576/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callithrix aurita",
         "confidence": 99,
@@ -41963,6 +42854,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "40643",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436481/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Leontopithecus chrysomelas",
         "confidence": 99,
@@ -42051,6 +42952,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41519",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219541/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callithrix penicillata",
         "confidence": 99,
@@ -43269,6 +44180,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "39994",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7262070/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Gorilla beringei",
         "confidence": 99,
@@ -44896,6 +45817,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "136615",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436546/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercocebus agilis",
         "confidence": 99,
@@ -47759,6 +48690,16 @@
           "source": "Cheirogaleidae"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "210364856_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786011/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus mittermeieri",
         "confidence": 99,
@@ -48078,6 +49019,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "22918",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436424/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Varecia variegata",
         "confidence": 99,
@@ -48743,6 +49694,16 @@
           "source": "GBIF"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "19824_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436473/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Saguinus tripartitus",
         "confidence": 98,
@@ -48802,6 +49763,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "8199",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436422/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Eulemur coronatus",
         "confidence": 99,
@@ -49889,6 +50860,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22678148",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2477630/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Tinamus major",
         "confidence": 99,
@@ -49945,6 +50926,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "18355",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5707433/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Propithecus coquereli",
         "confidence": 99,
@@ -50263,6 +51254,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22689394",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2497798/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Ninox connivens",
         "confidence": 99,
@@ -50527,6 +51528,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "12563",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436614/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca tonkeana",
         "confidence": 99,
@@ -50948,6 +51959,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "136717",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7519053/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Sapajus nigritus",
         "confidence": 99,
@@ -51211,6 +52232,16 @@
           "source": "Lepilemuridae"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136731",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266928/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur ankaranensis",
         "confidence": 99,
@@ -51355,6 +52386,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "210364856",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786008/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus lehilahytsara",
         "confidence": 99,
@@ -51627,6 +52668,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "15933",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219534/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pan troglodytes",
         "confidence": 98,
@@ -51713,6 +52764,16 @@
           "source": "Hominidae"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "9404",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436441/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Gorilla gorilla",
         "confidence": 99,
@@ -51884,6 +52945,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "163021377",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266968/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cheirogaleus crossleyi",
         "confidence": 99,
@@ -51951,6 +53022,16 @@
           "source": "Phthiraptera.myspecies.info"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "22723768_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2491665/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Camarhynchus psittacula",
         "confidence": 99,
@@ -52247,6 +53328,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22703765",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2487535/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Malurus cyanocephalus",
         "confidence": 99,
@@ -53794,6 +54885,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "136848",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7532139/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Papio kindae",
         "confidence": 99,
@@ -54354,6 +55455,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "41642",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786125/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Nomascus nasutus",
         "confidence": 99,
@@ -54909,6 +56020,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41559",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9584627/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Plecturocebus hoffmannsi",
         "confidence": 99,
@@ -55117,6 +56238,16 @@
           "source": "The Clements Checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22729706",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9691034/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Phoenicopterus ruber",
         "confidence": 99,
@@ -55296,6 +56427,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "16874",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266965/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Phaner pallescens",
         "confidence": 99,
@@ -56166,6 +57307,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "8207_2",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786411/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Eulemur fulvus mayottensis",
         "confidence": 98,
@@ -56831,6 +57982,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "41538",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8885431/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Saimiri ustus",
         "confidence": 99,
@@ -57189,6 +58350,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "22691900",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2474921/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Otis tarda",
         "confidence": 99,
@@ -58044,6 +59215,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "110466172",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5217334/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Xenopus laevis",
         "confidence": 99,
@@ -58812,6 +59993,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "39828",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267166/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pygathrix nigripes",
         "confidence": 99,
@@ -58945,6 +60136,16 @@
           "source": "Phthiraptera.myspecies.info"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22696264_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2481065/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Milvago chimango",
         "confidence": 99,
@@ -59566,6 +60767,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "136347",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786010/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus danfossi",
         "confidence": 99,
@@ -59595,6 +60806,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136537",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786012/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus bongolavensis",
         "confidence": 99,
@@ -59624,6 +60845,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136206_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786015/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus lokobensis",
         "confidence": 98,
@@ -60208,6 +61439,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22688316",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2475255/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Tauraco schuettii",
         "confidence": 99,
@@ -60325,6 +61566,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "42691",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786467/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Mico emiliae",
         "confidence": 99,
@@ -60393,6 +61644,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22704977",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2490708/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Orthonyx spaldingii",
         "confidence": 99,
@@ -60538,6 +61799,16 @@
           "source": "GBIF"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "19823_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436469/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Saguinus oedipus",
         "confidence": 99,
@@ -60598,6 +61869,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "3564",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436464/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callimico goeldii",
         "confidence": 99,
@@ -61021,6 +62302,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "41643",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267273/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Nomascus hainanus",
         "confidence": 99,
@@ -61420,6 +62711,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "22697752",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2481661/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Aptenodytes forsteri",
         "confidence": 99,
@@ -62985,6 +64286,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22689094",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2497541/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Strix varia",
         "confidence": 99,
@@ -63598,6 +64909,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "16018",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5707338/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Papio papio",
         "confidence": 99,
@@ -63936,6 +65257,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "2434",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436426/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Avahi laniger",
         "confidence": 99,
@@ -63977,6 +65308,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "868",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436445/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Allocebus trichotis",
         "confidence": 99,
@@ -64358,6 +65699,16 @@
           "source": "The Clements Checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "45093141",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5228112/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Colinus cristatus",
         "confidence": 99,
@@ -65635,6 +66986,16 @@
           "source": "Cheirogaleidae"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136458",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786013/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus jollyae",
         "confidence": 99,
@@ -65910,6 +67271,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "136684",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786007/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Mirza zaza",
         "confidence": 99,
@@ -66326,6 +67697,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "34051",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2683909/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Sequoia sempervirens",
         "confidence": 99,
@@ -66541,6 +67922,16 @@
           "source": "Phthiraptera.myspecies.info"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22689555",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2496782/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Aegotheles cristatus",
         "confidence": 98,
@@ -66843,6 +68234,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "181008073",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2435350/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Loxodonta africana",
         "confidence": 99,
@@ -68475,6 +69876,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "4207",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267135/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercocebus chrysogaster",
         "confidence": 99,
@@ -68521,6 +69932,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "12310",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267096/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lophocebus aterrimus",
         "confidence": 99,
@@ -69016,6 +70437,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "4615",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2442225/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Chelonia mydas",
         "confidence": 97,
@@ -69245,6 +70676,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136206",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786014/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus mamiratra",
         "confidence": 99,
@@ -69388,6 +70829,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "15951",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219404/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Panthera leo",
         "confidence": 99,
@@ -69972,6 +71423,16 @@
           "source": "Catálogo Taxonômico da Fauna do Brasil"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "11505",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436480/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Leontopithecus chrysopygus",
         "confidence": 99,
@@ -70538,6 +71999,16 @@
           "source": "Phthiraptera.myspecies.info"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22678551",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5229426/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Alectura lathami",
         "confidence": 99,
@@ -70592,6 +72063,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "18359",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5707429/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Propithecus edwardsi",
         "confidence": 99,
@@ -70650,6 +72131,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "136265",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267116/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Chlorocebus sabaeus",
         "confidence": 99,
@@ -70722,6 +72213,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "70330167_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5707305/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Chiropotes israelita",
         "confidence": 99,
@@ -71048,6 +72549,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "118355453",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786120/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Hoolock leuconedys",
         "confidence": 99,
@@ -71252,6 +72763,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "39793",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436607/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca ochreata",
         "confidence": 99,
@@ -71294,6 +72815,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "12570",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267156/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca hecki",
         "confidence": 99,
@@ -72097,6 +73628,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "1807",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786069/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Aotus griseimembra",
         "confidence": 99,
@@ -73047,6 +74588,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "54778911",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436452/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cheirogaleus major",
         "confidence": 99,
@@ -73943,6 +75494,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "39874",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267065/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus germaini",
         "confidence": 99,
@@ -74643,6 +76204,16 @@
           "source": "Checklist of Vascular Plants in Korea"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "77726273",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5290052/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Zea mays",
         "confidence": 99,
@@ -77039,6 +78610,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "167546892",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267223/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Semnopithecus priam",
         "confidence": 99,
@@ -77072,6 +78653,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "39853_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786364/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus francoisi francoisi",
         "confidence": 98,
@@ -78771,6 +80362,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "41558",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9410326/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Plecturocebus brunneus",
         "confidence": 99,
@@ -79146,6 +80747,16 @@
           "source": "The Clements Checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "45020636",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2495150/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Struthio camelus",
         "confidence": 99,
@@ -79953,6 +81564,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "136335",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786032/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Avahi cleesei",
         "confidence": 98,
@@ -80227,6 +81848,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "22728303",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2498063/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Anas chlorotis",
         "confidence": 99,
@@ -80283,6 +81914,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "22680280",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2498078/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Anas aucklandica",
         "confidence": 99,
@@ -81250,6 +82891,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136791",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786266/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Rungwecebus kipunji",
         "confidence": 99,
@@ -81637,6 +83288,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "9672",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436415/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Hapalemur aureus",
         "confidence": 99,
@@ -81850,6 +83511,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "2053",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436631/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Arctocebus aureus",
         "confidence": 99,
@@ -83348,6 +85019,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41542",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219595/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Aotus nigriceps",
         "confidence": 99,
@@ -83554,6 +85235,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "19855",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7595433/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Salmo salar",
         "confidence": 99,
@@ -83783,6 +85474,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "12561",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436618/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca sylvanus",
         "confidence": 99,
@@ -83834,6 +85535,16 @@
           "source": "Catálogo Taxonômico da Fauna do Brasil"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "12554",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436604/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca mulatta",
         "confidence": 99,
@@ -83915,6 +85626,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "12551",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436603/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca fascicularis",
         "confidence": 99,
@@ -84577,6 +86298,16 @@
           "source": "Indriidae"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "10826",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436432/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Indri indri",
         "confidence": 99,
@@ -86576,6 +88307,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "21489",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266947/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Tarsius dentatus",
         "confidence": 99,
@@ -86927,6 +88668,16 @@
           "source": "Martha's Vineyard species checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22679935",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5232437/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Branta canadensis",
         "confidence": 99,
@@ -87455,6 +89206,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "22693150",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2481685/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Limosa limosa",
         "confidence": 99,
@@ -87719,6 +89480,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "865",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436620/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Allenopithecus nigroviridis",
         "confidence": 99,
@@ -87775,6 +89546,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "5142",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5963047/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Colobus angolensis",
         "confidence": 99,
@@ -88731,6 +90512,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41775",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7705930/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Sus scrofa",
         "confidence": 99,
@@ -89002,6 +90793,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "16971461",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7631341/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus gerpi",
         "confidence": 99,
@@ -89418,6 +91219,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "22035",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436542/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus cristatus",
         "confidence": 99,
@@ -90132,6 +91943,16 @@
           "source": "Catálogo Taxonômico da Fauna do Brasil"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "12754",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219556/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Mandrillus sphinx",
         "confidence": 99,
@@ -90233,6 +92054,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "21744",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436553/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Theropithecus gelada",
         "confidence": 99,
@@ -90337,6 +92168,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "12753",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219557/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Mandrillus leucophaeus",
         "confidence": 99,
@@ -90961,6 +92802,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "103818789",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5231190/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Passer domesticus",
         "confidence": 99,
@@ -91410,6 +93261,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "136346",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7785578/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Sapajus libidinosus",
         "confidence": 99,
@@ -91985,6 +93846,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22689166",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2497530/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Strix woodfordii",
         "confidence": 99,
@@ -92598,6 +94469,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "3421_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266954/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cacajao calvus novaesi",
         "confidence": 98,
@@ -92661,6 +94542,16 @@
           "source": "Lepilemuridae"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136376",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786432/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur aeeclis",
         "confidence": 99,
@@ -93250,6 +95141,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "8212",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436420/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Eulemur macaco",
         "confidence": 99,
@@ -93525,6 +95426,16 @@
           "source": "The Clements Checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22680186",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9761484/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Anas platyrhynchos",
         "confidence": 99,
@@ -93711,6 +95622,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "136637",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266977/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus griseorufus",
         "confidence": 99,
@@ -93762,6 +95683,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "41573",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266980/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus berthae",
         "confidence": 99,
@@ -93791,6 +95722,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "41572",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266978/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus sambiranensis",
         "confidence": 99,
@@ -94364,6 +96305,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "9194",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2441205/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Giraffa camelopardalis",
         "confidence": 99,
@@ -94633,6 +96584,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "17975",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219532/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pongo pygmaeus",
         "confidence": 99,
@@ -95331,6 +97292,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "136366",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7906704/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Sapajus cay",
         "confidence": 99,
@@ -95937,6 +97908,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22683913",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2496491/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercococcyx montanus",
         "confidence": 99,
@@ -96682,6 +98663,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "22680405",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2498352/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Somateria mollissima",
         "confidence": 99,
@@ -96839,6 +98830,16 @@
           "source": "Martha's Vineyard species checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22729784",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2480989/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Caracara plancus",
         "confidence": 99,
@@ -97614,6 +99615,16 @@
           "source": "Atelidae"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "135446",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436641/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Ateles fusciceps",
         "confidence": 99,
@@ -97668,6 +99679,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "41545",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436652/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Alouatta caraya",
         "confidence": 99,
@@ -98844,6 +100865,16 @@
           "source": "TAXREF"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22688522",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5232369/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Tyto longimembris",
         "confidence": 99,
@@ -99683,6 +101714,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22696193",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2480672/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Spizaetus tyrannus",
         "confidence": 99,
@@ -100148,6 +102189,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22680500",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2475001/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Turnix sylvaticus",
         "confidence": 99,
@@ -100273,6 +102324,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "3419_2",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7261997/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cacajao calvus calvus",
         "confidence": 98,
@@ -100696,6 +102757,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "41546",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436651/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Alouatta sara",
         "confidence": 99,
@@ -103466,6 +105537,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "12558",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436612/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca radiata",
         "confidence": 99,
@@ -103562,6 +105643,16 @@
           "source": "Phthiraptera.myspecies.info"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22678602",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2482147/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Megapodius freycinet",
         "confidence": 99,
@@ -104569,6 +106660,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "39956",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219527/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Chiropotes satanas",
         "confidence": 99,
@@ -104840,6 +106941,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "22728328",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2481415/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Thalassarche bulleri",
         "confidence": 99,
@@ -106719,6 +108830,16 @@
           "source": "The Clements Checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "103656944",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9574405/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Eurylaimus javanicus",
         "confidence": 99,
@@ -107512,6 +109633,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "163023599",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436451/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cheirogaleus medius",
         "confidence": 99,
@@ -107570,6 +109701,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "15643",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8978926/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Otolemur crassicaudatus",
         "confidence": 99,
@@ -107716,6 +109857,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "41291",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436940/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Oryctolagus cuniculus",
         "confidence": 99,
@@ -107810,6 +109961,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "22694927",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2481353/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Fratercula arctica",
         "confidence": 99,
@@ -108847,6 +111008,16 @@
           "source": "Integrated Taxonomic Information System (ITIS)"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22682413_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2475959/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Tockus nasutus",
         "confidence": 98,
@@ -109015,6 +111186,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "4240",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267124/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Chlorocebus djamdjamensis",
         "confidence": 99,
@@ -111340,6 +113521,16 @@
           "source": "Mamíferos de Colombia"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "1808",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219591/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Aotus lemurinus",
         "confidence": 99,
@@ -111415,6 +113606,16 @@
           "source": "The Clements Checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22682912",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5228294/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Eurystomus glaucurus",
         "confidence": 99,
@@ -113182,6 +115383,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "40019",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266912/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cebus kaapori",
         "confidence": 99,
@@ -113754,6 +115965,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "216558622",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2481213/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Gygis alba",
         "confidence": 99,
@@ -114248,6 +116469,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "4223",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219567/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercopithecus neglectus",
         "confidence": 99,
@@ -114582,6 +116813,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "11506",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436482/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Leontopithecus rosalia",
         "confidence": 99,
@@ -115200,6 +117441,16 @@
           "source": "Mamíferos de Colombia"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41563",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9335792/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cheracebus lugens",
         "confidence": 99,
@@ -115264,6 +117515,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136569",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786213/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca munzala",
         "confidence": 99,
@@ -115433,6 +117694,16 @@
           "source": "Phthiraptera.myspecies.info"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "22692039",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5228232/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Balearica pavonina",
         "confidence": 99,
@@ -116351,6 +118622,16 @@
           "source": "ENVIRONMENTAL IMPACT ASSESSMENT (EIA) OF WORLD BANK FINANCED SIDDHIRGANJ 450 MW COMBINED CYCLE POWER PLANT (CCPP) PROJECT SIDDHIRGANJ, NARAYANGAJ"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22690066",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2495414/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Columba livia",
         "confidence": 99,
@@ -117271,6 +119552,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "39761",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786064/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Nycticebus javanicus",
         "confidence": 99,
@@ -117690,6 +119981,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "41570",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267099/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Miopithecus ogouensis",
         "confidence": 99,
@@ -118082,6 +120383,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "4220",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7416027/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Allochrocebus lhoesti",
         "confidence": 99,
@@ -118847,6 +121158,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "40488",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2433376/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Ornithorhynchus anatinus",
         "confidence": 99,
@@ -119226,6 +121547,16 @@
           "source": "The Clements Checklist"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22696395",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9685907/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Falco sparverius",
         "confidence": 99,
@@ -119799,6 +122130,16 @@
           "source": "Atelidae"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "160881218_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9205754/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lagothrix cana",
         "confidence": 98,
@@ -120524,6 +122865,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "13572",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436591/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Miopithecus talapoin",
         "confidence": 99,
@@ -120641,6 +122992,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "8205",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266932/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Eulemur cinereiceps",
         "confidence": 99,
@@ -120867,6 +123228,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41536",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436663/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Saimiri boliviensis",
         "confidence": 99,
@@ -121241,6 +123612,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22679144",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2474060/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Ithaginis cruentus",
         "confidence": 99,
@@ -121767,6 +124148,16 @@
           "source": "Catálogo Taxonômico da Fauna do Brasil"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "1095",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2431950/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Ambystoma mexicanum",
         "confidence": 99,
@@ -122386,6 +124777,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "5144",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5963044/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Colobus polykomos",
         "confidence": 99,
@@ -122927,6 +125328,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "10547",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219546/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Hylobates klossii",
         "confidence": 99,
@@ -123998,6 +126409,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "166487",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9797255/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Danio rerio",
         "confidence": 97,
@@ -124919,6 +127340,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "22695144",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2480446/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Haliaeetus leucocephalus",
         "confidence": 99,
@@ -125089,6 +127520,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "18252",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7262002/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Piliocolobus foai",
         "confidence": 99,
@@ -125132,6 +127573,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "136939",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266990/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Piliocolobus rufomitratus",
         "confidence": 99,
@@ -125310,6 +127761,16 @@
           "source": "GBIF"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "39945_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436477/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Saguinus nigricollis",
         "confidence": 98,
@@ -125364,6 +127825,16 @@
           "source": "Catálogo Taxonômico da Fauna do Brasil"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41518",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219542/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callithrix jacchus",
         "confidence": 99,
@@ -125447,6 +127918,16 @@
           "source": "Integrated Taxonomic Information System (ITIS)"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "160885500_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436474/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Saguinus fuscicollis",
         "confidence": 98,
@@ -126517,6 +128998,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "160875418",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436409/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cacajao melanocephalus",
         "confidence": 99,
@@ -127648,6 +130139,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "136294",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786462/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Mico melanurus",
         "confidence": 99,
@@ -128481,6 +130982,16 @@
           "source": "Cercopithecidae"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "40789",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267068/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus hatinhensis",
         "confidence": 99,
@@ -129719,6 +132230,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "39758",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267329/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Nycticebus bengalensis",
         "confidence": 99,
@@ -130599,6 +133120,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "3419",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436410/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cacajao calvus",
         "confidence": 99,
@@ -130655,6 +133186,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41539",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5707409/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Aotus azarae",
         "confidence": 99,
@@ -130712,6 +133253,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "210891841",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9264949/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cheracebus torquatus",
         "confidence": 99,
@@ -131679,6 +134230,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "12550",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436615/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca cyclopis",
         "confidence": 99,
@@ -131952,6 +134513,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "19595",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267005/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Rhinopithecus brelichi",
         "confidence": 99,
@@ -132362,6 +134933,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "92401376",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7411129/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercopithecus lomamiensis",
         "confidence": 99,
@@ -140202,6 +142783,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "200290653",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5232113/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Glaucidium brodiei",
         "confidence": 99,
@@ -144061,6 +146652,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "8266",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436513/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Euoticus pallidus",
         "confidence": 99,
@@ -144093,6 +146694,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136767",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786033/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Avahi betsileo",
         "confidence": 99,
@@ -144122,6 +146733,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136662",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786424/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur betsileo",
         "confidence": 99,
@@ -144156,6 +146777,16 @@
           "source": "Lepilemuridae"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136677",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786422/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur petteri",
         "confidence": 99,
@@ -144205,6 +146836,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136263",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786429/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur fleuretae",
         "confidence": 99,
@@ -144244,6 +146885,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "136843_2",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786416/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur ahmansonorum",
         "confidence": 98,
@@ -144293,6 +146944,16 @@
           "source": "Lepilemuridae"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "136709",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786434/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur tymerlachsoni",
         "confidence": 99,
@@ -144324,6 +146985,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "136609",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786439/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur milanoii",
         "confidence": 99,
@@ -144378,6 +147049,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "16873",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266966/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Phaner parienti",
         "confidence": 99,
@@ -144429,6 +147110,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "16875",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266967/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Phaner electromontis",
         "confidence": 99,
@@ -144503,6 +147194,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "9676",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4266941/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Hapalemur alaotrensis",
         "confidence": 99,
@@ -144544,6 +147245,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "922",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786094/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Alouatta juara",
         "confidence": 98,
@@ -144598,6 +147309,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "918",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786098/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Alouatta ululata",
         "confidence": 99,
@@ -144634,6 +147355,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "19839",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436660/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Saimiri vanzolinii",
         "confidence": 99,
@@ -144663,6 +147394,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "39910_2",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786460/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Mico chrysoleucus",
         "confidence": 98,
@@ -144697,6 +147438,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "3571",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219543/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callithrix flaviceps",
         "confidence": 99,
@@ -144753,6 +147504,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "39911",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786465/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Mico intermedius",
         "confidence": 99,
@@ -144794,6 +147555,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "39914",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786466/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Mico marcai",
         "confidence": 99,
@@ -144828,6 +147599,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "39913",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786461/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Mico nigriceps",
         "confidence": 99,
@@ -144859,6 +147640,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "17402",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436371/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pithecia aequatorialis",
         "confidence": 99,
@@ -144903,6 +147694,16 @@
           "source": "Phitheciidae"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "39928_2",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436385/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callicebus ornatus",
         "confidence": 98,
@@ -144947,6 +147748,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "136815",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9494739/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Plecturocebus aureipalatii",
         "confidence": 99,
@@ -145003,6 +147814,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "3554",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9613557/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Plecturocebus olallae",
         "confidence": 99,
@@ -145059,6 +147880,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "39930",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436393/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callicebus melanochir",
         "confidence": 99,
@@ -145113,6 +147944,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41557",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9390794/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Plecturocebus cinerascens",
         "confidence": 99,
@@ -145165,6 +148006,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41564",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9527247/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cheracebus lucifer",
         "confidence": 99,
@@ -145222,6 +148073,16 @@
           "source": "Integrated Taxonomic Information System (ITIS)"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "3549_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436403/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callicebus dubius",
         "confidence": 98,
@@ -145276,6 +148137,16 @@
           "source": "Mamíferos de Colombia"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "39944",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9407885/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cheracebus medemi",
         "confidence": 99,
@@ -145318,6 +148189,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "41560",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9595642/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Plecturocebus baptista",
         "confidence": 99,
@@ -145374,6 +148255,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "39929",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/2436391/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callicebus barbarabrownae",
         "confidence": 99,
@@ -145411,6 +148302,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "210891841_2",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9498920/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cheracebus purinus",
         "confidence": 98,
@@ -145455,6 +148356,16 @@
           "source": "The Paleobiology Database"
         }
       ],
+      "conservation": {
+        "category": "Data Deficient",
+        "code": "DD",
+        "iucnTaxonId": "136211",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786071/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Aotus jorgehernandezi",
         "confidence": 99,
@@ -145509,6 +148420,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "136931",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5707385/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercopithecus lowei",
         "confidence": 99,
@@ -145658,6 +148579,16 @@
           "source": "Cercopithecidae"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "4216_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5219583/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cercopithecus dryas",
         "confidence": 98,
@@ -145712,6 +148643,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "39833",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267222/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Semnopithecus ajax",
         "confidence": 99,
@@ -145770,6 +148711,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "167543916",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267224/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Semnopithecus hypoleucos",
         "confidence": 99,
@@ -145832,6 +148783,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "39840",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267220/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Semnopithecus schistaceus",
         "confidence": 99,
@@ -145877,6 +148838,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "40789_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267084/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Trachypithecus ebenus",
         "confidence": 99,
@@ -153017,6 +155988,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "163024481",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8142656/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus tanosi",
         "confidence": 99,
@@ -153046,6 +156027,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "46251646",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8188054/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus marohita",
         "confidence": 99,
@@ -155074,6 +158065,16 @@
           "source": "Mammal Species of the World"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "136852_3",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267327/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pseudopotto martini",
         "confidence": 98,
@@ -157598,6 +160599,16 @@
           "source": "Integrated Taxonomic Information System (ITIS)"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "136771",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786418/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur grewcockorum",
         "confidence": 98,
@@ -157912,6 +160923,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "14699281_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9163862/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Callicebus caquetensis",
         "confidence": 98,
@@ -158041,6 +161062,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Data Deficient",
+        "code": "DD",
+        "iucnTaxonId": "127530569",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9481435/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Plecturocebus miltoni",
         "confidence": 99,
@@ -158072,6 +161103,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "162369593",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7962394/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Tarsius fuscus",
         "confidence": 99,
@@ -158665,6 +161706,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "205889816",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8507707/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Macaca leucogenys",
         "confidence": 99,
@@ -158699,6 +161750,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "18250",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8127111/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Piliocolobus bouvieri",
         "confidence": 99,
@@ -158738,6 +161799,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "40648",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8051277/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Piliocolobus parmentieri",
         "confidence": 99,
@@ -158790,6 +161861,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "18248_2",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8376238/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Piliocolobus waldronae",
         "confidence": 99,
@@ -158852,6 +161933,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "39808",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7516644/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Presbytis canicrus",
         "confidence": 99,
@@ -158913,6 +162004,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "4081",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8075047/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cebus aequatorialis",
         "confidence": 99,
@@ -158954,6 +162055,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "81237954",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8179505/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cebus brunneus",
         "confidence": 99,
@@ -159010,6 +162121,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "81265980",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8028197/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cebus imitator",
         "confidence": 99,
@@ -159061,6 +162182,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "160940148",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7576788/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Saimiri cassiquiarensis",
         "confidence": 99,
@@ -159110,6 +162241,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Data Deficient",
+        "code": "DD",
+        "iucnTaxonId": "70609874",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8623151/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pithecia cazuzai",
         "confidence": 99,
@@ -159139,6 +162280,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "43943",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8526794/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pithecia chrysocephala",
         "confidence": 99,
@@ -159173,6 +162324,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "70606542",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8674990/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pithecia hirsuta",
         "confidence": 99,
@@ -159202,6 +162363,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "70609849",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8605892/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pithecia inusta",
         "confidence": 99,
@@ -159231,6 +162402,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Data Deficient",
+        "code": "DD",
+        "iucnTaxonId": "70609893",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8452481/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pithecia isabela",
         "confidence": 99,
@@ -159265,6 +162446,16 @@
           "source": "Mamíferos de Colombia"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "17407",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8594043/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pithecia milleri",
         "confidence": 99,
@@ -159296,6 +162487,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "70610693",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8480241/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pithecia mittermeieri",
         "confidence": 99,
@@ -159330,6 +162531,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "39955",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8469554/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Pithecia napensis",
         "confidence": 99,
@@ -159402,6 +162613,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "16971489",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/7807468/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur hollandorum",
         "confidence": 99,
@@ -159436,6 +162657,16 @@
           "source": "Integrated Taxonomic Information System (ITIS)"
         }
       ],
+      "conservation": {
+        "category": "Data Deficient",
+        "code": "DD",
+        "iucnTaxonId": "91979463",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8084387/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Sciurocheirus makandensis",
         "confidence": 99,
@@ -159470,6 +162701,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "163015864",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786054/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Nycticebus bancanus",
         "confidence": 99,
@@ -159499,6 +162740,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "163015906",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786052/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Nycticebus borneanus",
         "confidence": 97,
@@ -159533,6 +162784,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "163015583",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8086079/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Nycticebus kayan",
         "confidence": 99,
@@ -159943,6 +163204,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "136332",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/4267236/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Alouatta nigerrima",
         "confidence": 99,
@@ -160149,6 +163420,16 @@
           "source": "Wikipedia"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "172272064",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/10399958/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Plecturocebus grovesi",
         "confidence": 99,
@@ -160178,6 +163459,16 @@
           "source": "The IUCN Red List of Threatened Species"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "163313085",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9270709/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus ganzhorni",
         "confidence": 99,
@@ -160217,6 +163508,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "iucnTaxonId": "136212",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9423182/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Paragalago cocos",
         "confidence": 99,
@@ -160500,6 +163801,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Data Deficient",
+        "code": "DD",
+        "iucnTaxonId": "164377509",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9689399/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Erythrocebus poliophaeus",
         "confidence": 99,
@@ -160538,6 +163849,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "39806",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/8993538/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Presbytis robinsoni",
         "confidence": 99,
@@ -160609,6 +163930,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "136865",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9680321/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cebuella niveiventris",
         "confidence": 99,
@@ -160646,6 +163977,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "162336422",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9717634/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Tarsius spectrumgurskyae",
         "confidence": 99,
@@ -160680,6 +164021,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "iucnTaxonId": "162336881",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9785768/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Tarsius supriatnai",
         "confidence": 99,
@@ -160714,6 +164065,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "iucnTaxonId": "163020756",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9538844/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Cheirogaleus shethi",
         "confidence": 99,
@@ -160753,6 +164114,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Data Deficient",
+        "code": "DD",
+        "iucnTaxonId": "163314140",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9533337/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus boraha",
         "confidence": 99,
@@ -160792,6 +164163,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "163313848",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9476610/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Microcebus manitatra",
         "confidence": 99,
@@ -160826,6 +164207,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "iucnTaxonId": "136771_1",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/5786419/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Lepilemur grewcocki",
         "confidence": 99,
@@ -160863,6 +164254,16 @@
           "source": "Catalogue of Life"
         }
       ],
+      "conservation": {
+        "category": "Near Threatened",
+        "code": "NT",
+        "iucnTaxonId": "164378198",
+        "source": {
+          "label": "GBIF Species API · IUCN Red List category",
+          "url": "https://api.gbif.org/v1/species/9429229/iucnRedListCategory"
+        },
+        "system": "IUCN Red List"
+      },
       "gbif": {
         "canonicalName": "Galagoides kumbirensis",
         "confidence": 99,
@@ -161054,6 +164455,7 @@
   "retrievedAt": "2026-09-29T03:35:46+00:00",
   "sourcePriority": {
     "commonNames": "GBIF English preferred names, then other GBIF English names, then canonical Wikipedia title",
+    "conservation": "IUCN Red List category exposed by the GBIF Species API for an exact accepted GBIF match",
     "description": "English Wikipedia introductory extract whose Wikidata item is a taxon or organism group or has a matching scientific-name property; never generated or treated as taxonomic authority",
     "fieldNotes": "Peer-reviewed sources selected for the guided Journeys; each displayed fact carries its own citation",
     "identityAndTopology": "Open Tree of Life",
