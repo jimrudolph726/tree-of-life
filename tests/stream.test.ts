@@ -44,6 +44,11 @@ test('published pages preserve topology and geometry, and rebuild deterministica
     assert.equal(n.parentId, graph.metadata(i).parentId);
     if (r.parent !== NONE) { assert.ok(r.parent < i); edges++; }
     if (r.firstChild === NONE) leaves++;
+    else {
+      const lastChild = await store.node(r.firstChild + r.childCount - 1);
+      assert.equal(lastChild.record.parent, i, 'Breadth-first child ranges must remain contiguous');
+      assert.equal(lastChild.record.nextSibling, NONE);
+    }
     assert.ok(r.ratio > 0 && r.ratio <= 1);
     assert.ok([r.dx, r.dy, r.heading, ...r.bounds].every(Number.isFinite));
     assert.ok(Math.hypot(r.dx, r.dy) + r.ratio <= 1 + 1e-12);
@@ -183,6 +188,40 @@ test('aborted and failed reads do not poison retries or cache', async () => {
   assert.equal(store.requests, 0);
   assert.equal((await store.node(0)).summary.id, 'test-0000000');
   assert.equal(store.requests, 1);
+});
+
+test('concurrent page reads coalesce while an aborted caller leaves the shared result usable', async () => {
+  const read = reader('balanced');
+  let reads = 0;
+  let release = () => {};
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  const store = new TreeStore(balanced, async path => { reads++; await gate; return read(path); });
+  const abort = new AbortController();
+  const cancelled = store.node(0, abort.signal);
+  const survivor = store.node(1);
+  await Promise.resolve();
+  assert.equal(reads, 1);
+  abort.abort(); release();
+  await assert.rejects(cancelled, { name: 'AbortError' });
+  assert.equal((await survivor).summary.index, 1);
+  assert.equal(store.requests, 1);
+  assert.equal((await store.node(2)).summary.index, 2);
+  assert.equal(reads, 1);
+});
+
+test('next-level prefetch deduplicates pages and loads independent pages in parallel', async () => {
+  const read = reader('balanced');
+  let active = 0, maximum = 0;
+  const store = new TreeStore(balanced, async path => {
+    active++; maximum = Math.max(maximum, active);
+    await new Promise(resolve => setTimeout(resolve, 10));
+    try { return await read(path); } finally { active--; }
+  });
+  await store.prefetch({ nodes: [0, 1, 512, 513, 1024], fanoutPages: [] });
+  assert.equal(store.requests, 3);
+  assert.equal(maximum, 3);
+  assert.equal((await store.node(513)).summary.index, 513);
+  assert.equal(store.requests, 3);
 });
 
 test('corrupt pages, incompatible manifests and invalid graphs are rejected', async () => {

@@ -24,34 +24,42 @@ export function useScene(client: TreeClient, anchor: number, camera: Camera, siz
   useEffect(() => {
     let last: ViewRequest | null = null;
     let active: AbortController | null = null;
+    let activeRequest: ViewRequest | null = null;
     let activeAnchor = -1;
     let disposed = false;
     let retryAfter = 0;
+    let prefetchTimer: number | undefined;
     const tick = () => {
       const request = latest.current;
-      if (active && activeAnchor !== request.anchor) { active.abort(); active = null; }
+      if (active && (activeAnchor !== request.anchor || (activeRequest && !sameView(activeRequest, request, 70, 0.2)))) {
+        active.abort(); active = null; activeRequest = null;
+      }
       if (active || performance.now() < retryAfter) return;
       if (last && last.anchor === request.anchor && last.size.width === request.size.width && last.size.height === request.size.height &&
           Math.abs(last.camera.zoom - request.camera.zoom) < 0.2 &&
           Math.hypot(last.camera.target[0] - request.camera.target[0], last.camera.target[1] - request.camera.target[1]) * 2 ** request.camera.zoom < 70) return;
-      const controller = new AbortController(); active = controller; activeAnchor = request.anchor;
+      const controller = new AbortController(); active = controller; activeRequest = request; activeAnchor = request.anchor;
       void client.view(request, controller.signal).then(result => {
         if (!disposed && !controller.signal.aborted) {
           // A moving camera can defer a rebase. Retry once it settles even if it
           // moved less than the ordinary scene refresh threshold.
           last = result.rebase ? null : request;
           receive(result, request);
+          if (prefetchTimer) clearTimeout(prefetchTimer);
+          if (result.prefetch) prefetchTimer = window.setTimeout(() => {
+            if (!disposed && sameView(request, latest.current, 40, 0.12)) void client.prefetch(result.prefetch!).catch(() => undefined);
+          }, 140);
         }
       }).catch(cause => {
         if (!disposed && !controller.signal.aborted) {
           setError(cause instanceof Error ? cause.message : 'Could not load this part of the tree.');
           retryAfter = performance.now() + 1500;
         }
-      }).finally(() => { if (active === controller) active = null; });
+      }).finally(() => { if (active === controller) { active = null; activeRequest = null; } });
     };
     tick();
     const timer = window.setInterval(tick, 80);
-    return () => { disposed = true; clearInterval(timer); active?.abort(); };
+    return () => { disposed = true; clearInterval(timer); if (prefetchTimer) clearTimeout(prefetchTimer); active?.abort(); };
   }, [client]);
   return { scene: scene?.anchor === anchor ? scene : null, error, prime: setScene };
 }

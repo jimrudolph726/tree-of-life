@@ -1,4 +1,4 @@
-import type { Details, Manifest, Scene, Summary, ViewRequest } from './format.ts';
+import type { Details, Manifest, PrefetchHint, Scene, Summary, ViewRequest } from './format.ts';
 
 export class TreeClient {
   private worker: Worker;
@@ -37,6 +37,7 @@ export class TreeClient {
   }
   init(url: string, signal?: AbortSignal) { return this.request<Manifest>('init', { url }, signal); }
   view(request: ViewRequest, signal?: AbortSignal) { return this.request<Scene>('view', request, signal); }
+  prefetch(hint: PrefetchHint) { return this.request<void>('prefetch', hint); }
   search(query: string, signal?: AbortSignal) { return this.request<Summary[]>('search', { query }, signal); }
   details(index: number, signal?: AbortSignal) {
     const cached = this.detailCache.get(index);

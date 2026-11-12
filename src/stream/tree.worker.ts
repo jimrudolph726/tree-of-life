@@ -29,7 +29,8 @@ self.onmessage = async ({ data }) => {
       if (type === 'view') {
         const scene = await store.view(payload as ViewRequest, controller.signal);
         value = scene; transfers.push(scene.lines.buffer as ArrayBuffer, scene.lineTargets.buffer as ArrayBuffer);
-      } else if (type === 'search') value = await store.search(payload.query, controller.signal);
+      } else if (type === 'prefetch') value = await store.prefetch(payload);
+      else if (type === 'search') value = await store.search(payload.query, controller.signal);
       else if (type === 'details') value = await store.details(payload.index, controller.signal);
       else throw new Error(`Unknown worker operation: ${type}`);
     }

@@ -61,6 +61,7 @@ export interface Page { records: DataView; names: TreeNodeInput[]; count: number
 export interface SearchBlock { first: string; last: string; file: string }
 export type SearchEntry = [key: string, index: number];
 export interface ViewRequest { anchor: number; camera: Camera; size: Size }
+export interface PrefetchHint { nodes: number[]; fanoutPages: number[] }
 export interface StreamStats {
   requests: number; transferredBytes: number; cacheBytes: number; cacheEntries: number;
   cacheHits: number; evictions: number; visited: number; queryMs: number; limited: boolean;
@@ -71,6 +72,7 @@ export interface Scene {
   lines: Float64Array; lineTargets: Uint32Array;
   stats: StreamStats;
   rebase?: { anchor: number; x: number; y: number; radius: number };
+  prefetch?: PrefetchHint;
 }
 export interface Details { node: Summary; lineage: Summary[]; children: Summary[]; childrenTruncated: boolean; anchor: number; focus: StreamNode }
 

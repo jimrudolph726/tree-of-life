@@ -1,5 +1,5 @@
 import { cacheBudget, decodePage, INDEX_PAGE_SIZE, readRecord, NONE, validateManifest } from './format.ts';
-import type { AncestorEntry, ChildPreview, Details, FanoutEntry, Manifest, Page, RecordNode, Scene, SearchBlock, SearchEntry, StreamNode, Summary, ViewRequest } from './format.ts';
+import type { AncestorEntry, ChildPreview, Details, FanoutEntry, Manifest, Page, PrefetchHint, RecordNode, Scene, SearchBlock, SearchEntry, StreamNode, Summary, ViewRequest } from './format.ts';
 import type { Position } from '../tree/types.ts';
 
 export type ReadBytes = (path: string, signal?: AbortSignal) => Promise<ArrayBuffer>;
@@ -10,6 +10,7 @@ export class TreeStore {
   readonly manifest: Manifest;
   private read: ReadBytes;
   private cache = new Map<string, Entry>();
+  private inflight = new Map<string, Promise<unknown>>();
   private maxBytes: number;
   private bytes = 0;
   requests = 0;
@@ -26,28 +27,77 @@ export class TreeStore {
       this.cache.delete(path); this.cache.set(path, hit); this.cacheHits++;
       return hit.value as T;
     }
-    const buffer = await this.read(`${this.manifest.version}/${path}`, signal);
-    signal?.throwIfAborted();
-    this.requests++; this.transferredBytes += buffer.byteLength;
-    const value = decode(buffer);
-    // Charge decoded strings/objects as well as binary payload, conservatively.
-    const cost = buffer.byteLength * 4;
-    const previous = this.cache.get(path);
-    if (previous) this.bytes -= previous.bytes;
-    if (cost <= this.maxBytes) { this.cache.set(path, { value, bytes: cost }); this.bytes += cost; }
-    while (this.bytes > this.maxBytes && this.cache.size) {
-      const oldest = this.cache.keys().next().value!;
-      this.bytes -= this.cache.get(oldest)!.bytes; this.cache.delete(oldest); this.evictions++;
+    let request = this.inflight.get(path) as Promise<T> | undefined;
+    if (!request) {
+      request = this.read(`${this.manifest.version}/${path}`).then(buffer => {
+        this.requests++; this.transferredBytes += buffer.byteLength;
+        const value = decode(buffer);
+        // Charge decoded strings/objects as well as binary payload, conservatively.
+        const cost = buffer.byteLength * 4;
+        const previous = this.cache.get(path);
+        if (previous) this.bytes -= previous.bytes;
+        if (cost <= this.maxBytes) { this.cache.set(path, { value, bytes: cost }); this.bytes += cost; }
+        while (this.bytes > this.maxBytes && this.cache.size) {
+          const oldest = this.cache.keys().next().value!;
+          this.bytes -= this.cache.get(oldest)!.bytes; this.cache.delete(oldest); this.evictions++;
+        }
+        return value;
+      });
+      this.inflight.set(path, request);
+      request.then(() => { if (this.inflight.get(path) === request) this.inflight.delete(path); },
+        () => { if (this.inflight.get(path) === request) this.inflight.delete(path); });
     }
-    return value;
+    return this.withSignal(request, signal);
+  }
+  private withSignal<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
+    if (!signal) return promise;
+    signal.throwIfAborted();
+    return new Promise<T>((resolve, reject) => {
+      const abort = () => reject(new DOMException('Request cancelled', 'AbortError'));
+      signal.addEventListener('abort', abort, { once: true });
+      promise.then(value => { signal.removeEventListener('abort', abort); resolve(value); }, error => {
+        signal.removeEventListener('abort', abort); reject(error);
+      });
+    });
+  }
+  private page(pageNumber: number, signal?: AbortSignal) {
+    if (!Number.isInteger(pageNumber) || pageNumber < 0 || pageNumber >= this.manifest.pageCount) {
+      throw new Error('Invalid tree page number.');
+    }
+    return this.load<Page>(`pages/${pageNumber}.bin`, decodePage, signal);
+  }
+  private async nodes(indices: number[], signal?: AbortSignal) {
+    const pages = [...new Set(indices.map(index => {
+      if (!Number.isInteger(index) || index < 0 || index >= this.manifest.nodeCount) throw new Error('Invalid node index.');
+      return Math.floor(index / this.manifest.pageSize);
+    }))];
+    const loaded = new Map(await Promise.all(pages.map(async page => [page, await this.page(page, signal)] as const)));
+    return new Map(indices.map(index => {
+      const page = loaded.get(Math.floor(index / this.manifest.pageSize))!;
+      const offset = index % this.manifest.pageSize;
+      const record = readRecord(page, offset);
+      return [index, { record, summary: { ...page.names[offset], index, depth: record.depth, leafCount: record.leafCount,
+        isSyntheticNode: !!(record.flags & 1), isTerminal: !!(record.flags & 2) } }] as const;
+    }));
   }
   async node(index: number, signal?: AbortSignal): Promise<{ record: RecordNode; summary: Summary }> {
     if (!Number.isInteger(index) || index < 0 || index >= this.manifest.nodeCount) throw new Error('Invalid node index.');
-    const page = await this.load<Page>(`pages/${Math.floor(index / this.manifest.pageSize)}.bin`, decodePage, signal);
+    const page = await this.page(Math.floor(index / this.manifest.pageSize), signal);
     const offset = index % this.manifest.pageSize;
     const record = readRecord(page, offset);
     return { record, summary: { ...page.names[offset], index, depth: record.depth, leafCount: record.leafCount,
       isSyntheticNode: !!(record.flags & 1), isTerminal: !!(record.flags & 2) } };
+  }
+  async prefetch(hint: PrefetchHint) {
+    const nodePages = [...new Set(hint.nodes.filter(index => Number.isInteger(index) && index >= 0 && index < this.manifest.nodeCount)
+      .map(index => Math.floor(index / this.manifest.pageSize)))];
+    const indexPageSize = this.manifest.indexPageSize ?? INDEX_PAGE_SIZE;
+    const fanoutPages = [...new Set(hint.fanoutPages.filter(page => Number.isInteger(page) && page >= 0 &&
+      page * indexPageSize < (this.manifest.fanoutEntries ?? 0)))];
+    await Promise.allSettled([
+      ...nodePages.map(page => this.page(page)),
+      ...fanoutPages.map(page => this.json<FanoutEntry[]>(`fanout/${page}.json`)),
+    ]);
   }
   private async json<T>(path: string, signal?: AbortSignal): Promise<T> {
     return this.load<T>(path, b => JSON.parse(new TextDecoder().decode(b)), signal);
@@ -59,7 +109,8 @@ export class TreeStore {
     if (this.manifest.searchDirectory) {
       const candidates = blocks.filter(b => b.last >= key && b.first <= `${key}\uffff`);
       // Prefixes spanning multiple directory pages are read only as far as needed.
-      const result: Summary[] = [], seen = new Set<number>();
+      const found: number[] = [], seen = new Set<number>();
+      searchDirectories:
       for (const directory of candidates) {
         blocks = await this.json<SearchBlock[]>(directory.file, signal);
         for (const block of blocks) {
@@ -67,13 +118,14 @@ export class TreeStore {
           const entries = await this.json<SearchEntry[]>(block.file, signal);
           for (const [term, index] of entries) {
             if (term.startsWith(key) && !seen.has(index)) {
-              seen.add(index); result.push((await this.node(index, signal)).summary);
-              if (result.length === 12) return result;
+              seen.add(index); found.push(index);
+              if (found.length === 12) break searchDirectories;
             }
           }
         }
       }
-      return result;
+      const loaded = await this.nodes(found, signal);
+      return found.map(index => loaded.get(index)!.summary);
     }
     // Lower-bound lookup supports full-name, word-prefix and ID search without scanning all taxa.
     let lo = 0, hi = blocks.length;
@@ -83,9 +135,9 @@ export class TreeStore {
       const entries = await this.json<SearchEntry[]>(blocks[i].file, signal);
       for (const [term, index] of entries) { if (term.startsWith(key)) found.add(index); if (found.size === 12) break; }
     }
-    const result: Summary[] = [];
-    for (const index of found) result.push((await this.node(index, signal)).summary);
-    return result;
+    const indices = [...found];
+    const loaded = await this.nodes(indices, signal);
+    return indices.map(index => loaded.get(index)!.summary);
   }
   async details(index: number, signal?: AbortSignal): Promise<Details> {
     const item = await this.node(index, signal);
@@ -174,11 +226,13 @@ export class TreeStore {
       }
       limited ||= pending.length > 0;
     } else {
-      let child = record.firstChild;
-      while (child !== NONE && indices.length < budget) {
-        indices.push({ index: child }); child = (await this.node(child, signal)).record.nextSibling;
-      }
-      limited = child !== NONE;
+      // The publication is breadth-first, so every parent's immediate children
+      // occupy one contiguous range. Build the range without fetching each child
+      // merely to discover its next-sibling pointer; `view` loads their pages in
+      // one parallel batch below.
+      const count = Math.min(record.childCount, budget);
+      for (let offset = 0; offset < count; offset++) indices.push({ index: record.firstChild + offset });
+      limited = count < record.childCount;
     }
     return { indices, limited };
   }
@@ -205,6 +259,18 @@ export class TreeStore {
     let visited = 0;
     let limited = false;
     let rebase: Scene['rebase'];
+    const prefetchNodes = new Set<number>(), prefetchFanoutPages = new Set<number>();
+    const hintNextLevel = (record: RecordNode) => {
+      if (prefetchNodes.size + prefetchFanoutPages.size >= 12 || record.firstChild === NONE) return;
+      if (record.fanoutRoot !== NONE) {
+        prefetchFanoutPages.add(Math.floor(record.fanoutRoot / (this.manifest.indexPageSize ?? INDEX_PAGE_SIZE)));
+      } else {
+        prefetchNodes.add(record.firstChild);
+        if (record.childCount > 1 && prefetchNodes.size + prefetchFanoutPages.size < 12) {
+          prefetchNodes.add(record.firstChild + record.childCount - 1);
+        }
+      }
+    };
     const initial = await this.node(anchor, signal);
     // Restore surrounding clades when panning beyond a local frame as well as zooming out.
     const escapesFrame = Math.max(Math.abs(left), Math.abs(right), Math.abs(top), Math.abs(bottom)) > 1000;
@@ -262,18 +328,24 @@ export class TreeStore {
         nodes.push(n);
       }
       // Parent nodes summarize everything below this projected resolution.
-      if (record.firstChild === NONE || p.radius * record.maxChildRatio * scale < 0.5) continue;
+      if (record.firstChild === NONE) continue;
+      if (p.radius * record.maxChildRatio * scale < 0.5) { hintNextLevel(record); continue; }
       const children = await this.children(record,
         [(left - p.x) / p.radius, (top - p.y) / p.radius, (right - p.x) / p.radius, (bottom - p.y) / p.radius],
         0.5 / (p.radius * scale), Math.max(0, 12000 - visited - pending.length), signal);
       limited ||= children.limited;
+      const missing = children.indices.filter(child => !child.item).map(child => child.index);
+      const loaded = missing.length ? await this.nodes(missing, signal)
+        : new Map<number, { summary: Summary; record: RecordNode }>();
       for (const child of children.indices) {
-        const item = child.item ?? await this.node(child.index, signal), r = item.record;
+        const item = child.item ?? loaded.get(child.index)!; const r = item.record;
         pending.push({ index: child.index, item, x: p.x + r.dx * p.radius, y: p.y + r.dy * p.radius,
           radius: p.radius * r.ratio, px: p.x, py: p.y, incoming: true });
       }
     }
-    return { anchor, nodes, lines: new Float64Array(lineValues), lineTargets: new Uint32Array(targets), rebase,
+    const prefetch = prefetchNodes.size || prefetchFanoutPages.size
+      ? { nodes: [...prefetchNodes], fanoutPages: [...prefetchFanoutPages] } : undefined;
+    return { anchor, nodes, lines: new Float64Array(lineValues), lineTargets: new Uint32Array(targets), rebase, prefetch,
       stats: { requests: this.requests, transferredBytes: this.transferredBytes, cacheBytes: this.bytes,
         cacheEntries: this.cache.size, cacheHits: this.cacheHits, evictions: this.evictions,
         visited, queryMs: performance.now() - started, limited: limited || pending.length > 0 } };

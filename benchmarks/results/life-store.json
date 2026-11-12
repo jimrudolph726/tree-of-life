@@ -1,6 +1,6 @@
 {
   "version": "76ac044d37418e25",
-  "measuredAt": "2026-09-26T14:36:55.445Z",
+  "measuredAt": "2026-11-12T03:42:05.503Z",
   "node": "v24.15.0",
   "cacheBudgetMiB": 64,
   "methodology": "Filesystem-backed shared worker store. 600 camera queries, two viewports, five cross-domain selections. Timings exclude network and GPU.",
@@ -20,7 +20,7 @@
         "cacheHits": 0,
         "evictions": 0,
         "visited": 3470,
-        "queryMs": 4.513200000000012,
+        "queryMs": 3.150900000000007,
         "limited": false
       },
       "homeLabels": [
@@ -41,97 +41,97 @@
         {
           "query": "Bacteria",
           "depth": 1,
-          "selectionMs": 35.59530000000001,
+          "selectionMs": 10.501500000000007,
           "selectionRequests": 8,
           "first": {
             "requests": 9,
             "transferredBytes": 885909,
             "cacheBytes": 3543636,
             "cacheEntries": 9,
-            "cacheHits": 11,
+            "cacheHits": 2,
             "evictions": 0,
             "visited": 3470,
-            "queryMs": 0.05469999999999686,
+            "queryMs": 0.030100000000004457,
             "limited": false
           },
           "limitedViews": 0,
-          "warmP95Ms": 109.92930000000024
+          "warmP95Ms": 95.98439999999982
         },
         {
           "query": "Fungi",
           "depth": 5,
-          "selectionMs": 77.51440000000002,
+          "selectionMs": 57.11449999999968,
           "selectionRequests": 49,
           "first": {
             "requests": 385,
             "transferredBytes": 19800127,
             "cacheBytes": 66997004,
             "cacheEntries": 324,
-            "cacheHits": 32063,
+            "cacheHits": 21991,
             "evictions": 61,
             "visited": 329,
-            "queryMs": 59.46189999999979,
+            "queryMs": 43.97200000000021,
             "limited": false
           },
           "limitedViews": 0,
-          "warmP95Ms": 75.27790000000005
+          "warmP95Ms": 75.46000000000004
         },
         {
           "query": "Homo sapiens",
           "depth": 59,
-          "selectionMs": 21.340799999999945,
+          "selectionMs": 13.707600000000639,
           "selectionRequests": 10,
           "first": {
             "requests": 440,
             "transferredBytes": 22404251,
             "cacheBytes": 67085624,
             "cacheEntries": 286,
-            "cacheHits": 83063,
+            "cacheHits": 35039,
             "evictions": 154,
             "visited": 11,
-            "queryMs": 8.001800000000003,
+            "queryMs": 4.596300000000156,
             "limited": false
           },
           "limitedViews": 0,
-          "warmP95Ms": 0.13550000000032014
+          "warmP95Ms": 0.042699999999967986
         },
         {
           "query": "Chloroplastida",
           "depth": 8,
-          "selectionMs": 116.5586000000003,
+          "selectionMs": 95.34819999999945,
           "selectionRequests": 62,
           "first": {
             "requests": 502,
             "transferredBytes": 26438687,
             "cacheBytes": 67087184,
             "cacheEntries": 257,
-            "cacheHits": 85303,
+            "cacheHits": 35668,
             "evictions": 245,
             "visited": 526,
-            "queryMs": 107.55200000000059,
+            "queryMs": 87.86610000000019,
             "limited": false
           },
           "limitedViews": 0,
-          "warmP95Ms": 67.47289999999975
+          "warmP95Ms": 63.29210000000057
         },
         {
           "query": "Methanobacteria",
           "depth": 5,
-          "selectionMs": 38.08250000000044,
+          "selectionMs": 17.33889999999883,
           "selectionRequests": 11,
           "first": {
             "requests": 559,
             "transferredBytes": 29608290,
             "cacheBytes": 66950604,
             "cacheEntries": 252,
-            "cacheHits": 135956,
+            "cacheHits": 44842,
             "evictions": 307,
             "visited": 153,
-            "queryMs": 24.53809999999976,
+            "queryMs": 11.102500000000873,
             "limited": false
           },
           "limitedViews": 0,
-          "warmP95Ms": 16.03809999999976
+          "warmP95Ms": 15.994599999999991
         }
       ],
       "requests": 560,
@@ -150,7 +150,7 @@
         "cacheHits": 0,
         "evictions": 0,
         "visited": 3470,
-        "queryMs": 2.05199999999968,
+        "queryMs": 2.861300000000483,
         "limited": false
       },
       "homeLabels": [
@@ -168,97 +168,97 @@
         {
           "query": "Bacteria",
           "depth": 1,
-          "selectionMs": 7.625599999999395,
+          "selectionMs": 9.415299999998751,
           "selectionRequests": 8,
           "first": {
             "requests": 9,
             "transferredBytes": 885909,
             "cacheBytes": 3543636,
             "cacheEntries": 9,
-            "cacheHits": 11,
+            "cacheHits": 2,
             "evictions": 0,
             "visited": 3470,
-            "queryMs": 0.03179999999883876,
+            "queryMs": 0.01810000000114087,
             "limited": false
           },
           "limitedViews": 0,
-          "warmP95Ms": 66.42360000000008
+          "warmP95Ms": 64.46379999999954
         },
         {
           "query": "Fungi",
           "depth": 5,
-          "selectionMs": 50.00459999999839,
+          "selectionMs": 59.60080000000016,
           "selectionRequests": 48,
           "first": {
             "requests": 364,
             "transferredBytes": 18482328,
             "cacheBytes": 66569712,
             "cacheEntries": 341,
-            "cacheHits": 33064,
+            "cacheHits": 22491,
             "evictions": 23,
             "visited": 226,
-            "queryMs": 35.89589999999953,
+            "queryMs": 41.08729999999923,
             "limited": false
           },
           "limitedViews": 0,
-          "warmP95Ms": 63.33020000000033
+          "warmP95Ms": 62.39079999999922
         },
         {
           "query": "Homo sapiens",
           "depth": 59,
-          "selectionMs": 10.564099999999598,
+          "selectionMs": 11.843600000000151,
           "selectionRequests": 10,
           "first": {
             "requests": 402,
             "transferredBytes": 21213150,
             "cacheBytes": 67086844,
             "cacheEntries": 308,
-            "cacheHits": 62978,
+            "cacheHits": 30191,
             "evictions": 94,
             "visited": 11,
-            "queryMs": 4.202100000000428,
+            "queryMs": 4.627899999999499,
             "limited": false
           },
           "limitedViews": 0,
-          "warmP95Ms": 0.03570000000036089
+          "warmP95Ms": 0.02540000000044529
         },
         {
           "query": "Chloroplastida",
           "depth": 8,
-          "selectionMs": 756.3202000000001,
+          "selectionMs": 121.09370000000126,
           "selectionRequests": 93,
           "first": {
             "requests": 495,
             "transferredBytes": 26635160,
             "cacheBytes": 66685616,
             "cacheEntries": 251,
-            "cacheHits": 65116,
+            "cacheHits": 30788,
             "evictions": 244,
             "visited": 486,
-            "queryMs": 750.1083999999992,
+            "queryMs": 115.20329999999922,
             "limited": false
           },
           "limitedViews": 0,
-          "warmP95Ms": 53.97780000000057
+          "warmP95Ms": 48.85120000000097
         },
         {
           "query": "Methanobacteria",
           "depth": 5,
-          "selectionMs": 44.15970000000016,
+          "selectionMs": 17.32550000000083,
           "selectionRequests": 13,
           "first": {
             "requests": 557,
             "transferredBytes": 30061425,
             "cacheBytes": 66650560,
             "cacheEntries": 245,
-            "cacheHits": 100040,
+            "cacheHits": 40147,
             "evictions": 312,
             "visited": 180,
-            "queryMs": 38.13580000000002,
+            "queryMs": 10.841599999999744,
             "limited": false
           },
           "limitedViews": 0,
-          "warmP95Ms": 16.04109999999855
+          "warmP95Ms": 16.000599999999395
         }
       ],
       "requests": 558,
