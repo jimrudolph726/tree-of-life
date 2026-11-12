@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
+import Bootstrap from './Bootstrap.tsx'
 import { startRum } from './monitoring/rum.ts'
 
 // Monitoring is operationally useful but should never compete with the map's
@@ -12,6 +12,6 @@ else globalThis.setTimeout(startRum, 2500)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <Bootstrap />
   </StrictMode>,
 )

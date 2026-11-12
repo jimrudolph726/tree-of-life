@@ -47,9 +47,33 @@ export interface Manifest {
   detailPages?: boolean;
   presentation?: 'life';
   overview?: { file: string; maxScale: number };
+  tiles?: SpatialTileManifest;
   searchDirectory?: string;
   indexPageSize?: number;
 }
+export interface SpatialTileManifest {
+  format: 1;
+  indexFile: string;
+  pattern: string;
+  worldBounds: [number, number, number, number];
+  baseZoom: number;
+  maxLevel: number;
+  tileCount: number;
+  compressedBytes: number;
+  maxCompressedTileBytes: number;
+}
+export interface SpatialTileIndex { format: 1; levels: { z: number; side: number; tiles: string[] }[] }
+export interface SpatialTileNode {
+  summary: Summary;
+  position: [number, number];
+  radius: number;
+  heading: number;
+  group: number;
+  bounds: [number, number, number, number];
+  childCount: number;
+  maxChildRatio: number;
+}
+export interface SpatialTile { nodes: SpatialTileNode[]; lines: number[]; lineTargets: number[] }
 export const cacheBudget = (manifest: Manifest) => (manifest.presentation === 'life' ? 64 : 24) * 1024 * 1024;
 export interface RecordNode {
   parent: number; firstChild: number; nextSibling: number; leafCount: number;
@@ -61,7 +85,7 @@ export interface Page { records: DataView; names: TreeNodeInput[]; count: number
 export interface SearchBlock { first: string; last: string; file: string }
 export type SearchEntry = [key: string, index: number];
 export interface ViewRequest { anchor: number; camera: Camera; size: Size }
-export interface PrefetchHint { nodes: number[]; fanoutPages: number[] }
+export interface PrefetchHint { nodes: number[]; fanoutPages: number[]; tiles?: string[] }
 export interface StreamStats {
   requests: number; transferredBytes: number; cacheBytes: number; cacheEntries: number;
   cacheHits: number; evictions: number; visited: number; queryMs: number; limited: boolean;
@@ -130,6 +154,16 @@ export function validateManifest(value: unknown): Manifest {
       !m.root || m.root.index !== 0 || !Array.isArray(m.rootBounds) || m.rootBounds.length !== 4 || !m.rootBounds.every(Number.isFinite) ||
       m.rootBounds[0] > m.rootBounds[2] || m.rootBounds[1] > m.rootBounds[3]) {
     throw new Error('Unsupported or invalid tree manifest. Rebuild the dataset.');
+  }
+  if (m.tiles && (m.tiles.format !== 1 || m.tiles.indexFile !== 'tiles/index.json' ||
+      m.tiles.pattern !== 'tiles/{z}/{x}/{y}.json' || !Array.isArray(m.tiles.worldBounds) ||
+      m.tiles.worldBounds.length !== 4 || !m.tiles.worldBounds.every(Number.isFinite) ||
+      m.tiles.worldBounds[0] >= m.tiles.worldBounds[2] || m.tiles.worldBounds[1] >= m.tiles.worldBounds[3] ||
+      !Number.isInteger(m.tiles.baseZoom) || !Number.isInteger(m.tiles.maxLevel) || m.tiles.maxLevel < 0 || m.tiles.maxLevel > 16 ||
+      !Number.isInteger(m.tiles.tileCount) || m.tiles.tileCount < 1 ||
+      !Number.isInteger(m.tiles.compressedBytes) || m.tiles.compressedBytes < 1 ||
+      !Number.isInteger(m.tiles.maxCompressedTileBytes) || m.tiles.maxCompressedTileBytes < 1)) {
+    throw new Error('Unsupported or invalid spatial tile manifest. Rebuild the dataset.');
   }
   return m;
 }

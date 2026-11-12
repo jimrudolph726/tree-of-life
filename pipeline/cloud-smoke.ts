@@ -72,6 +72,12 @@ for (const [dataset, query] of [['life', 'Homo sapiens'], ['aves', 'Camarhynchus
     for (const name of ['Eukaryota', 'Archaea', 'Bacteria', 'Fungi', 'Opisthokonta']) {
       assert.ok(overview.nodes.some((n: { scientificName: string }) => n.scientificName === name));
     }
+    assert.ok(manifest.tiles, 'The complete tree is missing spatial tiles');
+    const broad = await store.view({ anchor: 0, camera: { target: [0, 0, 0], zoom: 0, minZoom: -4, maxZoom: 30 }, size: { width: 1280, height: 720 } });
+    for (const name of ['Eukaryota', 'Archaea', 'Bacteria']) {
+      assert.ok(broad.nodes.some(node => node.scientificName === name), `Spatial tiles are missing ${name}`);
+    }
+    assert.ok(broad.lines.every(Number.isFinite));
     // Repeat to observe CDN cache behavior; a first edge request may be a miss.
     await read(`data/life/${manifest.version}/overview.json`, true);
     const missing = await fetch(new URL(`data/life/${manifest.version}/pages/not-a-page.bin`, base));

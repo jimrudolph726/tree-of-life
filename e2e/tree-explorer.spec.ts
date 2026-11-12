@@ -25,6 +25,26 @@ test('loads the interactive tree without browser errors', async ({ page }) => {
   expect(browserErrors).toEqual([]);
 });
 
+test('complete-tree broad zoom switches to spatial tiles without a blank canvas', async ({ page }) => {
+  test.skip(!hasLifePublication, 'Complete OpenTree publication is not available');
+  const browserErrors: string[] = [], tileRequests: string[] = [];
+  page.on('pageerror', error => browserErrors.push(error.message));
+  page.on('response', response => { if (/\/tiles\/\d+\/\d+\/\d+\.json/.test(response.url())) tileRequests.push(response.url()); });
+  await page.goto('/?dataset=life', { waitUntil: 'domcontentloaded' });
+  const app = page.locator('main.app'), canvas = page.locator('canvas').first();
+  await expect(app).toHaveAttribute('data-tree-ready', 'true', { timeout: 30_000 });
+  const box = await canvas.boundingBox(); expect(box).not.toBeNull();
+  await page.mouse.move(box!.x + box!.width * 0.28, box!.y + box!.height * 0.42);
+  for (let attempt = 0; attempt < 4 && tileRequests.length === 0; attempt++) {
+    await page.mouse.wheel(0, -900);
+    await page.waitForTimeout(180);
+  }
+  await expect.poll(() => tileRequests.length, { timeout: 15_000 }).toBeGreaterThan(0);
+  await expect.poll(async () => Number(await app.getAttribute('data-scene-node-count'))).toBeGreaterThan(0);
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  expect(browserErrors).toEqual([]);
+});
+
 test('search, deep focus, wheel zoom, pan, and home stay responsive', async ({ page }) => {
   const { app, browserErrors } = await openTree(page);
   const search = page.getByRole('combobox', { name: 'Search taxa' });

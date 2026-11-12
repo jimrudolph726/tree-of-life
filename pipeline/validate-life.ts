@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { gzipSync } from 'node:zlib';
 import { releaseGraph } from './release-graph.ts';
 import { decodePage, NONE, readRecord } from '../src/stream/format.ts';
 import type { FanoutEntry, Manifest } from '../src/stream/format.ts';
@@ -19,6 +20,7 @@ const ids: string[] = [], parents = new Uint32Array(manifest.nodeCount), depth =
   first = new Uint32Array(manifest.nodeCount), next = new Uint32Array(manifest.nodeCount), children = new Uint32Array(manifest.nodeCount);
 const routes = new Uint32Array(manifest.nodeCount).fill(NONE), structural = new Uint8Array(manifest.nodeCount);
 const fingerprints = Buffer.alloc(manifest.nodeCount * 32);
+const summaryFingerprints = Buffer.alloc(manifest.nodeCount * 32);
 let tips = 0, named = 0, maxDepth = 0;
 for (let pageIndex = 0; pageIndex < manifest.pageCount; pageIndex++) {
   const buffer = readFileSync(join(folder, manifest.version, 'pages', `${pageIndex}.bin`));
@@ -39,6 +41,7 @@ for (let pageIndex = 0; pageIndex < manifest.pageCount; pageIndex++) {
     const summary = { ...n, index: i, depth: r.depth, leafCount: r.leafCount,
       isTerminal: r.firstChild === NONE, isSyntheticNode: !!n.isSyntheticNode };
     createHash('sha256').update(JSON.stringify({ summary, record: r })).digest().copy(fingerprints, i * 32);
+    createHash('sha256').update(JSON.stringify(summary)).digest().copy(summaryFingerprints, i * 32);
     if (n.isSyntheticNode) assert.deepEqual([r.dx, r.dy, r.ratio], [0, 0, 1]);
     if (r.firstChild === NONE) { tips++; totals[i] = 1; }
     if (!n.isSyntheticNode) named++;
@@ -98,9 +101,54 @@ for (let i = 0; i < routes.length; i++) {
   }
   if (targets.size) assert.equal(targets.size, expectedFrontier[i], 'Incomplete visible frontier');
 }
+assert.ok(manifest.tiles, 'Spatial tile publication is missing');
+assert.ok(manifest.tiles.maxCompressedTileBytes <= 256 * 1024);
+assert.ok(manifest.tiles.compressedBytes <= 32 * 1024 * 1024);
+const tileIndexBytes = readFileSync(join(folder, manifest.version, manifest.tiles.indexFile));
+const tileIndex = JSON.parse(tileIndexBytes.toString('utf8'));
+assert.equal(tileIndex.format, 1);
+assert.equal(tileIndex.levels.length, manifest.tiles.maxLevel + 1);
+let tileFiles = 0, tileCompressedBytes = gzipSync(tileIndexBytes, { level: 6 }).byteLength;
+let maxCompressedTileBytes = tileCompressedBytes, tiledNodes = 0, tiledLines = 0;
+for (let z = 0; z <= manifest.tiles.maxLevel; z++) {
+  const level = tileIndex.levels[z];
+  assert.equal(level.z, z); assert.ok(Number.isInteger(level.side) && level.side > 0);
+  const levelNodes = new Set<number>();
+  for (const key of level.tiles) {
+    assert.match(key, /^\d+\/\d+$/);
+    const [x, y] = key.split('/').map(Number);
+    assert.ok(x >= 0 && x < level.side && y >= 0 && y < level.side);
+    const raw = readFileSync(join(folder, manifest.version, `tiles/${z}/${key}.json`));
+    const compressed = gzipSync(raw, { level: 6 }).byteLength;
+    assert.ok(compressed <= 256 * 1024, `Spatial tile ${z}/${key} exceeds its compressed budget`);
+    tileCompressedBytes += compressed; maxCompressedTileBytes = Math.max(maxCompressedTileBytes, compressed); tileFiles++;
+    const tile = JSON.parse(raw.toString('utf8'));
+    assert.ok(Array.isArray(tile.nodes) && Array.isArray(tile.lines) && Array.isArray(tile.lineTargets));
+    assert.equal(tile.lines.length % 4, 0); assert.equal(tile.lines.length / 4, tile.lineTargets.length);
+    assert.ok(tile.lines.every(Number.isFinite));
+    for (const target of tile.lineTargets) assert.ok(Number.isInteger(target) && target > 0 && target < manifest.nodeCount);
+    tiledLines += tile.lineTargets.length;
+    for (const node of tile.nodes) {
+      const index = node.summary?.index;
+      assert.ok(Number.isInteger(index) && index >= 0 && index < manifest.nodeCount);
+      assert.ok(!levelNodes.has(index), `Duplicate spatial tile node ${index} at level ${z}`); levelNodes.add(index);
+      assert.equal(node.summary.id, ids[index]);
+      assert.deepEqual(createHash('sha256').update(JSON.stringify(node.summary)).digest(),
+        summaryFingerprints.subarray(index * 32, (index + 1) * 32));
+      assert.ok([...(node.position ?? []), node.radius, node.heading, node.group, ...(node.bounds ?? []), node.maxChildRatio].every(Number.isFinite));
+      assert.ok(node.radius > 0 && Number.isInteger(node.childCount) && node.childCount >= 0);
+      tiledNodes++;
+    }
+  }
+}
+assert.equal(tileFiles, manifest.tiles.tileCount);
+assert.equal(tileCompressedBytes, manifest.tiles.compressedBytes);
+assert.equal(maxCompressedTileBytes, manifest.tiles.maxCompressedTileBytes);
 const report = { version: manifest.version, synthId: manifest.provenance?.synthId, nodeCount: ids.length,
   edgeCount: ids.length - 1, tips, named, maxDepth,
   everySourceIdNameLabelAndParentMatched: true, everyChildLinkAndTerminalCountMatched: true, allGeometryFinite: true,
-  routedEdges, displayRoutingPreservesSourceAncestry: true, everyRoutingSnapshotMatched: true };
+  routedEdges, displayRoutingPreservesSourceAncestry: true, everyRoutingSnapshotMatched: true,
+  spatialTiles: { tileFiles, tiledNodes, tiledLines, compressedBytes: tileCompressedBytes,
+    maxCompressedTileBytes, everyTileSummaryMatched: true } };
 writeFileSync('benchmarks/results/life-validation.json', JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report));

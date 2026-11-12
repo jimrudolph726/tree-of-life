@@ -165,6 +165,19 @@ def prepare(folder, data_folder=None):
                 required = manifest.get('searchDirectory', 'search.json')
             if not (dataset_folder / required).is_file():
                 raise ValueError(f'{dataset}: missing {required}')
+        if dataset == 'life':
+            tiles = manifest.get('tiles', {})
+            if (tiles.get('format') != 1 or tiles.get('indexFile') != 'tiles/index.json' or
+                    tiles.get('maxCompressedTileBytes', 10**9) > 256 * 1024 or
+                    tiles.get('compressedBytes', 10**9) > 32 * 1024 * 1024):
+                raise ValueError('life: invalid spatial tile publication')
+            tile_index = json.loads((dataset_folder / tiles['indexFile']).read_text(encoding='utf-8'))
+            listed = [(level['z'], key) for level in tile_index.get('levels', []) for key in level.get('tiles', [])]
+            if len(listed) != tiles.get('tileCount'):
+                raise ValueError('life: spatial tile count does not match its index')
+            for level, key in listed:
+                if not re.fullmatch(r'\d+/\d+', key) or not (dataset_folder / 'tiles' / str(level) / f'{key}.json').is_file():
+                    raise ValueError(f'life: missing spatial tile {level}/{key}')
         for path in sorted(dataset_folder.rglob('*')):
             if path.is_file():
                 if path.is_symlink() or not path.resolve().is_relative_to(data_root):

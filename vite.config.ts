@@ -86,10 +86,13 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const treeDataUpstream = env.TREE_DATA_UPSTREAM ||
     (mode === 'development' ? 'https://dgilsep5ai167.cloudfront.net/' : undefined);
+  const treeDataBaseUrl = env.VITE_TREE_DATA_BASE_URL ||
+    (mode === 'development' && treeDataUpstream ? '/__tree-data__/' : undefined);
   return {
   publicDir: false,
+  define: treeDataBaseUrl ? { 'import.meta.env.VITE_TREE_DATA_BASE_URL': JSON.stringify(treeDataBaseUrl) } : undefined,
   server: { watch: { ignored: ['**/public/data/**', '**/data/processed/**', '**/.benchmarks/**'] } },
-  plugins: [react(), appPublicAssets(treeDataUpstream, env.VITE_TREE_DATA_BASE_URL), {
+  plugins: [react(), appPublicAssets(treeDataUpstream, treeDataBaseUrl), {
     name: 'local-benchmark-datasets',
     configureServer(server) {
       server.middlewares.use((request, response, next) => {

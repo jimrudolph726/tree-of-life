@@ -1,5 +1,5 @@
 import { cacheBudget, decodePage, INDEX_PAGE_SIZE, readRecord, NONE, validateManifest } from './format.ts';
-import type { AncestorEntry, ChildPreview, Details, FanoutEntry, Manifest, Page, PrefetchHint, RecordNode, Scene, SearchBlock, SearchEntry, StreamNode, Summary, ViewRequest } from './format.ts';
+import type { AncestorEntry, ChildPreview, Details, FanoutEntry, Manifest, Page, PrefetchHint, RecordNode, Scene, SearchBlock, SearchEntry, SpatialTile, SpatialTileIndex, StreamNode, Summary, ViewRequest } from './format.ts';
 import type { Position } from '../tree/types.ts';
 
 export type ReadBytes = (path: string, signal?: AbortSignal) => Promise<ArrayBuffer>;
@@ -97,6 +97,7 @@ export class TreeStore {
     await Promise.allSettled([
       ...nodePages.map(page => this.page(page)),
       ...fanoutPages.map(page => this.json<FanoutEntry[]>(`fanout/${page}.json`)),
+      ...(hint.tiles ?? []).slice(0, 12).map(path => this.json<SpatialTile>(path)),
     ]);
   }
   private async json<T>(path: string, signal?: AbortSignal): Promise<T> {
@@ -236,6 +237,91 @@ export class TreeStore {
     }
     return { indices, limited };
   }
+  private async tileView(request: ViewRequest, signal?: AbortSignal): Promise<Scene> {
+    const started = performance.now(), config = this.manifest.tiles!;
+    const { camera, size } = request, scale = 2 ** camera.zoom;
+    const margin = 160;
+    const left = camera.target[0] - (size.width / 2 + margin) / scale;
+    const right = camera.target[0] + (size.width / 2 + margin) / scale;
+    const top = camera.target[1] - (size.height / 2 + margin) / scale;
+    const bottom = camera.target[1] + (size.height / 2 + margin) / scale;
+    const level = Math.max(0, Math.min(config.maxLevel, Math.floor(camera.zoom - config.baseZoom)));
+    const index = await this.json<SpatialTileIndex>(config.indexFile, signal);
+    if (index.format !== 1) throw new Error('Invalid spatial tile index.');
+    const levelEntry = index.levels.find(item => item.z === level);
+    if (!levelEntry || !Number.isInteger(levelEntry.side) || levelEntry.side < 1 || !Array.isArray(levelEntry.tiles)) {
+      throw new Error('Invalid spatial tile level.');
+    }
+    const side = levelEntry.side, [minX, minY, maxX, maxY] = config.worldBounds;
+    const tileWidth = (maxX - minX) / side, tileHeight = (maxY - minY) / side;
+    const clamp = (value: number) => Math.max(0, Math.min(side - 1, value));
+    const fromX = clamp(Math.floor((left - minX) / tileWidth)), toX = clamp(Math.floor((right - minX) / tileWidth));
+    const fromY = clamp(Math.floor((top - minY) / tileHeight)), toY = clamp(Math.floor((bottom - minY) / tileHeight));
+    const available = new Set(levelEntry.tiles);
+    const selected: { key: string; path: string }[] = [];
+    if (right >= minX && left <= maxX && bottom >= minY && top <= maxY) {
+      for (let x = fromX; x <= toX; x++) for (let y = fromY; y <= toY; y++) {
+        const key = `${x}/${y}`;
+        if (available.has(key)) selected.push({ key, path: config.pattern.replace('{z}', String(level)).replace('{x}', String(x)).replace('{y}', String(y)) });
+      }
+    }
+    const loaded = await Promise.all(selected.map(async item => ({ ...item, tile: await this.json<SpatialTile>(item.path, signal) })));
+    const nodeMap = new Map<number, StreamNode>(), lineValues: number[] = [], lineTargets: number[] = [];
+    let visited = 0;
+    for (const { tile } of loaded) {
+      if (!Array.isArray(tile.nodes) || !Array.isArray(tile.lines) || tile.lines.length % 4 ||
+          !Array.isArray(tile.lineTargets) || tile.lineTargets.length * 4 !== tile.lines.length) {
+        throw new Error('Invalid spatial tile payload.');
+      }
+      visited += tile.nodes.length;
+      for (const item of tile.nodes) {
+        if (!item?.summary || !Number.isInteger(item.summary.index) || !Array.isArray(item.position) || !Array.isArray(item.bounds)) {
+          throw new Error('Invalid spatial tile node.');
+        }
+        const [x, y] = item.position;
+        if (x + item.radius < left || x - item.radius > right || y + item.radius < top || y - item.radius > bottom) continue;
+        const node: StreamNode = { ...item.summary, position: item.position, radius: item.radius,
+          heading: item.heading, group: item.group, bounds: item.bounds, region: [] };
+        if (item.childCount > 64 && item.radius * item.maxChildRatio * scale < 0.5) node.collapsedCount = item.childCount;
+        if (!item.summary.isTerminal && item.radius * scale >= 24 && item.radius * scale <= 4000) {
+          const span = item.summary.index === 0 || item.summary.depth === 1 ? Math.PI * 2 : Math.PI;
+          node.region.push(node.position);
+          for (let step = 0; step <= 32; step++) {
+            const angle = item.heading - span / 2 + span * step / 32;
+            node.region.push([x + item.radius * Math.cos(angle), y + item.radius * Math.sin(angle)] as Position);
+          }
+          node.region.push(node.position);
+        }
+        nodeMap.set(item.summary.index, node);
+      }
+      for (let at = 0; at < tile.lineTargets.length; at++) {
+        const offset = at * 4, sx = tile.lines[offset], sy = tile.lines[offset + 1], tx = tile.lines[offset + 2], ty = tile.lines[offset + 3];
+        if (Math.max(sx, tx) < left || Math.min(sx, tx) > right || Math.max(sy, ty) < top || Math.min(sy, ty) > bottom) continue;
+        lineValues.push(sx, sy, tx, ty); lineTargets.push(tile.lineTargets[at]);
+      }
+    }
+    const prefetchTiles: string[] = [];
+    if (level < config.maxLevel) {
+      const nextEntry = index.levels.find(item => item.z === level + 1);
+      const nextAvailable = new Set(nextEntry?.tiles ?? []), factor = (nextEntry?.side ?? side) / side;
+      for (const { key } of selected) {
+        const [x, y] = key.split('/').map(Number);
+        for (let childX = x * factor; childX < (x + 1) * factor; childX++) for (let childY = y * factor; childY < (y + 1) * factor; childY++) {
+          const child = `${childX}/${childY}`;
+          if (nextAvailable.has(child) && prefetchTiles.length < 12) {
+            prefetchTiles.push(config.pattern.replace('{z}', String(level + 1)).replace('{x}', String(childX)).replace('{y}', String(childY)));
+          }
+        }
+      }
+    }
+    const prefetch: PrefetchHint | undefined = prefetchTiles.length
+      ? { nodes: [], fanoutPages: [], tiles: prefetchTiles }
+      : level === config.maxLevel ? { nodes: [0], fanoutPages: [] } : undefined;
+    return { anchor: 0, nodes: [...nodeMap.values()], lines: new Float64Array(lineValues), lineTargets: new Uint32Array(lineTargets), prefetch,
+      stats: { requests: this.requests, transferredBytes: this.transferredBytes, cacheBytes: this.bytes,
+        cacheEntries: this.cache.size, cacheHits: this.cacheHits, evictions: this.evictions,
+        visited, queryMs: performance.now() - started, limited: false } };
+  }
   async view(request: ViewRequest, signal?: AbortSignal): Promise<Scene> {
     const started = performance.now();
     const { anchor, camera, size } = request;
@@ -246,6 +332,9 @@ export class TreeStore {
         stats: { requests: this.requests, transferredBytes: this.transferredBytes, cacheBytes: this.bytes,
           cacheEntries: this.cache.size, cacheHits: this.cacheHits, evictions: this.evictions,
           visited: overview.visits, queryMs: performance.now() - started, limited: false } };
+    }
+    if (anchor === 0 && this.manifest.tiles && camera.zoom < this.manifest.tiles.baseZoom + this.manifest.tiles.maxLevel + 1) {
+      return this.tileView(request, signal);
     }
     const margin = 160;
     const left = camera.target[0] - (size.width / 2 + margin) / scale;

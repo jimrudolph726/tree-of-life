@@ -9,6 +9,7 @@ import type { TreeNodeInput } from '../src/tree/types.ts';
 import { parseTreeData } from '../src/tree/layoutTreeV3.ts';
 import { SearchWriter } from './search-writer.ts';
 import { lifeGeometry, writeOverview } from './life-overview.ts';
+import { writeSpatialTiles } from './build-tiles.ts';
 
 export interface Graph {
   parents: Int32Array;
@@ -178,7 +179,7 @@ export function buildDataset(graph: Graph, outputDirectory: string) {
   mkdirSync(output, { recursive: true });
   const stage = mkdtempSync(join(tmpdir(), 'tree-build-'));
   mkdirSync(join(stage, 'pages')); mkdirSync(join(stage, 'search')); mkdirSync(join(stage, 'fanout'));
-  const hash = createHash('sha256').update(JSON.stringify({ format: FORMAT_VERSION, source: graph.source, title: graph.title, synthetic: graph.synthetic, provenance: graph.provenance, presentation: graph.presentation, presentationRevision: graph.presentation ? 2 : undefined }));
+  const hash = createHash('sha256').update(JSON.stringify({ format: FORMAT_VERSION, source: graph.source, title: graph.title, synthetic: graph.synthetic, provenance: graph.provenance, presentation: graph.presentation, presentationRevision: graph.presentation ? 3 : undefined }));
   const search: SearchEntry[] = [];
   const externalSearch = graph.presentation === 'life' ? new SearchWriter(stage) : null;
   let namedCount = 0; let diskBytes = 0;
@@ -297,6 +298,8 @@ export function buildDataset(graph: Graph, outputDirectory: string) {
   }
   const overview = graph.presentation === 'life' ? writeOverview(data, count, summary, stage) : undefined;
   if (overview) { hash.update(overview.bytes); diskBytes += overview.bytes.byteLength; }
+  const tiles = graph.presentation === 'life' ? writeSpatialTiles(data, count, summary, stage, hash) : undefined;
+  if (tiles) { hash.update(JSON.stringify(tiles.manifest)); diskBytes += tiles.bytes; }
   const version = hash.digest('hex').slice(0, 16);
   const manifest: Manifest = {
     format: FORMAT_VERSION, version, title: graph.title, source: graph.source, synthetic: graph.synthetic,
@@ -306,6 +309,7 @@ export function buildDataset(graph: Graph, outputDirectory: string) {
     builtAt: new Date().toISOString(), provenance: graph.provenance, maxChildren, fanoutEntries: fanout.length,
     ancestryPages: !!graph.provenance, detailPages: !!graph.provenance,
     presentation: graph.presentation, overview: overview ? { file: 'overview.json', maxScale: overview.maxScale } : undefined,
+    tiles: tiles?.manifest,
     searchDirectory: externalSearch ? 'search-top.json' : undefined,
     indexPageSize: graph.presentation ? indexPageSize : undefined,
   };

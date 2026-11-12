@@ -86,7 +86,7 @@ function openingCamera(root: StreamNode, size: Size, manifest: Manifest) {
     : { top: 90, left: 90, right: 90, bottom: 55 });
 }
 
-function TreeMap({ client, profileClient, journeyClient, manifest }: { client: TreeClient; profileClient: ProfileClient;
+export function TreeMap({ client, profileClient, journeyClient, manifest }: { client: TreeClient; profileClient: ProfileClient;
   journeyClient: JourneyClient; manifest: Manifest }) {
   const root = useMemo(() => rootNode(manifest), [manifest]);
   const container = useRef<HTMLElement>(null);
@@ -572,26 +572,4 @@ function TreeMap({ client, profileClient, journeyClient, manifest }: { client: T
   );
 }
 
-function App() {
-  const profileClient = useMemo(() => new ProfileClient(new URL(`${import.meta.env.BASE_URL}data/profiles/manifest.json`, window.location.href).href), []);
-  const journeyClient = useMemo(() => new JourneyClient(new URL(`${import.meta.env.BASE_URL}data/journeys/manifest.json`, window.location.href).href), []);
-  const [loaded, setLoaded] = useState<{ client: TreeClient; manifest: Manifest } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [attempt, setAttempt] = useState(0);
-  useEffect(() => {
-    const client = new TreeClient();
-    const controller = new AbortController();
-    const fixture = new URLSearchParams(window.location.search).get('dataset');
-    const path = fixture && /^(balanced|unbalanced)-(10000|100000|1000000)$/.test(fixture)
-      ? `${import.meta.env.BASE_URL}benchmarks/${fixture}/manifest.json`
-      : treeDataUrl(`data/${fixture === 'primates' ? 'primates' : fixture === 'aves' ? 'aves' : 'life'}/manifest.json`);
-    void client.init(new URL(path, window.location.href).href, controller.signal)
-      .then(manifest => setLoaded({ client, manifest }))
-      .catch(cause => { if (!controller.signal.aborted) setError(cause.message); });
-    return () => { controller.abort(); client.close(); };
-  }, [attempt]);
-  if (error) return <main className="app loading-message" role="alert"><div><h1>Unable to open the tree</h1><p>{error}</p><button onClick={() => { setError(null); setAttempt(value => value + 1); }}>Try again</button></div></main>;
-  if (!loaded) return <main className="app loading-message" role="status"><div className="loading-indicator" /><p>Opening the tree map…</p></main>;
-  return <TreeMap client={loaded.client} profileClient={profileClient} journeyClient={journeyClient} manifest={loaded.manifest} />;
-}
-export default App;
+export default TreeMap;

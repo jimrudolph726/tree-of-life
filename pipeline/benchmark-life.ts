@@ -20,6 +20,15 @@ for (const size of [{ width: 1280, height: 720 }, { width: 390, height: 844 }]) 
   const labels = visibleLabels(overview.nodes.filter(n => n.index !== 0), home, size).map(n => n.scientificName);
   for (const name of ['Eukaryota', 'Archaea', 'Bacteria']) assert.ok(labels.includes(name), `Missing home label ${name}`);
   if (size.width > 700) for (const name of ['Fungi', 'Opisthokonta', 'Methanobacteria', 'Thermoprotei', 'Actinobacteria', 'Cyanobacteria']) assert.ok(labels.includes(name), `Missing home invitation ${name}`);
+  const tileSweep = [];
+  const tileTarget = overview.nodes.find(node => node.scientificName === 'Eukaryota')!.position;
+  for (let zoom = 0; zoom <= (manifest.tiles?.maxLevel ?? -1); zoom++) {
+    const before = store.requests, tiled = await store.view({ anchor: 0, camera: { ...home, target: [tileTarget[0], tileTarget[1], 0], zoom }, size });
+    assert.ok(tiled.nodes.length, `Empty spatial tile scene at zoom ${zoom}`);
+    assert.ok(tiled.lines.every(Number.isFinite));
+    tileSweep.push({ zoom, requests: store.requests - before, nodes: tiled.nodes.length, lines: tiled.lineTargets.length,
+      queryMs: tiled.stats.queryMs, transferredBytes: tiled.stats.transferredBytes });
+  }
   const cases = [];
   for (const query of ['Bacteria', 'Fungi', 'Homo sapiens', 'Chloroplastida', 'Methanobacteria']) {
     const start = performance.now(), before = store.requests;
@@ -43,11 +52,11 @@ for (const size of [{ width: 1280, height: 720 }, { width: 390, height: 844 }]) 
     cases.push({ query, depth: detail.node.depth, selectionMs, selectionRequests, first: first.stats, limitedViews, warmP95Ms: times[Math.floor(times.length * .95)] });
     console.log(`${size.width}px ${query}: ${selectionMs.toFixed(1)}ms, ${selectionRequests} requests`);
   }
-  results.push({ size, overview: overview.stats, homeLabels: labels, cases, requests: store.requests, decodedBytes: store.transferredBytes });
+  results.push({ size, overview: overview.stats, homeLabels: labels, tileSweep, cases, requests: store.requests, decodedBytes: store.transferredBytes });
 }
 const overview = readFileSync(join(folder, manifest.version, 'overview.json'));
 const report = { version: manifest.version, measuredAt: new Date().toISOString(), node: process.version,
   cacheBudgetMiB: cacheBudget(manifest) / 1048576,
-  methodology: 'Filesystem-backed shared worker store. 600 camera queries, two viewports, five cross-domain selections. Timings exclude network and GPU.',
+  methodology: 'Filesystem-backed shared worker store. Broad spatial-tile zoom sweep plus 600 local camera queries, two viewports and five cross-domain selections. Timings exclude network and GPU.',
   overviewBytes: overview.byteLength, overviewGzipBytes: gzipSync(overview).byteLength, results };
 writeFileSync('benchmarks/results/life-store.json', JSON.stringify(report, null, 2));
