@@ -27,6 +27,10 @@ function appPublicAssets(treeDataUpstream?: string, treeDataBaseUrl?: string): P
   const localRoots = ['data/profiles', 'data/journeys', 'images/journeys'];
   return {
     name: 'app-public-assets',
+    transformIndexHtml() {
+      const base = treeDataBaseUrl?.replace(/\/+$/, '') ?? '';
+      return [{ tag: 'link', attrs: { rel: 'preload', href: `${base}/data/life/manifest.json`, as: 'fetch' }, injectTo: 'head' }];
+    },
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
         const pathname = decodeURIComponent((request.url ?? '').split('?')[0]);

@@ -1,6 +1,8 @@
 import type { Camera } from '../tree/navigation.ts';
 import type { Scene, ViewRequest } from './format.ts';
 
+export const WHEEL_ZOOM_SPEED = 0.05;
+
 // Orthographic wheel transitions emit two-coordinate targets. Sending a third
 // coordinate back makes deck.gl treat its own animation frame as a new camera
 // request and cancel the transition. Keep this boundary consistently 2D, and

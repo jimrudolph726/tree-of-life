@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { LinearInterpolator, OrthographicController, OrthographicViewport } from '@deck.gl/core';
 import type { TransitionInterpolator } from '@deck.gl/core';
 import { Timeline } from '@luma.gl/engine';
-import { cameraFromView, deckView } from '../src/stream/reframe.ts';
+import { cameraFromView, deckView, WHEEL_ZOOM_SPEED } from '../src/stream/reframe.ts';
 import type { Camera } from '../src/tree/navigation.ts';
 
 type State = Camera & { transitionDuration?: number | 'auto'; transitionInterpolator?: TransitionInterpolator };
@@ -31,7 +31,7 @@ function controlledCamera(initial: Camera) {
       camera = pending;
       pending = undefined;
       controller.setProps({ id: 'tree', x: 0, y: 0, width: 1000, height: 700,
-        ...deckView(camera), scrollZoom: { speed: 0.03, smooth: true } });
+        ...deckView(camera), scrollZoom: { speed: WHEEL_ZOOM_SPEED, smooth: true } });
     }
   }
   flush();
