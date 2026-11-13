@@ -6,13 +6,13 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
       - run: npm ci
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: python -m pip install -r pipeline/requirements.txt
@@ -30,8 +30,8 @@ jobs:
   browser:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -39,7 +39,7 @@ jobs:
       - run: npm run data:build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: browser-test-failure
@@ -68,19 +68,19 @@ jobs:
       VITE_RUM_APP_MONITOR_ID: ${{ vars.RUM_APP_MONITOR_ID }}
       VITE_RUM_REGION: us-east-1
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: npm ci
       - run: python -m pip install -r pipeline/requirements-cloud.txt
       - run: npm run data:build
       - run: npm run build:app
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.STAGING_ROLE_ARN }}
           aws-region: us-east-1
@@ -91,7 +91,7 @@ jobs:
         run: python pipeline/deploy_cloud.py deploy-app --bucket "$STAGING_BUCKET" --distribution "$STAGING_DISTRIBUTION"
       - name: Verify hosted app and all datasets
         run: node pipeline/cloud-smoke.ts "$STAGING_URL" staging-smoke.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: staging-deployment-results

@@ -23,18 +23,18 @@ jobs:
       VITE_RUM_APP_MONITOR_ID: ${{ vars.RUM_APP_MONITOR_ID }}
       VITE_RUM_REGION: us-east-1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Authenticate before spending time rebuilding the complete publication.
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.STAGING_ROLE_ARN }}
           aws-region: us-east-1
           retry-max-attempts: 3
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: npm ci
@@ -55,7 +55,7 @@ jobs:
         run: python pipeline/deploy_cloud.py deploy --data-root public --bucket "$STAGING_BUCKET" --distribution "$STAGING_DISTRIBUTION"
       - name: Verify hosted app and all datasets
         run: node pipeline/cloud-smoke.ts "$STAGING_URL" staging-smoke.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: full-tree-publication-results

@@ -30,13 +30,13 @@ jobs:
       STAGING_BUCKET: ${{ vars.STAGING_BUCKET }}
       STAGING_DISTRIBUTION: ${{ vars.STAGING_DISTRIBUTION }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@v7
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.STAGING_ROLE_ARN }}
           aws-region: us-east-1
           retry-max-attempts: 3
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: python -m pip install -r pipeline/requirements-cloud.txt
@@ -48,7 +48,7 @@ jobs:
           --keep-releases "${{ inputs.keep_releases }}"
           --grace-days "${{ inputs.grace_days }}"
           > cloud-retention-plan.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: cloud-retention-plan
           path: cloud-retention-plan.json
