@@ -57,13 +57,14 @@ test('search, deep focus, wheel zoom, pan, and home stay responsive', async ({ p
   await expect(app).not.toHaveAttribute('data-pending-taxon', taxon, { timeout: hosted ? 30_000 : 15_000 });
   await expect.poll(async () => Number(await app.getAttribute('data-scene-node-count'))).toBeGreaterThan(0);
 
-  const beforeZoom = await app.getAttribute('data-camera-zoom');
+  const beforeZoom = Number(await app.getAttribute('data-camera-zoom'));
   const canvas = page.locator('canvas').first();
   const box = await canvas.boundingBox();
   expect(box).not.toBeNull();
   await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
-  await page.mouse.wheel(0, -700);
-  if (beforeZoom !== null) await expect.poll(() => app.getAttribute('data-camera-zoom')).not.toBe(beforeZoom);
+  await page.mouse.wheel(0, -100);
+  if (Number.isFinite(beforeZoom)) await expect.poll(async () =>
+    Math.abs(Number(await app.getAttribute('data-camera-zoom')) - beforeZoom)).toBeGreaterThan(2);
 
   const beforePan = await app.getAttribute('data-camera-target');
   await page.mouse.move(box!.x + box!.width * 0.45, box!.y + box!.height * 0.55);

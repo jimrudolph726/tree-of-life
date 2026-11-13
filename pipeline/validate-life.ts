@@ -102,17 +102,20 @@ for (let i = 0; i < routes.length; i++) {
   if (targets.size) assert.equal(targets.size, expectedFrontier[i], 'Incomplete visible frontier');
 }
 assert.ok(manifest.tiles, 'Spatial tile publication is missing');
+assert.equal(manifest.tiles.format, 2);
 assert.ok(manifest.tiles.maxCompressedTileBytes <= 256 * 1024);
-assert.ok(manifest.tiles.compressedBytes <= 32 * 1024 * 1024);
+assert.ok(manifest.tiles.compressedBytes <= 128 * 1024 * 1024);
 const tileIndexBytes = readFileSync(join(folder, manifest.version, manifest.tiles.indexFile));
 const tileIndex = JSON.parse(tileIndexBytes.toString('utf8'));
-assert.equal(tileIndex.format, 1);
+assert.equal(tileIndex.format, 2);
 assert.equal(tileIndex.levels.length, manifest.tiles.maxLevel + 1);
 let tileFiles = 0, tileCompressedBytes = gzipSync(tileIndexBytes, { level: 6 }).byteLength;
 let maxCompressedTileBytes = tileCompressedBytes, tiledNodes = 0, tiledLines = 0;
+const allTiledNodes = new Set<number>();
 for (let z = 0; z <= manifest.tiles.maxLevel; z++) {
   const level = tileIndex.levels[z];
   assert.equal(level.z, z); assert.ok(Number.isInteger(level.side) && level.side > 0);
+  assert.ok(Number.isFinite(level.maxRadius) && level.maxRadius >= 0);
   const levelNodes = new Set<number>();
   for (const key of level.tiles) {
     assert.match(key, /^\d+\/\d+$/);
@@ -132,6 +135,7 @@ for (let z = 0; z <= manifest.tiles.maxLevel; z++) {
       const index = node.summary?.index;
       assert.ok(Number.isInteger(index) && index >= 0 && index < manifest.nodeCount);
       assert.ok(!levelNodes.has(index), `Duplicate spatial tile node ${index} at level ${z}`); levelNodes.add(index);
+      assert.ok(!allTiledNodes.has(index), `Cumulative spatial tile node ${index} appears at multiple levels`); allTiledNodes.add(index);
       assert.equal(node.summary.id, ids[index]);
       assert.deepEqual(createHash('sha256').update(JSON.stringify(node.summary)).digest(),
         summaryFingerprints.subarray(index * 32, (index + 1) * 32));

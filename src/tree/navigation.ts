@@ -79,7 +79,7 @@ export function searchTaxa(nodes: MapTreeNode[], query: string): MapTreeNode[] {
 
 export function labelSize(node: MapTreeNode): number {
   if (['Eukaryota', 'Archaea', 'Bacteria'].includes(node.scientificName)) return 22;
-  return node.depth === 0 ? 20 : node.isTerminal ? 12 : 15;
+  return node.depth === 0 ? 20 : node.isTerminal ? 11 : 14;
 }
 
 export function labelText(node: MapTreeNode, size: Size): string {
@@ -105,13 +105,16 @@ export function labelOffset(node: MapTreeNode, camera: Camera, size: Size): Posi
 export function visibleLabels(nodes: MapTreeNode[], camera: Camera, size: Size, selectedId?: string): MapTreeNode[] {
   const scale = 2 ** camera.zoom;
   const candidates = nodes.filter(node => !node.isSyntheticNode &&
-    (node.id === selectedId || node.depth === 0 || node.radius * scale >= (labelPriority(node) > 0 ? 3 : node.isTerminal ? 18 : 12)))
+    (node.id === selectedId || node.depth === 0 || node.radius * scale >= (labelPriority(node) > 0 ? 2.5 : node.isTerminal ? 12 : 5)))
     .sort((a, b) => Number(b.id === selectedId) - Number(a.id === selectedId) || labelPriority(b) - labelPriority(a) || b.radius - a.radius);
   const cells = new Map<string, Bounds[]>();
+  const occupiedAnchors = new Set<string>();
   return candidates.flatMap(node => {
     const [x, y] = project(node.position, camera, size);
     const fontSize = labelSize(node);
     if (x < -8 || x > size.width + 8) return [];
+    const anchorKey = `${Math.round(x)},${Math.round(y)}`;
+    if (occupiedAnchors.has(anchorKey)) return [];
     const center = x + labelOffset(node, camera, size)[0];
     const halfWidth = labelHalfWidth(node, size);
     const clampCenter = (value: number) => Math.max(halfWidth + 4, Math.min(size.width - halfWidth - 4, value));
@@ -120,7 +123,7 @@ export function visibleLabels(nodes: MapTreeNode[], camera: Camera, size: Size, 
       ? [[center, -12], [center, fontSize + 12], [left, fontSize / 2], [right, fontSize / 2],
           [left, -12], [right, -12], [left, fontSize + 12], [right, fontSize + 12],
           [center, -fontSize - 18], [center, fontSize * 2 + 18]]
-      : [[center, -12]];
+      : node.isTerminal ? [[center, -10]] : [[center, -10], [center, fontSize + 10], [left, fontSize / 2], [right, fontSize / 2]];
     for (const [candidateCenter, dy] of placements) {
       const box: Bounds = [candidateCenter - halfWidth, y + dy - fontSize - 6, candidateCenter + halfWidth, y + dy + 4];
       if (box[2] < 0 || box[0] > size.width || box[1] < 0 || box[3] > size.height) continue;
@@ -137,6 +140,7 @@ export function visibleLabels(nodes: MapTreeNode[], camera: Camera, size: Size, 
         const bucket = cells.get(key);
         if (bucket) bucket.push(box); else cells.set(key, [box]);
       }
+      occupiedAnchors.add(anchorKey);
       return [{ ...node, labelPlacement: [candidateCenter - x, dy] as Position }];
     }
     return [];

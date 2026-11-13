@@ -9,7 +9,7 @@ import { TreeClient } from './stream/client';
 import type { Details, Manifest, Scene, StreamNode, Summary } from './stream/format';
 import { cacheBudget } from './stream/format';
 import { useScene } from './stream/useScene';
-import { cameraFromView, deckView, reframe, WHEEL_ZOOM_SPEED } from './stream/reframe';
+import { cameraFromView, deckView, reframe, TreeOrthographicController } from './stream/reframe';
 import { useBrowserMetrics } from './stream/useBrowserMetrics';
 import { ProfileClient } from './profiles/client';
 import type { ScientificProfile } from './profiles/types';
@@ -391,7 +391,8 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
       data-scene-node-count={scene?.nodes.length ?? 0}
       data-camera-zoom={camera.zoom.toFixed(4)} data-camera-target={camera.target.slice(0, 2).map(value => value.toFixed(3)).join(',')}>
       <DeckGL views={view} viewState={deckView(camera)} layers={layers}
-        controller={{ dragPan: true, scrollZoom: { speed: WHEEL_ZOOM_SPEED, smooth: true }, doubleClickZoom: true, touchZoom: true, touchRotate: false, keyboard: true }}
+        controller={{ type: TreeOrthographicController, dragPan: true, scrollZoom: true,
+          doubleClickZoom: true, touchZoom: true, touchRotate: false, keyboard: true }}
         onViewStateChange={({ viewState, interactionState }) => {
           if (interactionState.isDragging || interactionState.isZooming) atHome.current = false;
           interaction.current.changedAt = performance.now();

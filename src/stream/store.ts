@@ -4,6 +4,7 @@ import type { Position } from '../tree/types.ts';
 
 export type ReadBytes = (path: string, signal?: AbortSignal) => Promise<ArrayBuffer>;
 interface Entry { value: unknown; bytes: number }
+interface TileLevel { z: number; side: number; maxRadius: number; available: Set<string> }
 
 /** Shared by the browser worker and benchmarks: byte-bounded LRU, no complete-tree index in memory. */
 export class TreeStore {
@@ -13,6 +14,7 @@ export class TreeStore {
   private inflight = new Map<string, Promise<unknown>>();
   private maxBytes: number;
   private bytes = 0;
+  private tileLevels?: Map<number, TileLevel>;
   requests = 0;
   transferredBytes = 0;
   cacheHits = 0;
@@ -98,6 +100,7 @@ export class TreeStore {
       ...nodePages.map(page => this.page(page)),
       ...fanoutPages.map(page => this.json<FanoutEntry[]>(`fanout/${page}.json`)),
       ...(hint.tiles ?? []).slice(0, 12).map(path => this.json<SpatialTile>(path)),
+      ...(hint.view ? [this.view(hint.view)] : []),
     ]);
   }
   private async json<T>(path: string, signal?: AbortSignal): Promise<T> {
@@ -246,24 +249,43 @@ export class TreeStore {
     const top = camera.target[1] - (size.height / 2 + margin) / scale;
     const bottom = camera.target[1] + (size.height / 2 + margin) / scale;
     const level = Math.max(0, Math.min(config.maxLevel, Math.floor(camera.zoom - config.baseZoom)));
-    const index = await this.json<SpatialTileIndex>(config.indexFile, signal);
-    if (index.format !== 1) throw new Error('Invalid spatial tile index.');
-    const levelEntry = index.levels.find(item => item.z === level);
-    if (!levelEntry || !Number.isInteger(levelEntry.side) || levelEntry.side < 1 || !Array.isArray(levelEntry.tiles)) {
-      throw new Error('Invalid spatial tile level.');
+    if (!this.tileLevels) {
+      const index = await this.json<SpatialTileIndex>(config.indexFile, signal);
+      if (index.format !== config.format || !Array.isArray(index.levels)) throw new Error('Invalid spatial tile index.');
+      this.tileLevels = new Map(index.levels.map(item => {
+        if (!Number.isInteger(item.z) || !Number.isInteger(item.side) || item.side < 1 || !Array.isArray(item.tiles) ||
+            (index.format === 2 && (!Number.isFinite(item.maxRadius) || item.maxRadius! < 0))) {
+          throw new Error('Invalid spatial tile level.');
+        }
+        return [item.z, { z: item.z, side: item.side, maxRadius: item.maxRadius ?? 0, available: new Set(item.tiles) }];
+      }));
     }
-    const side = levelEntry.side, [minX, minY, maxX, maxY] = config.worldBounds;
-    const tileWidth = (maxX - minX) / side, tileHeight = (maxY - minY) / side;
-    const clamp = (value: number) => Math.max(0, Math.min(side - 1, value));
-    const fromX = clamp(Math.floor((left - minX) / tileWidth)), toX = clamp(Math.floor((right - minX) / tileWidth));
-    const fromY = clamp(Math.floor((top - minY) / tileHeight)), toY = clamp(Math.floor((bottom - minY) / tileHeight));
-    const available = new Set(levelEntry.tiles);
-    const selected: { key: string; path: string }[] = [];
-    if (right >= minX && left <= maxX && bottom >= minY && top <= maxY) {
-      for (let x = fromX; x <= toX; x++) for (let y = fromY; y <= toY; y++) {
+    const [minX, minY, maxX, maxY] = config.worldBounds;
+    const selected: { level: number; path: string }[] = [];
+    const select = (entry: TileLevel, output: { level: number; path: string }[], limit = Infinity) => {
+      const tileWidth = (maxX - minX) / entry.side, tileHeight = (maxY - minY) / entry.side;
+      const clamp = (value: number) => Math.max(0, Math.min(entry.side - 1, value));
+      const expandedLeft = left - entry.maxRadius, expandedRight = right + entry.maxRadius;
+      const expandedTop = top - entry.maxRadius, expandedBottom = bottom + entry.maxRadius;
+      if (expandedRight < minX || expandedLeft > maxX || expandedBottom < minY || expandedTop > maxY) return;
+      const fromX = clamp(Math.floor((expandedLeft - minX) / tileWidth));
+      const toX = clamp(Math.floor((expandedRight - minX) / tileWidth));
+      const fromY = clamp(Math.floor((expandedTop - minY) / tileHeight));
+      const toY = clamp(Math.floor((expandedBottom - minY) / tileHeight));
+      for (let x = fromX; x <= toX && output.length < limit; x++) for (let y = fromY; y <= toY && output.length < limit; y++) {
         const key = `${x}/${y}`;
-        if (available.has(key)) selected.push({ key, path: config.pattern.replace('{z}', String(level)).replace('{x}', String(x)).replace('{y}', String(y)) });
+        if (entry.available.has(key)) output.push({ level: entry.z,
+          path: config.pattern.replace('{z}', String(entry.z)).replace('{x}', String(x)).replace('{y}', String(y)) });
       }
+    };
+    if (config.format === 2) {
+      for (let z = 0; z <= level; z++) {
+        const entry = this.tileLevels.get(z); if (!entry) throw new Error('Incomplete spatial tile index.');
+        select(entry, selected);
+      }
+    } else {
+      const entry = this.tileLevels.get(level); if (!entry) throw new Error('Incomplete spatial tile index.');
+      select(entry, selected);
     }
     const loaded = await Promise.all(selected.map(async item => ({ ...item, tile: await this.json<SpatialTile>(item.path, signal) })));
     const nodeMap = new Map<number, StreamNode>(), lineValues: number[] = [], lineTargets: number[] = [];
@@ -300,23 +322,14 @@ export class TreeStore {
         lineValues.push(sx, sy, tx, ty); lineTargets.push(tile.lineTargets[at]);
       }
     }
-    const prefetchTiles: string[] = [];
-    if (level < config.maxLevel) {
-      const nextEntry = index.levels.find(item => item.z === level + 1);
-      const nextAvailable = new Set(nextEntry?.tiles ?? []), factor = (nextEntry?.side ?? side) / side;
-      for (const { key } of selected) {
-        const [x, y] = key.split('/').map(Number);
-        for (let childX = x * factor; childX < (x + 1) * factor; childX++) for (let childY = y * factor; childY < (y + 1) * factor; childY++) {
-          const child = `${childX}/${childY}`;
-          if (nextAvailable.has(child) && prefetchTiles.length < 12) {
-            prefetchTiles.push(config.pattern.replace('{z}', String(level + 1)).replace('{x}', String(childX)).replace('{y}', String(childY)));
-          }
-        }
-      }
+    const future: { level: number; path: string }[] = [];
+    for (let z = level + 1; z <= Math.min(config.maxLevel, level + 2); z++) {
+      const entry = this.tileLevels.get(z); if (entry) select(entry, future, 12);
     }
-    const prefetch: PrefetchHint | undefined = prefetchTiles.length
-      ? { nodes: [], fanoutPages: [], tiles: prefetchTiles }
-      : level === config.maxLevel ? { nodes: [0], fanoutPages: [] } : undefined;
+    const topology = level >= config.maxLevel - 1
+      ? { ...request, camera: { ...camera, zoom: config.baseZoom + config.maxLevel + 1 } } : undefined;
+    const prefetch: PrefetchHint | undefined = future.length || topology
+      ? { nodes: [], fanoutPages: [], tiles: future.map(item => item.path), view: topology } : undefined;
     return { anchor: 0, nodes: [...nodeMap.values()], lines: new Float64Array(lineValues), lineTargets: new Uint32Array(lineTargets), prefetch,
       stats: { requests: this.requests, transferredBytes: this.transferredBytes, cacheBytes: this.bytes,
         cacheEntries: this.cache.size, cacheHits: this.cacheHits, evictions: this.evictions,

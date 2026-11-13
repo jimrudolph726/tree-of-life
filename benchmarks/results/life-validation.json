@@ -1,5 +1,5 @@
 {
-  "version": "88a8e6151565b42b",
+  "version": "6ef4a09436fb1c81",
   "synthId": "opentree16.1",
   "nodeCount": 2725682,
   "edgeCount": 2725681,
@@ -13,11 +13,11 @@
   "displayRoutingPreservesSourceAncestry": true,
   "everyRoutingSnapshotMatched": true,
   "spatialTiles": {
-    "tileFiles": 1172,
-    "tiledNodes": 47876,
-    "tiledLines": 909932,
-    "compressedBytes": 22435804,
-    "maxCompressedTileBytes": 233635,
+    "tileFiles": 3041,
+    "tiledNodes": 251822,
+    "tiledLines": 564882,
+    "compressedBytes": 30187963,
+    "maxCompressedTileBytes": 219876,
     "everyTileSummaryMatched": true
   }
 }

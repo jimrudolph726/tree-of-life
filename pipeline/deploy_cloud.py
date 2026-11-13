@@ -167,9 +167,9 @@ def prepare(folder, data_folder=None):
                 raise ValueError(f'{dataset}: missing {required}')
         if dataset == 'life':
             tiles = manifest.get('tiles', {})
-            if (tiles.get('format') != 1 or tiles.get('indexFile') != 'tiles/index.json' or
+            if (tiles.get('format') != 2 or tiles.get('indexFile') != 'tiles/index.json' or
                     tiles.get('maxCompressedTileBytes', 10**9) > 256 * 1024 or
-                    tiles.get('compressedBytes', 10**9) > 32 * 1024 * 1024):
+                    tiles.get('compressedBytes', 10**9) > 128 * 1024 * 1024):
                 raise ValueError('life: invalid spatial tile publication')
             tile_index = json.loads((dataset_folder / tiles['indexFile']).read_text(encoding='utf-8'))
             listed = [(level['z'], key) for level in tile_index.get('levels', []) for key in level.get('tiles', [])]

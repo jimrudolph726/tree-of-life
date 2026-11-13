@@ -1,7 +1,7 @@
 {
   "manifest": {
     "format": 2,
-    "version": "88a8e6151565b42b",
+    "version": "6ef4a09436fb1c81",
     "title": "Tree of Life",
     "source": "Open Tree of Life — opentree16.1",
     "synthetic": false,
@@ -29,7 +29,7 @@
       0.93,
       0.97
     ],
-    "builtAt": "2026-11-12T04:49:11.740Z",
+    "builtAt": "2026-11-12T23:15:14.979Z",
     "provenance": {
       "provider": "Open Tree of Life",
       "sourceUrl": "https://files.opentreeoflife.org/synthesis/opentree16.1/opentree16.1_tree.tgz",
@@ -130,7 +130,7 @@
       "maxScale": 0.6
     },
     "tiles": {
-      "format": 1,
+      "format": 2,
       "indexFile": "tiles/index.json",
       "pattern": "tiles/{z}/{x}/{y}.json",
       "worldBounds": [
@@ -140,15 +140,15 @@
         1024
       ],
       "baseZoom": 0,
-      "maxLevel": 8,
-      "tileCount": 1172,
-      "compressedBytes": 22435804,
-      "maxCompressedTileBytes": 233635
+      "maxLevel": 14,
+      "tileCount": 3041,
+      "compressedBytes": 30187963,
+      "maxCompressedTileBytes": 219876
     },
     "searchDirectory": "search-top.json",
     "indexPageSize": 16
   },
-  "buildMs": 257443.6741,
-  "diskBytes": 2362599569,
-  "peakRssMB": 1558.06640625
+  "buildMs": 281930.10740000004,
+  "diskBytes": 2446449412,
+  "peakRssMB": 1585.0546875
 }

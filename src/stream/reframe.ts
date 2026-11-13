@@ -1,7 +1,32 @@
+import { OrthographicController } from '@deck.gl/core';
+import type { MjolnirWheelEvent } from 'mjolnir.js';
 import type { Camera } from '../tree/navigation.ts';
 import type { Scene, ViewRequest } from './format.ts';
 
-export const WHEEL_ZOOM_SPEED = 0.05;
+/** deck.gl's stock wheel curve asymptotically caps each event at one zoom
+ * level. A physical mouse detent should cover enough hierarchy to make this
+ * million-tip map practical, while trackpads retain fine-grained control.
+ */
+export const MOUSE_WHEEL_ZOOM_LEVELS = 2.25;
+
+export class TreeOrthographicController extends OrthographicController {
+  protected override _onWheel(event: MjolnirWheelEvent): boolean {
+    if (!this.scrollZoom || (this.trackpadGesture && event.device !== 'mouse')) return false;
+    const position = this.getCenter(event);
+    if (!this.isPointInBounds(position, event)) return false;
+    event.srcEvent.preventDefault();
+    if (!event.delta) return true;
+    const levels = event.device === 'mouse'
+      ? MOUSE_WHEEL_ZOOM_LEVELS
+      : Math.max(0.02, Math.min(0.5, Math.abs(event.delta) * 0.01));
+    const zoomPosition = this.getZoomPosition(position);
+    const next = this.controllerState.zoom({ pos: zoomPosition,
+      scale: 2 ** (Math.sign(event.delta) * levels) });
+    this.updateViewport(next, { ...this._getTransitionProps({ around: zoomPosition }),
+      transitionDuration: event.device === 'mouse' ? 180 : 100 }, { isZooming: true, isPanning: true });
+    return true;
+  }
+}
 
 // Orthographic wheel transitions emit two-coordinate targets. Sending a third
 // coordinate back makes deck.gl treat its own animation frame as a new camera

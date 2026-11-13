@@ -52,7 +52,7 @@ export interface Manifest {
   indexPageSize?: number;
 }
 export interface SpatialTileManifest {
-  format: 1;
+  format: 1 | 2;
   indexFile: string;
   pattern: string;
   worldBounds: [number, number, number, number];
@@ -62,7 +62,7 @@ export interface SpatialTileManifest {
   compressedBytes: number;
   maxCompressedTileBytes: number;
 }
-export interface SpatialTileIndex { format: 1; levels: { z: number; side: number; tiles: string[] }[] }
+export interface SpatialTileIndex { format: 1 | 2; levels: { z: number; side: number; maxRadius?: number; tiles: string[] }[] }
 export interface SpatialTileNode {
   summary: Summary;
   position: [number, number];
@@ -85,7 +85,7 @@ export interface Page { records: DataView; names: TreeNodeInput[]; count: number
 export interface SearchBlock { first: string; last: string; file: string }
 export type SearchEntry = [key: string, index: number];
 export interface ViewRequest { anchor: number; camera: Camera; size: Size }
-export interface PrefetchHint { nodes: number[]; fanoutPages: number[]; tiles?: string[] }
+export interface PrefetchHint { nodes: number[]; fanoutPages: number[]; tiles?: string[]; view?: ViewRequest }
 export interface StreamStats {
   requests: number; transferredBytes: number; cacheBytes: number; cacheEntries: number;
   cacheHits: number; evictions: number; visited: number; queryMs: number; limited: boolean;
@@ -155,7 +155,7 @@ export function validateManifest(value: unknown): Manifest {
       m.rootBounds[0] > m.rootBounds[2] || m.rootBounds[1] > m.rootBounds[3]) {
     throw new Error('Unsupported or invalid tree manifest. Rebuild the dataset.');
   }
-  if (m.tiles && (m.tiles.format !== 1 || m.tiles.indexFile !== 'tiles/index.json' ||
+  if (m.tiles && (![1, 2].includes(m.tiles.format) || m.tiles.indexFile !== 'tiles/index.json' ||
       m.tiles.pattern !== 'tiles/{z}/{x}/{y}.json' || !Array.isArray(m.tiles.worldBounds) ||
       m.tiles.worldBounds.length !== 4 || !m.tiles.worldBounds.every(Number.isFinite) ||
       m.tiles.worldBounds[0] >= m.tiles.worldBounds[2] || m.tiles.worldBounds[1] >= m.tiles.worldBounds[3] ||

@@ -33,6 +33,8 @@ test('whole-tree presentation preserves source ancestors and supplies one overvi
   assert.ok(manifest.tiles);
   assert.ok(manifest.tiles.maxCompressedTileBytes <= 256 * 1024);
   const tileIndex = JSON.parse(readFileSync(join(folder, 'tree', manifest.version, manifest.tiles.indexFile), 'utf8'));
+  assert.equal(manifest.tiles.format, 2);
+  assert.equal(tileIndex.format, 2);
   assert.equal(tileIndex.levels.length, manifest.tiles.maxLevel + 1);
   assert.equal(tileIndex.levels.reduce((total: number, level: { tiles: string[] }) => total + level.tiles.length, 0), manifest.tiles.tileCount);
   const openingTile = readFileSync(join(folder, 'tree', manifest.version, 'tiles/0/0/0.json'));

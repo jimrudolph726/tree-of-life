@@ -7,8 +7,7 @@ import type { SpatialTile, SpatialTileIndex, SpatialTileManifest, SpatialTileNod
 
 const WORLD_BOUNDS: [number, number, number, number] = [-1024, -1024, 1024, 1024];
 const BASE_ZOOM = 0;
-const MAX_LEVEL = 8;
-const PARTITION_OFFSET = 2;
+const MAX_LEVEL = 14;
 const MIN_NODE_PIXELS = 3;
 const MIN_LINE_PIXELS = 0.7;
 const MAX_COMPRESSED_TILE_BYTES = 256 * 1024;
@@ -73,9 +72,11 @@ export function writeSpatialTiles(data: DataView, count: number, summary: (index
   const levels: SpatialTileIndex['levels'] = [];
   let bytes = 0, compressedBytes = 0, maxCompressedTileBytes = 0, tileCount = 0;
   for (let z = 0; z <= MAX_LEVEL; z++) {
-    const scale = 2 ** (BASE_ZOOM + z), side = 2 ** Math.max(0, z - PARTITION_OFFSET);
+    const scale = 2 ** (BASE_ZOOM + z), previousScale = scale / 2;
+    const side = 2 ** Math.max(0, z - (z <= 8 ? 2 : 1));
     const width = (WORLD_BOUNDS[2] - WORLD_BOUNDS[0]) / side;
     const tiles = new Map<string, MutableTile>();
+    let maxRadius = 0, levelNodes = 0, levelLines = 0;
     const get = (x: number, y: number) => {
       const key = `${x}/${y}`;
       let tile = tiles.get(key);
@@ -85,7 +86,8 @@ export function writeSpatialTiles(data: DataView, count: number, summary: (index
     for (let index = 0; index < count; index++) {
       const offset = index * RECORD_BYTES, radius = radii[index];
       const item = summary(index);
-      if (!item.isSyntheticNode && radius * scale >= MIN_NODE_PIXELS) {
+      if (!item.isSyntheticNode && radius * scale >= MIN_NODE_PIXELS &&
+          (z === 0 || radius * previousScale < MIN_NODE_PIXELS)) {
         const x = cell(xs[index], WORLD_BOUNDS[0], width, side);
         const y = cell(ys[index], WORLD_BOUNDS[1], width, side);
         get(x, y).nodes.push({
@@ -95,17 +97,20 @@ export function writeSpatialTiles(data: DataView, count: number, summary: (index
             (dimension % 2 ? ys[index] : xs[index]) + data.getFloat32(offset + at, true) * radius) as SpatialTileNode['bounds'],
           childCount: data.getUint32(offset + 72, true), maxChildRatio: data.getFloat32(offset + 76, true),
         });
+        maxRadius = Math.max(maxRadius, radius); levelNodes++;
       }
       if (!index) continue;
       const parent = data.getUint32(offset, true), length = Math.hypot(xs[index] - xs[parent], ys[index] - ys[parent]);
       // Match the live traversal's resolution stop: a branch is unreachable
       // once its target subtree projects below half a pixel, even if a very
       // elongated local edge would otherwise be measurable.
-      if (radius * scale < 0.5 || length * scale < MIN_LINE_PIXELS) continue;
+      if (radius * scale < 0.5 || length * scale < MIN_LINE_PIXELS ||
+          (z > 0 && radius * previousScale >= 0.5 && length * previousScale >= MIN_LINE_PIXELS)) continue;
       for (const segment of lineCells(xs[parent], ys[parent], xs[index], ys[index], width, side)) {
         const tile = get(segment.x, segment.y);
         tile.lines.push(...segment.values); tile.lineTargets.push(index);
       }
+      levelLines++;
     }
     const keys = [...tiles.keys()].sort((a, b) => {
       const [ax, ay] = a.split('/').map(Number), [bx, by] = b.split('/').map(Number);
@@ -123,15 +128,15 @@ export function writeSpatialTiles(data: DataView, count: number, summary: (index
       bytes += Buffer.byteLength(text); compressedBytes += compressed;
       maxCompressedTileBytes = Math.max(maxCompressedTileBytes, compressed); tileCount++;
     }
-    levels.push({ z, side, tiles: keys });
-    console.log(`Spatial tiles z${z}: ${keys.length.toLocaleString()} files`);
+    levels.push({ z, side, maxRadius, tiles: keys });
+    console.log(`Spatial tiles z${z}: ${keys.length.toLocaleString()} files, ${levelNodes.toLocaleString()} nodes, ${levelLines.toLocaleString()} branches`);
   }
-  const index: SpatialTileIndex = { format: 1, levels };
+  const index: SpatialTileIndex = { format: 2, levels };
   const indexText = JSON.stringify(index), indexCompressed = gzipSync(indexText, { level: DEPLOY_GZIP_LEVEL }).byteLength;
   hash.update('tiles/index.json').update(indexText); writeFileSync(join(folder, 'tiles', 'index.json'), indexText);
   bytes += Buffer.byteLength(indexText); compressedBytes += indexCompressed;
   const manifest: SpatialTileManifest = {
-    format: 1, indexFile: 'tiles/index.json', pattern: 'tiles/{z}/{x}/{y}.json', worldBounds: WORLD_BOUNDS,
+    format: 2, indexFile: 'tiles/index.json', pattern: 'tiles/{z}/{x}/{y}.json', worldBounds: WORLD_BOUNDS,
     baseZoom: BASE_ZOOM, maxLevel: MAX_LEVEL, tileCount, compressedBytes,
     maxCompressedTileBytes: Math.max(maxCompressedTileBytes, indexCompressed),
   };

@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { LinearInterpolator, OrthographicController, OrthographicViewport } from '@deck.gl/core';
+import { LinearInterpolator, OrthographicViewport } from '@deck.gl/core';
 import type { TransitionInterpolator } from '@deck.gl/core';
 import { Timeline } from '@luma.gl/engine';
-import { cameraFromView, deckView, WHEEL_ZOOM_SPEED } from '../src/stream/reframe.ts';
+import { cameraFromView, deckView, MOUSE_WHEEL_ZOOM_LEVELS, TreeOrthographicController } from '../src/stream/reframe.ts';
 import type { Camera } from '../src/tree/navigation.ts';
 
 type State = Camera & { transitionDuration?: number | 'auto'; transitionInterpolator?: TransitionInterpolator };
@@ -15,7 +15,7 @@ function controlledCamera(initial: Camera) {
   let camera: State = initial;
   let pending: State | undefined = camera;
   const viewport = () => new OrthographicViewport({ width: 1000, height: 700, ...deckView(camera), flipY: true });
-  const controller = new OrthographicController({
+  const controller = new TreeOrthographicController({
     timeline,
     eventManager: null!,
     makeViewport: props => new OrthographicViewport({ ...props, flipY: true }),
@@ -31,7 +31,7 @@ function controlledCamera(initial: Camera) {
       camera = pending;
       pending = undefined;
       controller.setProps({ id: 'tree', x: 0, y: 0, width: 1000, height: 700,
-        ...deckView(camera), scrollZoom: { speed: WHEEL_ZOOM_SPEED, smooth: true } });
+        ...deckView(camera), scrollZoom: true });
     }
   }
   flush();
@@ -68,14 +68,15 @@ for (const zoom of [-2, 18]) test(`wheel zoom animates in both directions at zoo
     const worldPoint = app.viewport().unproject(pointer);
     app.wheel(100, pointer);
     app.advance(125);
-    assert.ok(app.camera.zoom > zoom + 0.2, 'wheel animation advances beyond its first frame');
-    assert.ok(app.camera.zoom < zoom + 0.9, 'wheel animates instead of jumping to its endpoint');
-    app.advance(150);
-    assert.ok(app.camera.zoom > zoom + 0.9);
+    assert.ok(app.camera.zoom > zoom + 0.5, 'wheel animation advances beyond its first frame');
+    assert.ok(app.camera.zoom < zoom + MOUSE_WHEEL_ZOOM_LEVELS, 'wheel animates instead of jumping to its endpoint');
+    app.advance(75);
+    assert.ok(Math.abs(app.camera.zoom - (zoom + MOUSE_WHEEL_ZOOM_LEVELS)) < 1e-8,
+      'one wheel detent crosses multiple hierarchy levels');
     const projected = app.viewport().project(worldPoint);
     assert.ok(Math.hypot(projected[0] - pointer[0], projected[1] - pointer[1]) < 1e-5, 'pointer stays anchored');
     app.wheel(-100, pointer);
-    app.advance(275);
+    app.advance(200);
     assert.ok(Math.abs(app.camera.zoom - zoom) < 1e-8, 'reverse wheel returns to original scale');
     app.animate(zoom + 2);
     app.advance(325);

@@ -14,13 +14,13 @@ if (manifest.nodeCount !== source.counts.nodes || JSON.stringify(manifest.proven
 for (const file of ['manifest.json', 'overview.json', 'pages/0.bin', 'search-top.json']) {
   if (!existsSync(join(root, manifest.version, file))) throw new Error(`Incomplete publication: ${file}. Run npm run data:life:build.`);
 }
-if (!manifest.tiles || manifest.tiles.format !== 1 || manifest.tiles.indexFile !== 'tiles/index.json' ||
+if (!manifest.tiles || manifest.tiles.format !== 2 || manifest.tiles.indexFile !== 'tiles/index.json' ||
     manifest.tiles.pattern !== 'tiles/{z}/{x}/{y}.json' || manifest.tiles.maxCompressedTileBytes > 256 * 1024 ||
-    manifest.tiles.compressedBytes > 32 * 1024 * 1024) {
+    manifest.tiles.compressedBytes > 128 * 1024 * 1024) {
   throw new Error('The complete tree is missing its bounded spatial tile publication. Run npm run data:life:build.');
 }
 const tileIndex = JSON.parse(readFileSync(join(root, manifest.version, manifest.tiles.indexFile), 'utf8'));
-if (tileIndex.format !== 1 || tileIndex.levels.length !== manifest.tiles.maxLevel + 1 ||
+if (tileIndex.format !== 2 || tileIndex.levels.length !== manifest.tiles.maxLevel + 1 ||
     tileIndex.levels.reduce((total, level) => total + level.tiles.length, 0) !== manifest.tiles.tileCount) {
   throw new Error('The complete-tree spatial tile index is inconsistent.');
 }
