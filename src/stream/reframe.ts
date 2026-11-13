@@ -5,7 +5,7 @@ import type { Scene, ViewRequest } from './format.ts';
 
 /** deck.gl's stock wheel curve asymptotically caps each event at one zoom
  * level. A physical mouse detent should cover enough hierarchy to make this
- * million-tip map practical, while trackpads retain fine-grained control.
+ * million-tip map practical, while trackpads retain fine-grained control. 
  */
 export const MOUSE_WHEEL_ZOOM_LEVELS = 2;
 
