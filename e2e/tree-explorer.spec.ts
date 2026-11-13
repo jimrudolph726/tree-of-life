@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { MOUSE_WHEEL_ZOOM_LEVELS } from '../src/stream/reframe.ts';
 
 const hosted = Boolean(process.env.PLAYWRIGHT_BASE_URL);
 function completeLifePublication() {
@@ -74,7 +75,8 @@ test('search, deep focus, wheel zoom, pan, and home stay responsive', async ({ p
   await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
   await page.mouse.wheel(0, -100);
   if (Number.isFinite(beforeZoom)) await expect.poll(async () =>
-    Math.abs(Number(await app.getAttribute('data-camera-zoom')) - beforeZoom)).toBeGreaterThan(2);
+    Math.abs(Number(await app.getAttribute('data-camera-zoom')) - beforeZoom))
+    .toBeGreaterThanOrEqual(MOUSE_WHEEL_ZOOM_LEVELS - 0.01);
 
   const beforePan = await app.getAttribute('data-camera-target');
   await page.mouse.move(box!.x + box!.width * 0.45, box!.y + box!.height * 0.55);
