@@ -7,7 +7,7 @@ import type { Scene, ViewRequest } from './format.ts';
  * level. A physical mouse detent should cover enough hierarchy to make this
  * million-tip map practical, while trackpads retain fine-grained control.
  */
-export const MOUSE_WHEEL_ZOOM_LEVELS = 2.25;
+export const MOUSE_WHEEL_ZOOM_LEVELS = 2;
 
 export class TreeOrthographicController extends OrthographicController {
   protected override _onWheel(event: MjolnirWheelEvent): boolean {
