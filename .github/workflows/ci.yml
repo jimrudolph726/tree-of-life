@@ -25,7 +25,8 @@ jobs:
       - run: npm run lint
       # Compile the app without downloading the multi-gigabyte full publication.
       # The manually dispatched dataset workflow validates and publishes that publication.
-      - run: npm run build:app
+      - if: github.event_name != 'push' || github.ref != 'refs/heads/main'
+        run: npm run build:app
   browser:
     runs-on: ubuntu-latest
     steps:
@@ -45,4 +46,56 @@ jobs:
           path: |
             playwright-report/
             test-results/
+          retention-days: 7
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [check, browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: staging
+    concurrency:
+      group: tree-of-life-staging
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: us-east-1
+      STAGING_BUCKET: ${{ vars.STAGING_BUCKET }}
+      STAGING_DISTRIBUTION: ${{ vars.STAGING_DISTRIBUTION }}
+      STAGING_URL: ${{ vars.STAGING_URL }}
+      VITE_RELEASE_ID: ${{ github.sha }}
+      VITE_RUM_APP_MONITOR_ID: ${{ vars.RUM_APP_MONITOR_ID }}
+      VITE_RUM_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: npm ci
+      - run: python -m pip install -r pipeline/requirements-cloud.txt
+      - run: npm run data:build
+      - run: npm run build:app
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.STAGING_ROLE_ARN }}
+          aws-region: us-east-1
+          retry-max-attempts: 3
+      - name: Record previous release
+        run: python pipeline/deploy_cloud.py status --distribution "$STAGING_DISTRIBUTION" > staging-before.json
+      - name: Publish and activate validated app
+        run: python pipeline/deploy_cloud.py deploy-app --bucket "$STAGING_BUCKET" --distribution "$STAGING_DISTRIBUTION"
+      - name: Verify hosted app and all datasets
+        run: node pipeline/cloud-smoke.ts "$STAGING_URL" staging-smoke.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: staging-deployment-results
+          path: |
+            staging-before.json
+            staging-smoke.json
           retention-days: 7

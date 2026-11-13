@@ -1,8 +1,18 @@
 import { expect, test, type Page } from '@playwright/test';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const hosted = Boolean(process.env.PLAYWRIGHT_BASE_URL);
-const hasLifePublication = existsSync('public/data/life/manifest.json');
+function completeLifePublication() {
+  const pointer = 'public/data/life/manifest.json';
+  try {
+    const manifest = JSON.parse(readFileSync(pointer, 'utf8'));
+    return /^[a-f0-9]{16}$/.test(manifest.version) &&
+      existsSync(join('public/data/life', manifest.version, 'manifest.json')) &&
+      existsSync(join('public/data/life', manifest.version, manifest.overview?.file ?? 'overview.json'));
+  } catch { return false; }
+}
+const hasLifePublication = completeLifePublication();
 const path = hosted ? '/' : '/?dataset=aves';
 const taxon = hosted ? 'Homo sapiens' : 'Camarhynchus psittacula';
 

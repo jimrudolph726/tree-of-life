@@ -14,7 +14,9 @@ python -m pip install -r pipeline/requirements.txt
 npm run dev
 ```
 
-Local development serves the app, current profiles, Journeys and images from Vite while proxying the multi-gigabyte tree from the deployed CloudFront dataset. The full local release is optional. Set `VITE_TREE_DATA_BASE_URL=/` when deliberately testing `public/data/life` locally.
+`npm run dev` starts Vite immediately. Local development serves the checked-in profiles, Journeys, images and smaller datasets while proxying the multi-gigabyte tree from the deployed CloudFront dataset. It does not rebuild scientific publications on every start. Run `npm run data:prepare` only after intentionally editing their sources. The full local release is optional; set `VITE_TREE_DATA_BASE_URL=/` when deliberately testing `public/data/life` locally.
+
+Generated local data has a guarded cleanup command. `npm run clean:local-data` is always a dry run. After reviewing its exact paths and sizes, append `-- --apply` to remove obsolete full-tree versions and benchmark fixtures. `--all-life` also removes the active local full-tree publication, and `--source-cache` additionally removes the redownloadable `.opentree` source cache; neither broader scope is implicit.
 
 Maintainers use the one-time `data:life` command to download the pinned OpenTree archive and build the full static release. Large source and generated files remain ignored by Git. `npm run build:app` creates a deployable app artifact without copying the full tree; the current output is only a few megabytes. The manual data workflow uploads immutable tree files directly from `public/` to S3.
 
@@ -27,7 +29,7 @@ npm run build
 npm run preview
 ```
 
-GitHub Actions runs unit tests, smaller-source audits, lint and app compilation on pushes and pull requests. The automatic **Deploy app or roll back staging** workflow publishes ordinary frontend changes while reusing the active immutable datasets. A separate manually dispatched **Publish complete OpenTree dataset** workflow downloads, builds, exhaustively validates, benchmarks and publishes the full release. `npm run build:app` compiles the frontend without requiring the full publication; use `npm run build` for a complete runnable production artifact. Tests include topology, geometry, label collisions, mobile camera fitting, serialization, indexed search, deep coordinate frames, bounded caching, cancellation and corrupt-data recovery.
+GitHub Actions runs unit tests, smaller-source audits, lint, compilation and Chromium checks on pushes and pull requests. On a push to `main`, one **Validate tree explorer** run deploys the already-built application only after both validation jobs succeed, while reusing the active immutable datasets. **Retry or roll back staging** remains a manual recovery workflow. A separate manually dispatched **Publish complete OpenTree dataset** workflow downloads, builds, exhaustively validates, benchmarks and publishes the full release. `npm run build:app` compiles the frontend without requiring the full publication; use `npm run build` for a complete runnable production artifact. Tests include topology, geometry, label collisions, mobile camera fitting, serialization, indexed search, deep coordinate frames, bounded caching, cancellation and corrupt-data recovery.
 
 The Aves checks exhaustively compare every published ID, name, source label, parent edge, child link, depth and terminal count to the imported records. They also verify every ancestry-bundle entry. Python revalidates the original Newick edges and labels and three archived OpenTree API lineages. These checks establish faithful representation of the snapshot, not independent confirmation that every biological relationship is correct.
 

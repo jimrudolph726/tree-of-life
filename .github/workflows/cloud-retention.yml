@@ -1,0 +1,56 @@
+name: Audit cloud storage retention
+on:
+  workflow_dispatch:
+    inputs:
+      keep_releases:
+        description: Minimum number of newest rollback releases to preserve
+        required: true
+        default: '5'
+        type: string
+      grace_days:
+        description: Never propose objects newer than this many days
+        required: true
+        default: '30'
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: tree-of-life-staging
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: us-east-1
+      STAGING_BUCKET: ${{ vars.STAGING_BUCKET }}
+      STAGING_DISTRIBUTION: ${{ vars.STAGING_DISTRIBUTION }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.STAGING_ROLE_ARN }}
+          aws-region: us-east-1
+          retry-max-attempts: 3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -r pipeline/requirements-cloud.txt
+      - name: Build read-only retention plan
+        run: >-
+          python pipeline/deploy_cloud.py retention
+          --bucket "$STAGING_BUCKET"
+          --distribution "$STAGING_DISTRIBUTION"
+          --keep-releases "${{ inputs.keep_releases }}"
+          --grace-days "${{ inputs.grace_days }}"
+          > cloud-retention-plan.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cloud-retention-plan
+          path: cloud-retention-plan.json
+          if-no-files-found: error
+          retention-days: 14

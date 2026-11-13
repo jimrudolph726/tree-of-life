@@ -11,6 +11,7 @@ No custom domain, backend or database is required. The CloudFront HTTPS hostname
 - Every file is gzip-compressed before upload, including binary geometry. Content-Type remains the original type and Content-Encoding is gzip. This avoids relying on CloudFront's automatic compression eligibility for `.bin` objects. Browsers transparently decode them.
 - The uploader checks uploaded object ETags/sizes, writes a complete release inventory only after verification, then changes the app origin with an ETag concurrency precondition. It never deletes retained releases or overwrites changed immutable content.
 - Hashed application assets are shared too, so an already-open older tab can still load its worker and lazy chunks after deployment.
+- Cloud retention is audited separately. The read-only plan protects the active release, a configurable number of recent rollback releases, every release inside a grace period and all shared objects referenced by them. The normal GitHub deployment role deliberately has no delete permission.
 
 CloudFront propagation is gradual across edge locations. A release contains a consistent app and three manifest pointers; shared immutable data remains accessible throughout propagation. This is not a globally instantaneous transaction. Run one deployment at a time; the GitHub workflow serializes staging runs.
 
@@ -112,8 +113,10 @@ Activation re-verifies all objects in the retained release inventory, changes on
 
 The workflows deliberately separate application delivery from scientific data publication:
 
-- **Deploy app or roll back staging** runs automatically on pushes to `main`. It tests and builds the React application, reuses the active datasets, publishes the app release, and runs the hosted smoke check. Manual dispatch with an empty release retries the current revision; a retained release ID performs a rollback.
+- **Validate tree explorer** runs code/data checks and Chromium checks in parallel. A `main` push builds the staging application once, with its protected runtime configuration, then deploys only after both validation jobs pass. Pull requests stop after validation.
+- **Retry or roll back staging** is manual. Dispatch with an empty release to rebuild and retry the current revision; provide a retained release ID to roll back.
 - **Publish complete OpenTree dataset** is manual. It downloads the pinned source, rebuilds and exhaustively validates the complete publication, publishes all immutable dataset objects, activates the matching application release, and runs the hosted smoke check. Use it after changing the OpenTree version, layout geometry, binary format or generated search/routing data.
+- **Audit cloud storage retention** is manual and read-only. It uploads a JSON artifact listing protected releases, old unreferenced deletion candidates, byte totals, warnings and unknown orphan uploads. It never passes `--apply`.
 
 Both deployment workflows share one concurrency group and use short-lived OIDC credentials rather than saved AWS access keys. Authentication is checked before expensive work begins. The ordinary app workflow remains independently safe to publish; it does not depend on the timing of the separate CI workflow.
 
@@ -125,7 +128,19 @@ The **Check production browsers** workflow is manually dispatched when a product
 2. Use/create the account's GitHub OIDC provider (`https://token.actions.githubusercontent.com`, audience `sts.amazonaws.com`). Supply its ARN as `GitHubOidcProviderArn` when updating the stack, preserving the current `ReleaseId`. Obtain `sub_claim_prefix` with `gh api repos/OWNER/REPO/actions/oidc/customization/sub` and supply that exact value as `GitHubOidcSubjectPrefix`. This repository uses immutable owner/repository IDs in the prefix; the older name-only subject does not match. The template appends `:environment:staging` and requires an exact match, with no wildcard. The template deliberately does not create another account-wide provider automatically.
 3. Create GitHub environment **staging**. Restrict deployments to the intended branch and configure required reviewers if desired; the OIDC trust is restricted to this repository and environment.
 4. Set environment variables `STAGING_ROLE_ARN`, `STAGING_BUCKET`, `STAGING_DISTRIBUTION`, `STAGING_URL`, and `RUM_APP_MONITOR_ID` using stack outputs.
-5. Push a commit to `main` to deploy the application automatically. Alternatively, dispatch **Deploy app or roll back staging** with an empty release field for retry, or a retained release ID for rollback. Run **Publish complete OpenTree dataset** manually only for a data-generating change. Deployment results preserve the previous ID and HTTP smoke measurements as workflow artifacts.
+5. Push a commit to `main` to validate and deploy the application in one workflow. Alternatively, dispatch **Retry or roll back staging** with an empty release field for retry, or a retained release ID for rollback. Run **Publish complete OpenTree dataset** manually only for a data-generating change. Deployment results preserve the previous ID and HTTP smoke measurements as workflow artifacts.
+
+## Storage retention audit
+
+Run **Audit cloud storage retention** with its conservative defaults (five newest releases and a 30-day grace period). Download and inspect `cloud-retention-plan.json`. The report is generated from release inventories rather than filename guesses: retained releases protect their application files, tree versions, scientific profiles, Journeys and shared hashed assets. Invalid release records, missing protected objects or a missing active release set `safeToApply` to false. Unknown interrupted-upload objects are reported but excluded from automatic deletion.
+
+The GitHub deployment role cannot delete S3 objects, so the workflow is structurally read-only. If deletion is eventually warranted, use a separately authenticated administrative/cleanup identity after reviewing the saved plan and rerun the same command locally with both `--apply` and the exact `--confirm-bucket BUCKET`. The command rechecks that CloudFront's active release has not changed. S3 versioning keeps deleted current objects recoverable as noncurrent versions until the existing 30-day lifecycle expires them.
+
+```sh
+python pipeline/deploy_cloud.py retention --bucket BUCKET --distribution DISTRIBUTION --keep-releases 5 --grace-days 30
+# Only after review, with a separately authorized identity:
+python pipeline/deploy_cloud.py retention --bucket BUCKET --distribution DISTRIBUTION --keep-releases 5 --grace-days 30 --apply --confirm-bucket BUCKET
+```
 
 The deployment role can only read/write this bucket's app/data/release prefixes and update this CloudFront distribution. It cannot delete objects, provision infrastructure or modify IAM. Infrastructure provisioning requires a separately authenticated administrative/setup identity.
 

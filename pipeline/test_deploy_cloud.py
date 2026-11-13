@@ -1,6 +1,7 @@
 import gzip
 import io
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import shutil
 import tempfile
@@ -254,6 +255,60 @@ class DeploymentTests(unittest.TestCase):
         before = cloud.content(file, True)
         file.write_text('{"builtAt":"today","version":"abc"}', encoding='utf-8')
         self.assertEqual(before, cloud.content(file, True))
+
+    def test_retention_preserves_active_recent_and_shared_objects(self):
+        now = datetime(2026, 11, 13, tzinfo=timezone.utc)
+        old = now - timedelta(days=90)
+        recent = now - timedelta(days=2)
+        objects = {
+            'releases/active/release.json': {'size': 10, 'lastModified': recent},
+            'releases/active/index.html': {'size': 20, 'lastModified': recent},
+            'releases/recent/release.json': {'size': 10, 'lastModified': recent},
+            'releases/recent/index.html': {'size': 20, 'lastModified': recent},
+            'releases/old/release.json': {'size': 10, 'lastModified': old},
+            'releases/old/index.html': {'size': 20, 'lastModified': old},
+            'data/life/current/page.bin': {'size': 100, 'lastModified': old},
+            'data/life/old/page.bin': {'size': 200, 'lastModified': old},
+            'assets/shared.js': {'size': 30, 'lastModified': old},
+            'assets/orphan-old.js': {'size': 40, 'lastModified': old},
+            'assets/orphan-recent.js': {'size': 50, 'lastModified': recent},
+            'releases/interrupted/index.html': {'size': 5, 'lastModified': old},
+        }
+        releases = {
+            'active': {'lastModified': recent, 'record': {'objects': {
+                'releases/active/index.html': {}, 'data/life/current/page.bin': {}, 'assets/shared.js': {}}}},
+            'recent': {'lastModified': recent, 'record': {'objects': {
+                'releases/recent/index.html': {}, 'data/life/current/page.bin': {}, 'assets/shared.js': {}}}},
+            'old': {'lastModified': old, 'record': {'objects': {
+                'releases/old/index.html': {}, 'data/life/old/page.bin': {}, 'assets/shared.js': {}}}},
+        }
+        report = cloud.plan_retention('active', objects, releases, now=now, keep_releases=2, grace_days=30)
+        self.assertEqual(report['retainedReleases'], ['active', 'recent'])
+        self.assertEqual(report['expiredReleases'], ['old'])
+        candidates = {item['key'] for item in report['candidateObjects']}
+        self.assertEqual(candidates, {
+            'releases/old/release.json', 'releases/old/index.html',
+            'data/life/old/page.bin', 'assets/orphan-old.js',
+        })
+        self.assertNotIn('assets/shared.js', candidates)
+        self.assertEqual(report['orphanObjectsNotAutomaticallyDeleted'], ['releases/interrupted/index.html'])
+        self.assertEqual(report['recentUnreferencedObjects'], ['assets/orphan-recent.js'])
+        self.assertTrue(report['safeToApply'])
+
+    def test_retention_apply_requires_exact_confirmation_and_unchanged_release(self):
+        report = {'activeRelease': 'active', 'safeToApply': True,
+                  'candidateObjects': [{'key': 'assets/old.js', 'size': 1}]}
+        s3, cf = MagicMock(), MagicMock()
+        s3.delete_objects.return_value = {}
+        with self.assertRaisesRegex(ValueError, 'confirm-bucket'):
+            cloud.apply_retention(s3, cf, 'bucket', 'distribution', report, None)
+        with patch.object(cloud, 'current_release', return_value='different'):
+            with self.assertRaisesRegex(ValueError, 'changed'):
+                cloud.apply_retention(s3, cf, 'bucket', 'distribution', report, 'bucket')
+        with patch.object(cloud, 'current_release', return_value='active'):
+            applied = cloud.apply_retention(s3, cf, 'bucket', 'distribution', report, 'bucket')
+        self.assertEqual(applied['deletedObjects'], 1)
+        s3.delete_objects.assert_called_once()
 
 
 if __name__ == '__main__':

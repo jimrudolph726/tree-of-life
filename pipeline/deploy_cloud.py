@@ -1,13 +1,15 @@
-"""Publish immutable files first, then promote a complete app release. No deletes.
+"""Publish immutable files first, then promote a complete app release.
 
 Local preflight needs no AWS credentials. Deploy/status/activate use the normal
 boto3 credential chain (including an explicitly selected AWS profile). A full
 deploy publishes locally built datasets; deploy-app reuses the active immutable
-datasets and uploads only the newly built application.
+datasets and uploads only the newly built application. Retention is dry-run by
+default; deletion requires explicit confirmation and separate S3 permission.
 """
 import argparse
 import base64
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta, timezone
 import gzip
 import hashlib
 import json
@@ -239,6 +241,131 @@ def listing(s3, bucket, prefixes):
     return found
 
 
+def retention_listing(s3, bucket, prefixes):
+    """List current objects with the metadata needed for a conservative retention plan."""
+    found = {}
+    for prefix in prefixes:
+        for page in s3.get_paginator('list_objects_v2').paginate(Bucket=bucket, Prefix=prefix):
+            for item in page.get('Contents', []):
+                found[item['Key']] = {'size': item['Size'], 'lastModified': item['LastModified']}
+    return found
+
+
+def retention_category(key):
+    parts = key.split('/')
+    if parts[0] == 'data' and len(parts) > 1:
+        return f'data/{parts[1]}'
+    return parts[0]
+
+
+def plan_retention(active, objects, releases, *, now=None, keep_releases=5, grace_days=30, warnings=None):
+    """Return a deletion plan without mutating S3.
+
+    `releases` maps release IDs to validated release records and their record
+    timestamps. The active release, newest N releases, and every release inside
+    the grace window are retained. Only objects unreferenced by all retained
+    inventories can become candidates.
+    """
+    if keep_releases < 2:
+        raise ValueError('Retention must keep at least two recent releases')
+    if grace_days < 7:
+        raise ValueError('Retention grace period must be at least seven days')
+    now = now or datetime.now(timezone.utc)
+    cutoff = now - timedelta(days=grace_days)
+    ordered = sorted(releases, key=lambda item: releases[item]['lastModified'], reverse=True)
+    retained = set(ordered[:keep_releases])
+    retained.add(active)
+    retained.update(item for item in ordered if releases[item]['lastModified'] >= cutoff)
+    expired = set(releases) - retained
+    protected = set()
+    for release in retained & set(releases):
+        protected.add(f'releases/{release}/release.json')
+        protected.update(releases[release]['record']['objects'])
+
+    candidates, orphans, recent_unreferenced = [], [], []
+    for key, metadata in objects.items():
+        if key in protected:
+            continue
+        match = re.fullmatch(r'releases/([^/]+)/.*', key)
+        if match:
+            release = match.group(1)
+            if release not in releases:
+                orphans.append(key)
+                continue
+            if release not in expired:
+                continue
+        elif not (key.startswith('data/') or key.startswith('assets/')):
+            continue
+        if metadata['lastModified'] >= cutoff:
+            recent_unreferenced.append(key)
+            continue
+        candidates.append({'key': key, 'size': metadata['size'],
+                           'lastModified': metadata['lastModified'].isoformat()})
+
+    candidates.sort(key=lambda item: (item['key'].endswith('/release.json'), item['key']))
+    by_prefix = {}
+    for item in candidates:
+        category = retention_category(item['key'])
+        summary = by_prefix.setdefault(category, {'objects': 0, 'bytes': 0})
+        summary['objects'] += 1; summary['bytes'] += item['size']
+    warnings = list(warnings or [])
+    if active not in releases:
+        warnings.append(f'Active release record is missing or invalid: {active}')
+    missing = sorted(key for key in protected if key not in objects)
+    if missing:
+        warnings.append(f'{len(missing)} retained inventory objects are absent from the current S3 listing')
+    return {
+        'mode': 'dry-run', 'activeRelease': active, 'keepNewestReleases': keep_releases,
+        'graceDays': grace_days, 'cutoff': cutoff.isoformat(),
+        'retainedReleases': sorted(retained), 'expiredReleases': sorted(expired),
+        'protectedObjects': len(protected), 'candidateObjects': candidates,
+        'candidateObjectCount': len(candidates),
+        'candidateBytes': sum(item['size'] for item in candidates), 'candidatesByPrefix': by_prefix,
+        'orphanObjectsNotAutomaticallyDeleted': sorted(orphans),
+        'recentUnreferencedObjects': sorted(recent_unreferenced),
+        'warnings': warnings, 'safeToApply': not warnings,
+    }
+
+
+def retention_report(s3, cf, bucket, distribution, *, keep_releases=5, grace_days=30):
+    active = current_release(cf, distribution)
+    objects = retention_listing(s3, bucket, ['releases/', 'data/', 'assets/'])
+    releases, warnings = {}, []
+    for key, metadata in objects.items():
+        match = re.fullmatch(r'releases/([^/]+)/release\.json', key)
+        if not match:
+            continue
+        release = match.group(1)
+        try:
+            valid_release(release)
+            record, _ = read_json_object(s3, bucket, key)
+            if record.get('release') != release or not isinstance(record.get('objects'), dict):
+                raise ValueError('release ID or inventory mismatch')
+            releases[release] = {'record': record, 'lastModified': metadata['lastModified']}
+        except Exception as error:  # A malformed retained record must block deletion, not the audit.
+            warnings.append(f'{key}: {error}')
+    return plan_retention(active, objects, releases, keep_releases=keep_releases,
+                          grace_days=grace_days, warnings=warnings)
+
+
+def apply_retention(s3, cf, bucket, distribution, report, confirmation):
+    if confirmation != bucket:
+        raise ValueError('Retention apply requires --confirm-bucket with the exact bucket name')
+    if not report.get('safeToApply'):
+        raise ValueError('Refusing retention apply because the audit reported warnings')
+    if current_release(cf, distribution) != report['activeRelease']:
+        raise ValueError('Active release changed after the retention audit; run a new dry-run')
+    keys = [item['key'] for item in report['candidateObjects']]
+    for start in range(0, len(keys), 1000):
+        response = s3.delete_objects(Bucket=bucket, Delete={
+            'Objects': [{'Key': key} for key in keys[start:start + 1000]], 'Quiet': True,
+        })
+        if response.get('Errors'):
+            raise ValueError(f"S3 retention deletion failed: {response['Errors']}")
+    return {**report, 'mode': 'applied', 'deletedObjects': len(keys),
+            'note': 'S3 versioning retains recoverable noncurrent versions until the bucket lifecycle expires them.'}
+
+
 def upload_file(s3, bucket, entry, existing):
     path, key, canonical = entry
     body, options = encode(path, key, canonical)
@@ -393,7 +520,7 @@ def deploy_app(s3, cf, bucket, distribution, folder):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['preflight', 'deploy', 'deploy-app', 'activate', 'status'])
+    parser.add_argument('command', choices=['preflight', 'deploy', 'deploy-app', 'activate', 'status', 'retention'])
     parser.add_argument('--dist', default='dist')
     parser.add_argument('--data-root', help='Root containing data/<dataset>/<version>; defaults to --dist')
     parser.add_argument('--bucket')
@@ -401,14 +528,22 @@ def main():
     parser.add_argument('--release')
     parser.add_argument('--profile')
     parser.add_argument('--region', default='us-east-1')
+    parser.add_argument('--keep-releases', type=int, default=5,
+                        help='Retention audit: always preserve at least this many newest releases (minimum 2)')
+    parser.add_argument('--grace-days', type=int, default=30,
+                        help='Retention audit: never remove objects newer than this many days (minimum 7)')
+    parser.add_argument('--apply', action='store_true', help='Apply a reviewed retention plan; dry-run is the default')
+    parser.add_argument('--confirm-bucket', help='Required with --apply; must exactly match --bucket')
     args = parser.parse_args()
+    if (args.apply or args.confirm_bucket) and args.command != 'retention':
+        parser.error('--apply and --confirm-bucket are valid only for the retention command')
     if args.command == 'preflight':
         release, versions, files = prepare(args.dist, args.data_root)
         print(json.dumps({'release': release, 'datasets': versions, 'files': len(files),
                           'sourceBytes': sum(p.stat().st_size for p, _, _ in files)}, indent=2))
         return
     if not args.distribution or (args.command != 'status' and not args.bucket):
-        parser.error('--distribution and --bucket are required for deploy/activate; --distribution for status')
+        parser.error('--distribution and --bucket are required except for preflight/status; --distribution for status')
     if args.command == 'activate' and not args.release:
         parser.error('--release is required for activate')
     import boto3
@@ -421,6 +556,15 @@ def main():
         state = cf.get_distribution(Id=args.distribution)['Distribution']
         print(json.dumps({'status': state['Status'], 'url': 'https://' + state['DomainName'],
                           'release': app_origin(state['DistributionConfig']).get('OriginPath')}, indent=2))
+    elif args.command == 'retention':
+        try:
+            report = retention_report(s3, cf, args.bucket, args.distribution,
+                                      keep_releases=args.keep_releases, grace_days=args.grace_days)
+            if args.apply:
+                report = apply_retention(s3, cf, args.bucket, args.distribution, report, args.confirm_bucket)
+        except ValueError as error:
+            parser.error(str(error))
+        print(json.dumps(report, indent=2))
     elif args.command == 'activate':
         activate(s3, cf, args.bucket, args.distribution, args.release)
     elif args.command == 'deploy-app':
