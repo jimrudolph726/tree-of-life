@@ -27,7 +27,20 @@ class DeploymentTests(unittest.TestCase):
         self.write('assets/app-123.js', 'console.log("app")')
         self.profile_fixture()
         for dataset in cloud.DATASETS:
-            value = json.dumps({'version': '0123456789abcdef', 'pageCount': 1})
+            manifest = {'version': '0123456789abcdef', 'pageCount': 1}
+            if dataset == 'life':
+                manifest['tiles'] = {
+                    'format': 2,
+                    'indexFile': 'tiles/index.json',
+                    'pattern': 'tiles/{z}/{x}/{y}.json',
+                    'worldBounds': [-1024, -1024, 1024, 1024],
+                    'baseZoom': 0,
+                    'maxLevel': 0,
+                    'tileCount': 1,
+                    'compressedBytes': 100,
+                    'maxCompressedTileBytes': 100,
+                }
+            value = json.dumps(manifest)
             self.write(f'data/{dataset}/manifest.json', value)
             self.write(f'data/{dataset}/0123456789abcdef/manifest.json', value)
             self.write(f'data/{dataset}/0123456789abcdef/pages/0.bin', 'geometry')
@@ -35,6 +48,12 @@ class DeploymentTests(unittest.TestCase):
             if dataset == 'life':
                 self.write(f'data/{dataset}/0123456789abcdef/overview.json', '{}')
                 self.write(f'data/{dataset}/0123456789abcdef/search-top.json', '[]')
+                tile_index = {'format': 2, 'levels': [
+                    {'z': 0, 'side': 1, 'maxRadius': 1000, 'tiles': ['0/0']},
+                ]}
+                self.write(f'data/{dataset}/0123456789abcdef/tiles/index.json', json.dumps(tile_index))
+                self.write(f'data/{dataset}/0123456789abcdef/tiles/0/0/0.json',
+                           '{"nodes":[],"lines":[],"lineTargets":[]}')
 
     def profile_fixture(self):
         value = json.dumps({'format': 3, 'version': 'fedcba9876543210', 'profileCount': 50000,

@@ -30,9 +30,15 @@ class ProfileIdentityTests(unittest.TestCase):
         source_root = ROOT / provenance['snapshotPath']
         offsets = array('I')
         offsets_path = source_root / 'labels.u32'
+        labels_path = source_root / 'labels.utf8'
+        if not offsets_path.is_file() or not labels_path.is_file():
+            self.skipTest(
+                'Pinned OpenTree source snapshot is optional in ordinary CI; '
+                'the complete-tree publication workflow downloads and audits it.'
+            )
         with offsets_path.open('rb') as stream:
             offsets.fromfile(stream, offsets_path.stat().st_size // offsets.itemsize)
-        labels = (source_root / 'labels.utf8').read_bytes()
+        labels = labels_path.read_bytes()
 
         unmatched = {ott_id: profile['scientificName'] for ott_id, profile in self.profiles.items()}
         for offset, length in zip(offsets[::2], offsets[1::2]):
