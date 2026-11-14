@@ -1,4 +1,4 @@
-import type { ProfileMatchKind, ProfileSearchHit, ProfileSearchRecord } from './types.ts';
+import type { ProfileMatchKind, ProfileSearchHit, ProfileSearchRecord, ProfileSearchScope } from './types.ts';
 
 export function normalizeScientificQuery(value: string) {
   return value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase()
@@ -42,7 +42,8 @@ function score(name: string, query: string, kind: ProfileMatchKind, allowFuzzy: 
   return distance <= limit ? 60 + distance * 2 + kindScore : null;
 }
 
-export function searchProfiles(records: ProfileSearchRecord[], rawQuery: string, limit = 12): ProfileSearchHit[] {
+export function searchProfiles(records: ProfileSearchRecord[], rawQuery: string, limit = 12,
+  scope: ProfileSearchScope = 'all'): ProfileSearchHit[] {
   const query = normalizeScientificQuery(rawQuery);
   if (!query) return [];
   const hits: Array<ProfileSearchHit & { score: number }> = [];
@@ -51,9 +52,10 @@ export function searchProfiles(records: ProfileSearchRecord[], rawQuery: string,
     for (const [ottId, scientificName, rank, commonNames, synonyms] of records) {
       if (matched.has(ottId)) continue;
       let best: (ProfileSearchHit & { score: number }) | undefined;
-      const candidates: [string, ProfileMatchKind][] = [[scientificName, 'scientific name'],
+      const candidates: [string, ProfileMatchKind][] = ([[scientificName, 'scientific name'],
         ...commonNames.map(name => [name, 'common name'] as [string, ProfileMatchKind]),
-        ...synonyms.map(name => [name, 'synonym'] as [string, ProfileMatchKind])];
+        ...synonyms.map(name => [name, 'synonym'] as [string, ProfileMatchKind])])
+        .filter(([, kind]) => scope === 'all' || kind === scope) as [string, ProfileMatchKind][];
       for (const [name, matchKind] of candidates) {
         const matchScore = score(name, query, matchKind, allowFuzzy);
         if (matchScore === null || (best && matchScore >= best.score)) continue;

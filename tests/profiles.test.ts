@@ -6,11 +6,13 @@ import { test } from 'node:test';
 import { gzipSync } from 'node:zlib';
 import { searchProfiles } from '../src/profiles/search.ts';
 import { profileContentCache } from '../src/profiles/client.ts';
+import { validateProfileManifest } from '../src/profiles/types.ts';
 
 const root = 'public/data/profiles';
 const manifest = JSON.parse(readFileSync(join(root, 'manifest.json'), 'utf8'));
 
 test('scientific profiles are complete, correctly routed, and within the payload budget', () => {
+  validateProfileManifest(manifest);
   const published = readFileSync(join(root, manifest.version, 'manifest.json'), 'utf8');
   assert.deepEqual(JSON.parse(published), manifest);
   assert.equal(manifest.profileCount, 50000);
@@ -35,6 +37,13 @@ test('scientific profiles are complete, correctly routed, and within the payload
   assert.equal(new Set(crosswalk.records.map((record: unknown[]) => record[0])).size, manifest.profileCount);
   assert.equal(manifest.identityCoverage.openTree, 50000);
   assert.equal(manifest.identityCoverage.gbifIdentifierCollisions, 0);
+  assert.equal(manifest.openTree.synthId, 'opentree16.1');
+  assert.ok(manifest.sources.some((source: { name: string }) => source.name === 'Open Tree of Life'));
+  assert.ok(manifest.sources.some((source: { name: string }) => source.name === 'GBIF Species API'));
+  for (const field of ['identityAndTopology', 'rankAndSynonyms', 'commonNames', 'description', 'conservation']) {
+    assert.equal(typeof manifest.sourcePriority[field], 'string');
+    assert.ok(manifest.sourcePriority[field].length >= 10);
+  }
 
   const profiles: Record<string, unknown>[] = [];
   let compressedTotal = 0;

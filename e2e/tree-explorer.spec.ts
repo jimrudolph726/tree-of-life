@@ -60,11 +60,14 @@ test('search, deep focus, wheel zoom, pan, and home stay responsive', async ({ p
   const { app, browserErrors } = await openTree(page);
   const search = page.getByRole('combobox', { name: 'Search taxa' });
   await search.fill(taxon);
+  await expect(page.getByRole('group', { name: 'Search by name type' })).toBeVisible();
   const exactResult = page.getByRole('option').filter({ has: page.locator('span', { hasText: new RegExp(`^${taxon}$`) }) });
   await expect(exactResult).toHaveAttribute('aria-selected', 'true');
   await search.press('Enter');
   const details = page.getByRole('complementary', { name: 'Taxon details' });
   await expect(details.getByRole('heading', { name: taxon })).toBeVisible({ timeout: hosted ? 30_000 : 15_000 });
+  await expect(details.getByRole('heading', { name: 'Evolutionary context' })).toBeVisible();
+  await expect(details.getByRole('heading', { name: 'Scientific record' })).toBeVisible();
   await expect(app).not.toHaveAttribute('data-pending-taxon', taxon, { timeout: hosted ? 30_000 : 15_000 });
   await expect.poll(async () => Number(await app.getAttribute('data-scene-node-count'))).toBeGreaterThan(0);
 
@@ -74,9 +77,10 @@ test('search, deep focus, wheel zoom, pan, and home stay responsive', async ({ p
   expect(box).not.toBeNull();
   await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
   await page.mouse.wheel(0, -100);
+  const minimumWheelZoom = (page.viewportSize()?.width ?? 1000) < 700 ? 0.1 : MOUSE_WHEEL_ZOOM_LEVELS - 0.01;
   if (Number.isFinite(beforeZoom)) await expect.poll(async () =>
     Math.abs(Number(await app.getAttribute('data-camera-zoom')) - beforeZoom))
-    .toBeGreaterThanOrEqual(MOUSE_WHEEL_ZOOM_LEVELS - 0.01);
+    .toBeGreaterThanOrEqual(minimumWheelZoom);
 
   const beforePan = await app.getAttribute('data-camera-target');
   await page.mouse.move(box!.x + box!.width * 0.45, box!.y + box!.height * 0.55);

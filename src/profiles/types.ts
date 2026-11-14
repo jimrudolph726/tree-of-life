@@ -88,12 +88,16 @@ export interface ProfileManifest {
   crosswalkCount: number;
   compressedCrosswalkBytes: number;
   identityCoverage: Record<string, number>;
+  openTree: { synthId: string; taxonomyVersion: string };
+  sourcePriority: Record<string, string>;
+  sources: Array<{ name: string; role: string; url: string; license?: string }>;
 }
 
 export type ProfileSearchRecord = [ottId: number, scientificName: string, rank: string | null,
   commonNames: string[], synonyms: string[]];
 
 export type ProfileMatchKind = 'scientific name' | 'common name' | 'synonym';
+export type ProfileSearchScope = 'all' | ProfileMatchKind;
 
 export interface ProfileSearchHit {
   ottId: number;
@@ -118,7 +122,13 @@ export function validateProfileManifest(value: unknown): ProfileManifest {
       !isObject(value.coverage) || typeof value.searchFile !== 'string' ||
       !Number.isInteger(value.compressedSearchBytes) || typeof value.crosswalkFile !== 'string' ||
       !Number.isInteger(value.crosswalkCount) || !Number.isInteger(value.compressedCrosswalkBytes) ||
-      !isObject(value.identityCoverage)) {
+      !isObject(value.identityCoverage) || !isObject(value.openTree) ||
+      typeof value.openTree.synthId !== 'string' || typeof value.openTree.taxonomyVersion !== 'string' ||
+      !isObject(value.sourcePriority) || !Object.values(value.sourcePriority).every(item => typeof item === 'string') ||
+      !Array.isArray(value.sources) || value.sources.some(source => !isObject(source) ||
+        typeof source.name !== 'string' || typeof source.role !== 'string' || typeof source.url !== 'string' ||
+        (!source.url.startsWith('https://') && !source.url.startsWith('data/')) ||
+        (source.license !== undefined && typeof source.license !== 'string'))) {
     throw new Error('The scientific-profile manifest is invalid.');
   }
   return value as unknown as ProfileManifest;

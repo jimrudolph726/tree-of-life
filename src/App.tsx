@@ -12,8 +12,7 @@ import { useScene } from './stream/useScene';
 import { cameraFromView, deckView, reframe, TreeOrthographicController } from './stream/reframe';
 import { useBrowserMetrics } from './stream/useBrowserMetrics';
 import { ProfileClient } from './profiles/client';
-import type { ScientificProfile } from './profiles/types';
-import type { ProfileSearchHit } from './profiles/types';
+import type { ProfileManifest, ProfileSearchHit, ProfileSearchScope, ScientificProfile } from './profiles/types';
 import { JourneyClient } from './journeys/client';
 import type { Journey, JourneySummary } from './journeys/types';
 import { treeDataUrl } from './data/urls';
@@ -34,11 +33,16 @@ type ProfileState = { ottId: number; status: 'ready' | 'missing' | 'error'; prof
 type SearchResult = { node: Summary; commonName?: string; rank?: string; matchedName?: string;
   matchKind?: ProfileSearchHit['matchKind'] | 'OpenTree ID' };
 type JourneyState = { view: 'closed' | 'library' | 'playing' | 'paused' | 'complete'; journeyId: string; step: number };
+type RelatedBranches = { index: number; nodes: Summary[] };
 const getSize = (): Size => ({ width: window.innerWidth, height: window.innerHeight });
 const animate = (camera: Camera): CameraState => ({ ...camera,
   transitionDuration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650, transitionInterpolator: TRANSITION });
 const EMPTY_NODES: StreamNode[] = [];
 const benchmarkMode = new URLSearchParams(window.location.search).has('bench');
+const SEARCH_SCOPES: Array<[ProfileSearchScope, string]> = [['all', 'All'], ['scientific name', 'Scientific'],
+  ['common name', 'Common'], ['synonym', 'Synonyms']];
+const PROFILE_METHOD_FIELDS = [['identityAndTopology', 'Identity & relationships'], ['rankAndSynonyms', 'Rank & synonyms'],
+  ['commonNames', 'Common names'], ['description', 'Description'], ['conservation', 'Conservation']] as const;
 
 function initialJourneyState(): JourneyState {
   const params = new URLSearchParams(window.location.search);
@@ -104,9 +108,13 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
   const [future, setFuture] = useState<Visit[]>([]);
   const selected = pendingNode ?? details?.node ?? null;
   const [profileState, setProfileState] = useState<ProfileState | null>(null);
+  const [profileManifest, setProfileManifest] = useState<ProfileManifest | null>(null);
+  const [relatedBranches, setRelatedBranches] = useState<RelatedBranches | null>(null);
   const [query, setQuery] = useState('');
-  const [searchState, setSearchState] = useState<{ query: string; results: SearchResult[] }>({ query: '', results: [] });
-  const searching = query.trim() !== searchState.query;
+  const [searchScope, setSearchScope] = useState<ProfileSearchScope>('all');
+  const [searchState, setSearchState] = useState<{ query: string; scope: ProfileSearchScope; results: SearchResult[] }>(
+    { query: '', scope: 'all', results: [] });
+  const searching = query.trim() !== searchState.query || searchScope !== searchState.scope;
   const results = useMemo(() => searching ? [] : searchState.results, [searching, searchState.results]);
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeResult, setActiveResult] = useState(0);
@@ -149,7 +157,7 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
     const started = performance.now();
     const timer = setTimeout(() => {
       const directRequest = client.search(query, controller.signal);
-      const profileRequest = profileClient.search(query, controller.signal).catch(error => {
+      const profileRequest = profileClient.search(query, controller.signal, searchScope).catch(error => {
         if (controller.signal.aborted) throw error;
         return [] as ProfileSearchHit[];
       });
@@ -159,6 +167,7 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
         const combined = new Map<number, SearchResult>();
         for (const node of direct) {
           const hit = node.ottId ? profileByOtt.get(node.ottId) : undefined;
+          if ((searchScope === 'common name' || searchScope === 'synonym') && !hit) continue;
           combined.set(node.index, { node, commonName: hit?.commonName, rank: hit?.rank,
             matchedName: hit?.matchedName, matchKind: hit?.matchKind ?? (/^(?:ott)?\d+$/i.test(query.trim()) ? 'OpenTree ID' : undefined) });
         }
@@ -173,17 +182,18 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
           const aHit = profileByOtt.get(a.node.ottId ?? -1), bHit = profileByOtt.get(b.node.ottId ?? -1);
           return Number(!aHit) - Number(!bHit) || a.node.scientificName.localeCompare(b.node.scientificName);
         }).slice(0, 12);
-        setSearchState({ query: query.trim(), results });
+        setSearchState({ query: query.trim(), scope: searchScope, results });
         if (query.trim()) recordSearch(performance.now() - started);
       }).catch(error => { if (!controller.signal.aborted) setNavigationError(error.message); });
     }, 160);
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [client, profileClient, query, recordSearch]);
+  }, [client, profileClient, query, recordSearch, searchScope]);
   useEffect(() => {
     const ottId = selected?.ottId;
     if (!ottId || manifest.synthetic) return;
     const controller = new AbortController();
-    void profileClient.profile(ottId, controller.signal).then(profile => {
+    void Promise.all([profileClient.profile(ottId, controller.signal), profileClient.metadata(controller.signal)]).then(([profile, metadata]) => {
+      setProfileManifest(metadata);
       setProfileState(profile ? { ottId, status: 'ready', profile } : { ottId, status: 'missing' });
     }).catch(error => {
       if (!controller.signal.aborted) setProfileState({ ottId, status: 'error', error: error.message });
@@ -333,6 +343,19 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
   const namedLineage = lineage.filter(node => !node.isSyntheticNode);
   const breadcrumbs = namedLineage.length > 8 ? [namedLineage[0], ...namedLineage.slice(-6)] : namedLineage;
   const descendants = details?.children ?? [];
+  const parentGroup = selected?.isSyntheticNode ? namedLineage.at(-1)
+    : namedLineage.length > 1 ? namedLineage.at(-2) : undefined;
+  useEffect(() => {
+    const parent = details?.lineage.at(-2);
+    if (!details || !parent) return;
+    const controller = new AbortController();
+    void client.details(parent.index, controller.signal).then(parentDetails => {
+      const lineageIndices = new Set(details.lineage.map(node => node.index));
+      const nodes = parentDetails.children.filter(node => !lineageIndices.has(node.index) && !node.isSyntheticNode).slice(0, 6);
+      setRelatedBranches({ index: details.node.index, nodes });
+    }).catch(() => undefined);
+    return () => controller.abort();
+  }, [client, details]);
   const selectedProfileState = profileState?.ottId === selected?.ottId ? profileState : null;
   const profile = selectedProfileState?.profile;
   const profileStatus = selected?.ottId && !manifest.synthetic ? selectedProfileState?.status ?? 'loading' : undefined;
@@ -340,6 +363,12 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
   const canonicalCommonName = articleName && profile?.commonNames.find(item => item.name.localeCompare(articleName, undefined, { sensitivity: 'base' }) === 0)?.name;
   const primaryCommonName = canonicalCommonName ?? profile?.commonNames[0]?.name ?? selected?.commonName;
   const otherCommonNames = profile?.commonNames.filter(item => item.name !== primaryCommonName) ?? [];
+  const related = relatedBranches && relatedBranches.index === selected?.index ? relatedBranches.nodes : [];
+  const profileSourceCount = profile ? 1 + Number(Boolean(profile.gbif || profile.conservation ||
+    profile.commonNames.some(item => item.source === 'GBIF'))) + Number(Boolean(profile.wikipedia)) +
+    Number(Boolean(profile.wikidata || profile.wikipedia?.wikidataId)) + Number(Boolean(profile.facts?.length || profile.image)) : 1;
+  const profileTier = profile?.wikipedia || profile?.facts?.length || profile?.image ? 'Enriched profile'
+    : profile ? 'Taxonomic profile' : 'OpenTree record';
   const profileImageUrl = profile?.image ? new URL(profile.image.src,
     new URL(import.meta.env.BASE_URL, window.location.href)).href : undefined;
   const labelNodes = useMemo(() => visibleLabels(manifest.presentation === 'life' ? namedNodes.filter(n => n.index !== 0) : namedNodes, camera, size, selected?.id), [namedNodes, camera, size, selected, manifest.presentation]);
@@ -431,15 +460,21 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
               if (event.key === 'Enter' && results[activeResult]) { event.preventDefault(); focusNode(results[activeResult].node); }
             }} />
           {query && <button className="search-clear" aria-label="Clear search" onClick={() => { setQuery(''); setActiveResult(0); }}>×</button>}
-          {searchOpen && query.trim() && <div className="search-results" id="taxon-results" role="listbox" aria-label="Matching taxa">
-            {results.length ? results.map((result, index) => <button type="button" role="option" aria-selected={index === activeResult}
-              id={`result-${result.node.id}`} key={result.node.id} onPointerEnter={() => queuePrefetch(result.node)} onPointerLeave={() => queuePrefetch()}
-              onPointerDown={() => prefetchNow(result.node)} onFocus={() => queuePrefetch(result.node)} onClick={() => focusNode(result.node)}>
-              <span className="search-result-title"><strong><span>{result.node.scientificName}</span></strong>{result.commonName && <em>{result.commonName}</em>}</span>
-              <small><span>{result.rank ?? (result.node.isTerminal ? 'Terminal taxon' : 'Clade')}</span>
-                <span>{result.matchKind && result.matchedName && result.matchedName.localeCompare(result.node.scientificName, undefined, { sensitivity: 'base' }) !== 0
-                  ? `Matched ${result.matchKind}: ${result.matchedName}` : terminalTaxaLabel(result.node)}</span></small>
-            </button>) : <p role="status">{searching ? 'Searching…' : 'No matching taxa in this dataset.'}</p>}
+          {searchOpen && query.trim() && <div className="search-results">
+            <div className="search-scopes" role="group" aria-label="Search by name type">{SEARCH_SCOPES.map(([scope, label]) =>
+              <button key={scope} type="button" aria-pressed={searchScope === scope} onClick={() => {
+                setSearchScope(scope); setActiveResult(0);
+              }}>{label}</button>)}</div>
+            <div id="taxon-results" role="listbox" aria-label="Matching taxa">
+              {results.length ? results.map((result, index) => <button type="button" role="option" aria-selected={index === activeResult}
+                id={`result-${result.node.id}`} key={result.node.id} onPointerEnter={() => queuePrefetch(result.node)} onPointerLeave={() => queuePrefetch()}
+                onPointerDown={() => prefetchNow(result.node)} onFocus={() => queuePrefetch(result.node)} onClick={() => focusNode(result.node)}>
+                <span className="search-result-title"><strong><span>{result.node.scientificName}</span></strong>{result.commonName && <em>{result.commonName}</em>}</span>
+                <small><span>{result.rank ?? (result.node.isTerminal ? 'Terminal taxon' : 'Clade')}</span>
+                  <span>{result.matchKind && result.matchedName && result.matchedName.localeCompare(result.node.scientificName, undefined, { sensitivity: 'base' }) !== 0
+                    ? `Matched ${result.matchKind}: ${result.matchedName}` : terminalTaxaLabel(result.node)}</span></small>
+              </button>) : <p role="status">{searching ? 'Searching…' : `No ${searchScope === 'all' ? '' : `${searchScope} `}matches in this dataset.`}</p>}
+            </div>
           </div>}
         </div>
         {!manifest.synthetic && <div className="header-menu dataset-menu" onBlur={event => {
@@ -496,6 +531,17 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
         <h1>{selected.scientificName}</h1>
         {primaryCommonName && <p className="common-name">{primaryCommonName}</p>}
         <div className="taxon-stat"><strong>{selected.leafCount.toLocaleString()}</strong><span>terminal {selected.leafCount === 1 ? 'taxon' : 'taxa'} in this subtree</span></div>
+        {details && <section className="evolution-context"><h2>Evolutionary context</h2><dl>
+          <div><dt>Parent group</dt><dd>{parentGroup ? <button onPointerEnter={() => queuePrefetch(parentGroup)}
+            onPointerLeave={() => queuePrefetch()} onPointerDown={() => prefetchNow(parentGroup)} onFocus={() => queuePrefetch(parentGroup)}
+            onClick={() => focusNode(parentGroup)}>{parentGroup.scientificName}</button> : 'Root of this tree'}</dd></div>
+          <div><dt>Named ancestry</dt><dd>{Math.max(0, namedLineage.length - 1).toLocaleString()} groups</dd></div>
+          <div><dt>Record</dt><dd>{profileStatus === 'loading' ? 'Loading profile…' : <>{profileTier} · {profileSourceCount} {profileSourceCount === 1 ? 'source' : 'sources'}</>}</dd></div>
+        </dl>
+        {related.length > 0 && <div className="related-branches"><small>Nearby branches</small><div>{related.map(node =>
+          <button key={node.id} onPointerEnter={() => queuePrefetch(node)} onPointerLeave={() => queuePrefetch()}
+            onPointerDown={() => prefetchNow(node)} onFocus={() => queuePrefetch(node)} onClick={() => focusNode(node)}>{node.scientificName}</button>)}</div></div>}
+        </section>}
         {profile?.conservation && <a className={`conservation-status status-${profile.conservation.code.toLocaleLowerCase()}`}
           href={profile.conservation.source.url} target="_blank" rel="noreferrer">
           <span><small>{profile.conservation.system}</small><strong>{profile.conservation.category}</strong></span>
@@ -521,6 +567,14 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
           {profile.synonyms.map(name => <span key={name}>{name}</span>)}</div></section>}
         {otherCommonNames.length > 0 && <section><h2>Other common names</h2><div className="profile-tags common-tags">
           {otherCommonNames.map(item => <span key={`${item.name}:${item.source}`} title={item.source}>{item.name}</span>)}</div></section>}
+        <section className="scientific-record"><h2>Scientific record</h2><dl>
+          <div><dt>Rank</dt><dd>{profile?.rank ?? selected.rank ?? (selected.isTerminal ? 'Terminal taxon' : 'Clade')}</dd></div>
+          <div><dt>OpenTree identifier</dt><dd>OTT {selected.ottId ?? 'not assigned'}</dd></div>
+          {profile?.gbif && <><div><dt>GBIF status</dt><dd>{profile.gbif.status.toLocaleLowerCase()}</dd></div>
+            <div><dt>Identity match</dt><dd>{profile.gbif.confidence}% confidence</dd></div></>}
+          {profileManifest && <div><dt>Profile release</dt><dd>{profileManifest.version}</dd></div>}
+        </dl></section>
+        {selectedProfileState?.status === 'missing' && <p className="profile-missing">This taxon is present in OpenTree, but it does not yet have an enriched encyclopedia profile. Its name, ancestry, relationships and subtree counts remain available.</p>}
         <p className="data-note">{manifest.synthetic ? 'Generated data for performance testing. These are not biological taxa.' : 'Relationships follow the OpenTree synthesis. Tips represent terminal taxa, not necessarily species. Distances on this map do not represent evolutionary time.'}</p>
         {manifest.provenance && <p className="data-note">Synthesis {manifest.provenance.synthId} · Taxonomy {manifest.provenance.taxonomyVersion}<br />Retrieved {manifest.provenance.fetchedAt.slice(0, 10)}</p>}
         {selectedProfileState?.status === 'error' && <p className="profile-error">Scientific profile unavailable. {selectedProfileState.error}</p>}
@@ -532,6 +586,10 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
           {profile?.wikipedia?.wikidataId && <a href={`https://www.wikidata.org/wiki/${profile.wikipedia.wikidataId}`} target="_blank" rel="noreferrer"><span>Wikidata</span><small>{profile.wikipedia.wikidataId}</small></a>}
           {profile?.wikidata && <a href={`https://www.wikidata.org/wiki/${profile.wikidata.itemId}`} target="_blank" rel="noreferrer"><span>Wikidata</span><small>{profile.wikidata.itemId}</small></a>}
         </div></section>}
+        {profileManifest && <details className="profile-method"><summary>How this profile was assembled</summary><div>
+          {PROFILE_METHOD_FIELDS.map(([key, label]) => profileManifest.sourcePriority[key] && <p key={key}><strong>{label}</strong>{profileManifest.sourcePriority[key]}</p>)}
+          <small>Profile sources retrieved {profileManifest.retrievedAt.slice(0, 10)} · OpenTree {profileManifest.openTree.synthId} · Taxonomy {profileManifest.openTree.taxonomyVersion}</small>
+        </div></details>}
         {descendants.length > 0 && <section><h2>Explore this clade</h2><div className="descendant-list">{descendants.map(node =>
           <button key={node.id} onPointerEnter={() => queuePrefetch(node)} onPointerLeave={() => queuePrefetch()}
             onPointerDown={() => prefetchNow(node)} onFocus={() => queuePrefetch(node)} onClick={() => focusNode(node)}>

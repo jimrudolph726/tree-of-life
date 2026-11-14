@@ -26,6 +26,13 @@ test('scientific discovery ranks common names, synonyms, and scientific names', 
   assert.deepEqual(searchProfiles(records, 'no match'), []);
 });
 
+test('scientific discovery can be narrowed without maintaining separate indexes', () => {
+  assert.deepEqual(searchProfiles(records, 'bird', 12, 'common name').map(item => item.scientificName), ['Aves', 'Aepyornis']);
+  assert.deepEqual(searchProfiles(records, 'bird', 12, 'scientific name').map(item => item.scientificName), ['Birdantis bloetei']);
+  assert.equal(searchProfiles(records, 'domesticus', 12, 'synonym')[0]?.scientificName, 'Gallus gallus');
+  assert.deepEqual(searchProfiles(records, 'domesticus', 12, 'common name'), []);
+});
+
 test('the versioned Journey library is complete, sourced, licensed, and within its lazy payload budget', () => {
   const root = join(process.cwd(), 'public', 'data', 'journeys');
   const manifest = validateJourneyManifest(JSON.parse(readFileSync(join(root, 'manifest.json'), 'utf8')));

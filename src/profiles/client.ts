@@ -1,5 +1,5 @@
 import { validateProfileManifest, validateProfileSearch, validateProfileShard, type ProfileManifest,
-  type ProfileSearchHit, type ProfileSearchRecord, type ScientificProfile } from './types.ts';
+  type ProfileSearchHit, type ProfileSearchRecord, type ProfileSearchScope, type ScientificProfile } from './types.ts';
 import { searchProfiles } from './search.ts';
 
 const MAX_CACHED_SHARDS = 16;
@@ -67,11 +67,15 @@ export class ProfileClient {
     return profiles.get(ottId) ?? null;
   }
 
+  metadata(signal?: AbortSignal) {
+    return this.withSignal(this.getManifest(), signal);
+  }
+
   prefetch(ottId?: number | null) {
     return ottId ? this.profile(ottId).then(() => undefined) : Promise.resolve();
   }
 
-  async search(query: string, signal?: AbortSignal): Promise<ProfileSearchHit[]> {
+  async search(query: string, signal?: AbortSignal, scope: ProfileSearchScope = 'all'): Promise<ProfileSearchHit[]> {
     if (!query.trim()) return [];
     const manifest = await this.withSignal(this.getManifest(), signal);
     if (!this.searchIndex) {
@@ -81,7 +85,7 @@ export class ProfileClient {
           return validateProfileSearch(await response.json());
         }).catch(error => { this.searchIndex = undefined; throw error; });
     }
-    return searchProfiles(await this.withSignal(this.searchIndex, signal), query);
+    return searchProfiles(await this.withSignal(this.searchIndex, signal), query, 12, scope);
   }
 
   private withSignal<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
