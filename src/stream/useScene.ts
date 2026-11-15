@@ -8,6 +8,7 @@ export function useScene(client: TreeClient, anchor: number, camera: Camera, siz
   onRebase: (anchor: number, camera: Camera) => void, canRebase: () => boolean = () => true) {
   const [scene, setScene] = useState<Scene | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const latest = useRef<ViewRequest>({ anchor, camera, size });
   useEffect(() => { latest.current = { anchor, camera, size }; }, [anchor, camera, size]);
   const receive = useEffectEvent((result: Scene, request: ViewRequest) => {
@@ -39,6 +40,7 @@ export function useScene(client: TreeClient, anchor: number, camera: Camera, siz
           Math.abs(last.camera.zoom - request.camera.zoom) < 0.2 &&
           Math.hypot(last.camera.target[0] - request.camera.target[0], last.camera.target[1] - request.camera.target[1]) * 2 ** request.camera.zoom < 70) return;
       const controller = new AbortController(); active = controller; activeRequest = request; activeAnchor = request.anchor;
+      setLoading(true);
       void client.view(request, controller.signal).then(result => {
         if (!disposed && !controller.signal.aborted) {
           // A moving camera can defer a rebase. Retry once it settles even if it
@@ -55,11 +57,11 @@ export function useScene(client: TreeClient, anchor: number, camera: Camera, siz
           setError(cause instanceof Error ? cause.message : 'Could not load this part of the tree.');
           retryAfter = performance.now() + 1500;
         }
-      }).finally(() => { if (active === controller) { active = null; activeRequest = null; } });
+      }).finally(() => { if (active === controller) { active = null; activeRequest = null; setLoading(false); } });
     };
     tick();
     const timer = window.setInterval(tick, 80);
     return () => { disposed = true; clearInterval(timer); if (prefetchTimer) clearTimeout(prefetchTimer); active?.abort(); };
   }, [client]);
-  return { scene: scene?.anchor === anchor ? scene : null, error, prime: setScene };
+  return { scene: scene?.anchor === anchor ? scene : null, error, loading, prime: setScene };
 }

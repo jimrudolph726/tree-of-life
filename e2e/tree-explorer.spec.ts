@@ -33,6 +33,18 @@ test('loads the interactive tree without browser errors', async ({ page }) => {
   const { browserErrors } = await openTree(page);
   await expect(page.getByRole('combobox', { name: 'Search taxa' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Map controls' })).toBeVisible();
+  const header = page.locator('header.top-bar');
+  await header.getByRole('button', { name: 'Explore' }).click();
+  const explore = header.getByRole('menu', { name: 'Explore the Tree of Life' });
+  const menuBox = await explore.boundingBox();
+  expect(menuBox?.x).toBeGreaterThanOrEqual(0);
+  expect((menuBox?.x ?? 0) + (menuBox?.width ?? 0)).toBeLessThanOrEqual(page.viewportSize()?.width ?? Infinity);
+  expect((menuBox?.y ?? 0) + (menuBox?.height ?? 0)).toBeLessThanOrEqual(page.viewportSize()?.height ?? Infinity);
+  await expect(explore.getByRole('menuitem', { name: /All Life/ })).toContainText('Eukaryota, Archaea, and Bacteria');
+  await expect(explore.getByRole('menuitem', { name: /Birds/ })).toContainText('Aves');
+  await expect(explore.getByRole('menuitem', { name: /Mammals/ })).toContainText('Mammalia');
+  await expect(explore.getByRole('menuitem', { name: /Primates/ })).toBeVisible();
+  await page.keyboard.press('Escape');
   expect(browserErrors).toEqual([]);
 });
 
@@ -115,9 +127,13 @@ test('selection responds before the focused scene finishes loading', async ({ pa
     const details = page.getByRole('complementary', { name: 'Taxon details' });
     await expect(details.getByRole('heading', { name: taxon })).toBeVisible({ timeout: 400 });
     await expect(app).toHaveAttribute('data-pending-taxon', taxon);
-    await expect(page.locator('.stream-notice[role="status"]').filter({ hasText: `Opening ${taxon}` })).toBeVisible();
+    await expect(app).toHaveAttribute('data-map-loading', 'navigation');
+    await expect(app).toHaveAttribute('data-scene-held', 'true');
+    await expect(page.getByRole('status').filter({ hasText: `Opening ${taxon}` })).toBeVisible();
+    await expect.poll(async () => Number(await app.getAttribute('data-scene-node-count'))).toBeGreaterThan(0);
     release();
     await expect(app).not.toHaveAttribute('data-pending-taxon', taxon, { timeout: hosted ? 30_000 : 15_000 });
+    await expect(page.getByRole('status').filter({ hasText: `Opening ${taxon}` })).toHaveCount(0);
     await expect.poll(async () => Number(await app.getAttribute('data-scene-node-count'))).toBeGreaterThan(0);
     await expect(page.getByRole('alert')).toHaveCount(0);
     expect(browserErrors).toEqual([]);
@@ -241,7 +257,10 @@ test('bird-flight journey navigates real OpenTree evidence and can be paused', a
   await expect(header.getByRole('combobox', { name: 'Search taxa' })).toBeVisible();
   await expect(page.locator('.explore-hint')).toHaveCount(0);
   await header.getByRole('button', { name: 'Explore' }).click();
-  await expect(header.getByRole('menuitemradio', { name: 'All life' })).toHaveAttribute('aria-checked', 'true');
+  const explore = header.getByRole('menu', { name: 'Explore the Tree of Life' });
+  await expect(explore.getByRole('menuitem', { name: /All Life/ })).toBeVisible();
+  await expect(explore.getByRole('group', { name: 'Domains' }).getByRole('menuitem')).toHaveCount(3);
+  await expect(explore.getByRole('menuitem', { name: /Birds/ })).toContainText('Aves');
   await header.getByRole('button', { name: 'Explore' }).press('Escape');
   await header.getByRole('button', { name: /Journeys/ }).click();
   await expect(header.getByRole('menuitem')).toHaveCount(3);
