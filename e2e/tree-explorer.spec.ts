@@ -161,6 +161,52 @@ test('common names discover the corresponding scientific taxon', async ({ page }
   expect(browserErrors).toEqual([]);
 });
 
+test('two taxa can be compared, shared by URL, and restored with browser history', async ({ page }) => {
+  const { app, browserErrors } = await openTree(page);
+  const search = page.getByRole('combobox', { name: 'Search taxa' });
+  const open = async (name: string) => {
+    await search.fill(name);
+    const result = page.getByRole('option').filter({ has: page.locator('span', { hasText: new RegExp(`^${name}$`) }) });
+    await expect(result).toBeVisible();
+    await result.click();
+    await expect(page.getByRole('complementary', { name: 'Taxon details' }).getByRole('heading', { name })).toBeVisible();
+  };
+  await open('Gallus gallus');
+  await page.getByRole('button', { name: 'Compare this taxon' }).click();
+  const compareMenu = page.getByRole('dialog', { name: 'Compare taxa' });
+  await expect(compareMenu).toBeVisible();
+  const menuBox = await compareMenu.boundingBox();
+  expect(menuBox?.x).toBeGreaterThanOrEqual(0);
+  expect((menuBox?.x ?? 0) + (menuBox?.width ?? 0)).toBeLessThanOrEqual(page.viewportSize()?.width ?? Infinity);
+  await expect(compareMenu.getByText('Gallus gallus', { exact: true })).toBeVisible();
+  await compareMenu.getByRole('textbox', { name: 'Second taxon' }).fill('Camarhynchus psittacula');
+  const second = compareMenu.getByRole('option').filter({ hasText: 'Camarhynchus psittacula' });
+  await expect(second).toBeVisible();
+  await second.click();
+  await compareMenu.getByRole('button', { name: 'Compare lineages' }).click();
+  const panel = page.getByRole('complementary', { name: 'Taxon comparison' });
+  await expect(panel).toBeVisible();
+  await expect(panel.getByRole('heading', { name: 'Gallus gallus', exact: true })).toBeVisible();
+  await expect(panel.getByRole('heading', { name: 'Camarhynchus psittacula', exact: true })).toBeVisible();
+  await expect(app).toHaveAttribute('data-comparison', /\d+:\d+/);
+  await expect.poll(() => new URL(page.url()).searchParams.get('compare')).toMatch(/^ott\d+$/);
+  await page.locator('header.top-bar').getByRole('button', { name: /^Compare/ }).click();
+  const activeMenu = page.getByRole('dialog', { name: 'Compare taxa' });
+  await expect(activeMenu.getByRole('button', { name: 'Update comparison' })).toBeVisible();
+  await expect(activeMenu.getByRole('button', { name: 'Copy comparison link' })).toBeVisible();
+  await expect(activeMenu.getByRole('button', { name: 'End comparison' })).toBeVisible();
+  await page.keyboard.press('Escape');
+
+  await page.goBack();
+  await expect(page.getByRole('complementary', { name: 'Taxon details' })
+    .getByRole('heading', { name: 'Gallus gallus' })).toBeVisible();
+  await page.goForward();
+  await expect(page.getByRole('complementary', { name: 'Taxon comparison' })).toBeVisible();
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('complementary', { name: 'Taxon comparison' })).toBeVisible({ timeout: 15_000 });
+  expect(browserErrors).toEqual([]);
+});
+
 test('search waits for common-name ranking instead of flashing raw terminal matches', async ({ page }) => {
   test.skip(hosted, 'This assertion controls the checked-in profile search response.');
   let releaseSearch = () => {};

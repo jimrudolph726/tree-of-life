@@ -22,6 +22,8 @@ Maintainers use the one-time `data:life` command to download the pinned OpenTree
 
 Open Vite's local URL. Drag to pan, scroll or pinch to zoom, and select a region, node or label to inspect it. A physical mouse-wheel detent crosses 2 zoom levels; trackpads retain fine-grained input. Search accepts scientific names, word prefixes, common names when present, synonyms and OTT IDs; its compact scopes can narrow results to scientific, common or synonymous names without downloading another index. Arrow keys and Enter select a result. Back and Forward restore earlier selected views and camera positions; Home fits the tree. Breadcrumbs, parent groups, nearby branches and descendants navigate between clades. The previous map remains visible while a selected destination loads.
 
+Every OpenTree-backed profile has a copyable permalink and a prominent **Compare this taxon** action. The header's **Compare** menu also accepts any two taxa through independent autocomplete fields, then shows their most recent common ancestor, shared path and separately colored descendant lineages. An active comparison can be changed, swapped, copied or ended from the same menu, while the comparison panel places sourced profiles, conservation records and lineage summaries side by side. URLs use stable OTT identifiers (`?taxon=ott…&compare=ott…`), survive a full reload and participate in browser Back and Forward history. The comparison is computed from the already-published ancestry bundles; it adds no API or database dependency, and drawn branch lengths still do not represent time or genetic distance.
+
 ```sh
 npm test
 npm run lint

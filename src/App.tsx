@@ -12,10 +12,13 @@ import { useScene } from './stream/useScene';
 import { cameraFromView, deckView, reframe, TreeOrthographicController } from './stream/reframe';
 import { useBrowserMetrics } from './stream/useBrowserMetrics';
 import { ProfileClient } from './profiles/client';
-import type { ProfileManifest, ProfileSearchHit, ProfileSearchScope, ScientificProfile } from './profiles/types';
+import { discoverTaxa, type DiscoveryResult } from './profiles/discovery';
+import type { ProfileManifest, ProfileSearchScope, ScientificProfile } from './profiles/types';
 import { JourneyClient } from './journeys/client';
 import type { Journey, JourneySummary } from './journeys/types';
 import { treeDataUrl } from './data/urls';
+import { compareTaxa, parseTaxonSelection, taxonSelectionUrl, type TaxonComparison } from './tree/comparison';
+import CompareMenu from './tree/CompareMenu';
 import './App.css';
 
 const JourneyPanel = lazy(() => import('./journeys/JourneyPanel.tsx'));
@@ -30,10 +33,10 @@ type Visit = { camera: CameraState; anchor: number; details: Details | null; hom
 type FocusTarget = { details: Details; camera: Camera };
 type PreparedFocus = { target: Promise<FocusTarget>; ready: Promise<FocusTarget & { scene: Scene }> };
 type ProfileState = { ottId: number; status: 'ready' | 'missing' | 'error'; profile?: ScientificProfile; error?: string };
-type SearchResult = { node: Summary; commonName?: string; rank?: string; matchedName?: string;
-  matchKind?: ProfileSearchHit['matchKind'] | 'OpenTree ID' };
 type JourneyState = { view: 'closed' | 'library' | 'playing' | 'paused' | 'complete'; journeyId: string; step: number };
 type RelatedBranches = { index: number; nodes: Summary[] };
+type HistoryMode = 'push' | 'replace' | 'none';
+type ComparisonProfiles = { key: string; first: ScientificProfile | null; second: ScientificProfile | null };
 const getSize = (): Size => ({ width: window.innerWidth, height: window.innerHeight });
 const animate = (camera: Camera): CameraState => ({ ...camera,
   transitionDuration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650, transitionInterpolator: TRANSITION });
@@ -53,6 +56,7 @@ function initialJourneyState(): JourneyState {
 
 function updateJourneyUrl(view: JourneyState['view'], journeyId: string, step: number) {
   const url = new URL(window.location.href);
+  url.searchParams.delete('taxon'); url.searchParams.delete('compare');
   if (view === 'closed' || view === 'library') { url.searchParams.delete('journey'); url.searchParams.delete('step'); }
   else { url.searchParams.set('journey', journeyId); url.searchParams.set('step', String(step)); }
   window.history.replaceState(null, '', url);
@@ -76,6 +80,30 @@ function isPositioned(node: Summary): node is StreamNode {
 function terminalTaxaLabel(node: Summary) {
   const count = node.isTerminal ? 1 : node.leafCount;
   return `${count.toLocaleString()} terminal ${count === 1 ? 'taxon' : 'taxa'}`;
+}
+
+function packedLineage(scene: Scene | null | undefined, nodes: Summary[]) {
+  const indices = new Set(nodes.map(node => node.index));
+  const values: number[] = [];
+  scene?.lineTargets.forEach((index, i) => { if (indices.has(index)) values.push(...scene.lines.subarray(i * 4, i * 4 + 4)); });
+  const lines = new Float64Array(values);
+  return { length: lines.length / 4, attributes: {
+    getSourcePosition: { value: lines, size: 2, stride: 32, offset: 0 },
+    getTargetPosition: { value: lines, size: 2, stride: 32, offset: 16 },
+  } };
+}
+
+function conciseLineage(nodes: Summary[]) {
+  const named = nodes.filter(node => !node.isSyntheticNode);
+  return named.length <= 6 ? named : [...named.slice(0, 2), ...named.slice(-3)];
+}
+
+function profileCommonName(profile: ScientificProfile | null | undefined, node: Summary) {
+  return profile?.commonNames[0]?.name ?? node.commonName;
+}
+
+function taxonDisplayName(node: Summary) {
+  return node.scientificName || (node.isSyntheticNode ? 'Unnamed branching point' : node.ottId ? `OTT ${node.ottId}` : 'Unnamed taxon');
 }
 
 function rootNode(manifest: Manifest): StreamNode {
@@ -110,9 +138,17 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
   const [profileState, setProfileState] = useState<ProfileState | null>(null);
   const [profileManifest, setProfileManifest] = useState<ProfileManifest | null>(null);
   const [relatedBranches, setRelatedBranches] = useState<RelatedBranches | null>(null);
+  const [comparison, setComparison] = useState<TaxonComparison | null>(null);
+  const [comparisonProfiles, setComparisonProfiles] = useState<ComparisonProfiles | null>(null);
+  const [compareFirst, setCompareFirst] = useState<Summary | undefined>();
+  const [compareSecond, setCompareSecond] = useState<Summary | undefined>();
+  const [comparePending, setComparePending] = useState(false);
+  const [linkNotice, setLinkNotice] = useState<string | null>(null);
+  const urlRestoreRequest = useRef<AbortController | null>(null);
+  const restoreUrlSelectionRef = useRef<() => Promise<void>>(async () => undefined);
   const [query, setQuery] = useState('');
   const [searchScope, setSearchScope] = useState<ProfileSearchScope>('all');
-  const [searchState, setSearchState] = useState<{ query: string; scope: ProfileSearchScope; results: SearchResult[] }>(
+  const [searchState, setSearchState] = useState<{ query: string; scope: ProfileSearchScope; results: DiscoveryResult[] }>(
     { query: '', scope: 'all', results: [] });
   const searching = query.trim() !== searchState.query || searchScope !== searchState.scope;
   const results = useMemo(() => searching ? [] : searchState.results, [searching, searchState.results]);
@@ -126,6 +162,7 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
   const [activeJourney, setActiveJourney] = useState<Journey | null>(null);
   const [datasetMenuOpen, setDatasetMenuOpen] = useState(false);
   const [journeyMenuOpen, setJourneyMenuOpen] = useState(false);
+  const [compareMenuOpen, setCompareMenuOpen] = useState(false);
   const initialJourneyLoaded = useRef(false);
   const homeCamera = useMemo(() => openingCamera(root, size, manifest), [root, size, manifest]);
   const { scene, error: streamError, prime } = useScene(client, anchor, camera, size, (nextAnchor, nextCamera) => {
@@ -156,32 +193,7 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
     const controller = new AbortController();
     const started = performance.now();
     const timer = setTimeout(() => {
-      const directRequest = client.search(query, controller.signal);
-      const profileRequest = profileClient.search(query, controller.signal, searchScope).catch(error => {
-        if (controller.signal.aborted) throw error;
-        return [] as ProfileSearchHit[];
-      });
-      void Promise.all([directRequest, profileRequest]).then(async ([direct, profileHits]) => {
-        controller.signal.throwIfAborted();
-        const profileByOtt = new Map(profileHits.map(hit => [hit.ottId, hit]));
-        const combined = new Map<number, SearchResult>();
-        for (const node of direct) {
-          const hit = node.ottId ? profileByOtt.get(node.ottId) : undefined;
-          if ((searchScope === 'common name' || searchScope === 'synonym') && !hit) continue;
-          combined.set(node.index, { node, commonName: hit?.commonName, rank: hit?.rank,
-            matchedName: hit?.matchedName, matchKind: hit?.matchKind ?? (/^(?:ott)?\d+$/i.test(query.trim()) ? 'OpenTree ID' : undefined) });
-        }
-        const missing = profileHits.filter(hit => ![...combined.values()].some(result => result.node.ottId === hit.ottId)).slice(0, 8);
-        const resolved = await Promise.all(missing.map(async hit => {
-          const nodes = await client.search(`ott${hit.ottId}`, controller.signal);
-          const node = nodes.find(item => item.ottId === hit.ottId);
-          return node ? { node, commonName: hit.commonName, rank: hit.rank, matchedName: hit.matchedName, matchKind: hit.matchKind } satisfies SearchResult : null;
-        }));
-        for (const result of resolved) if (result && !combined.has(result.node.index)) combined.set(result.node.index, result);
-        const results = [...combined.values()].sort((a, b) => {
-          const aHit = profileByOtt.get(a.node.ottId ?? -1), bHit = profileByOtt.get(b.node.ottId ?? -1);
-          return Number(!aHit) - Number(!bHit) || a.node.scientificName.localeCompare(b.node.scientificName);
-        }).slice(0, 12);
+      void discoverTaxa(client, profileClient, query, controller.signal, searchScope).then(results => {
         setSearchState({ query: query.trim(), scope: searchScope, results });
         if (query.trim()) recordSearch(performance.now() - started);
       }).catch(error => { if (!controller.signal.aborted) setNavigationError(error.message); });
@@ -245,8 +257,17 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
     if (active) queuePrefetch(active);
     return () => queuePrefetch();
   }, [searchOpen, results, activeResult, queuePrefetch]);
-  const focusNode = useCallback((node: Summary, preserveJourney = false, zoomOut = 0, maximumZoom = Infinity) => {
+  const syncTaxonUrl = useCallback((first?: Summary, second?: Summary, mode: HistoryMode = 'push') => {
+    if (mode === 'none' || manifest.synthetic) return;
+    const url = taxonSelectionUrl(window.location.href, first?.ottId ?? undefined, second?.ottId ?? undefined);
+    if (url.href === window.location.href) return;
+    window.history[mode === 'replace' ? 'replaceState' : 'pushState'](null, '', url);
+  }, [manifest.synthetic]);
+  const focusNode = useCallback((node: Summary, preserveJourney = false, zoomOut = 0, maximumZoom = Infinity,
+    urlMode: HistoryMode = 'push') => {
     if (!preserveJourney && journeyState.view === 'playing') setJourneyState(current => ({ ...current, view: 'paused' }));
+    if (urlMode !== 'none') { setComparison(null); setComparisonProfiles(null); setCompareFirst(undefined);
+      setCompareSecond(undefined); setCompareMenuOpen(false); syncTaxonUrl(node, undefined, urlMode); }
     startFocus(node.index);
     focusRequest.current?.abort();
     const controller = new AbortController(); focusRequest.current = controller;
@@ -272,13 +293,54 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
       atHome.current = previous.home; setNavigationError(error.message); setPendingTaxon(null); setPendingNode(null);
       setDetails(previous.details); setCamera(animate(previous.camera));
     } });
-  }, [size, anchor, camera, details, startFocus, recordFocusReady, prime, prepareFocus, journeyState.view]);
+  }, [size, anchor, camera, details, startFocus, recordFocusReady, prime, prepareFocus, journeyState.view, syncTaxonUrl]);
+  const beginComparison = useCallback((first: Details, second: Details, urlMode: HistoryMode = 'push') => {
+    if (first.node.index === second.node.index) return;
+    try {
+      const next = compareTaxa(first, second);
+      setComparison(next); setCompareFirst(first.node); setCompareSecond(second.node);
+      setComparePending(false); setCompareMenuOpen(false); setNavigationError(null);
+      syncTaxonUrl(first.node, second.node, urlMode);
+      focusNode(next.mrca, false, 0, Infinity, 'none');
+    } catch (error) {
+      setNavigationError(error instanceof Error ? error.message : 'These taxa could not be compared.');
+    }
+  }, [focusNode, syncTaxonUrl]);
+  const beginComparisonNodes = useCallback(() => {
+    if (!compareFirst || !compareSecond || compareFirst.index === compareSecond.index) return;
+    const controller = new AbortController(); setComparePending(true);
+    void Promise.all([client.details(compareFirst.index, controller.signal), client.details(compareSecond.index, controller.signal)])
+      .then(([first, second]) => beginComparison(first, second))
+      .catch(error => setNavigationError(error instanceof Error ? error.message : 'These taxa could not be compared.'))
+      .finally(() => setComparePending(false));
+  }, [beginComparison, client, compareFirst, compareSecond]);
+  useEffect(() => {
+    if (!comparison) return;
+    const controller = new AbortController();
+    const key = `${comparison.first.node.index}:${comparison.second.node.index}`;
+    const load = (node: Summary) => {
+      const ottId = node.ottId;
+      return ottId ? profileClient.profile(ottId, controller.signal) : Promise.resolve(null);
+    };
+    void Promise.all([load(comparison.first.node), load(comparison.second.node)]).then(([first, second]) => {
+      setComparisonProfiles({ key, first, second });
+    }).catch(() => undefined);
+    return () => controller.abort();
+  }, [comparison, profileClient]);
+  const copySelectionLink = useCallback(async (first: Summary, second?: Summary) => {
+    const url = taxonSelectionUrl(window.location.href, first.ottId ?? undefined, second?.ottId ?? undefined);
+    try {
+      await navigator.clipboard.writeText(url.href); setLinkNotice(second ? 'Comparison link copied' : 'Taxon link copied');
+    } catch { setLinkNotice('Copy failed'); }
+    window.setTimeout(() => setLinkNotice(null), 1800);
+  }, []);
   const loadJourneyCatalog = useCallback(() => {
     void journeyClient.catalog().then(setJourneyCatalog).catch(error => setNavigationError(error.message));
   }, [journeyClient]);
   const openJourney = useCallback((journeyId: string) => {
     const saved = Math.max(0, Number(localStorage.getItem(`tree-of-life:journey:${journeyId}`)) || 0);
-    setJourneyState({ view: 'library', journeyId, step: saved });
+    setComparison(null); setComparisonProfiles(null); setCompareFirst(undefined); setCompareSecond(undefined);
+    setCompareMenuOpen(false); setJourneyState({ view: 'library', journeyId, step: saved });
     setActiveJourney(null); updateJourneyUrl('library', journeyId, saved);
     void Promise.all([journeyClient.catalog(), journeyClient.journey(journeyId)]).then(([catalog, journey]) => {
       setJourneyCatalog(catalog); setActiveJourney(journey);
@@ -299,7 +361,7 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
       setJourneyState({ view: 'playing', journeyId, step: bounded });
       localStorage.setItem(`tree-of-life:journey:${journeyId}`, String(bounded));
       updateJourneyUrl('playing', journeyId, bounded);
-      focusNode(node, true, JOURNEY_CONTEXT_ZOOM_OUT, JOURNEY_CONTEXT_MAX_ZOOM);
+      focusNode(node, true, JOURNEY_CONTEXT_ZOOM_OUT, JOURNEY_CONTEXT_MAX_ZOOM, 'none');
     }).catch(error => setNavigationError(error.message));
   }, [client, focusNode, journeyClient, journeyState.journeyId, manifest.presentation]);
   useEffect(() => {
@@ -316,14 +378,16 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
     };
     window.addEventListener('keydown', onKeyDown); return () => window.removeEventListener('keydown', onKeyDown);
   }, [activeJourney, goJourneyStep, journeyState]);
-  const goHome = () => {
+  const goHome = useCallback((urlMode: HistoryMode = 'push') => {
     if (journeyState.view === 'playing') setJourneyState(current => ({ ...current, view: 'paused' }));
     if (!atHome.current || details) { setPast(history => [...history.slice(-49), { camera, anchor, details, home: atHome.current }]); setFuture([]); }
     focusRequest.current?.abort(); atHome.current = true;
+    setComparison(null); setComparisonProfiles(null); setCompareFirst(undefined); setCompareSecond(undefined); setCompareMenuOpen(false);
     setPendingTaxon(null); setPendingNode(null);
     setDetails(null); setQuery(''); setSearchOpen(false); setNavigationError(null); setAnchor(0);
     setCamera(anchor === 0 ? animate(homeCamera) : { ...homeCamera, transitionDuration: 0 });
-  };
+    syncTaxonUrl(undefined, undefined, urlMode);
+  }, [anchor, camera, details, homeCamera, journeyState.view, syncTaxonUrl]);
   const revisit = (direction: 'back' | 'forward') => {
     const history = direction === 'back' ? past : future, visit = history.at(-1);
     if (!visit) return;
@@ -331,15 +395,51 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
     const current = { camera, anchor, details, home: atHome.current };
     if (direction === 'back') { setPast(history.slice(0, -1)); setFuture(values => [...values, current]); }
     else { setFuture(history.slice(0, -1)); setPast(values => [...values, current]); }
+    setComparison(null); setComparisonProfiles(null); setCompareFirst(undefined); setCompareSecond(undefined); setCompareMenuOpen(false);
     atHome.current = visit.home; setDetails(visit.details); setAnchor(visit.anchor);
     setCamera({ ...visit.camera, transitionDuration: 0 }); setQuery(''); setSearchOpen(false);
+    syncTaxonUrl(visit.details?.node, undefined, 'replace');
   };
+  const restoreUrlSelection = useCallback(async () => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('journey')) return;
+    const selection = parseTaxonSelection(url.search);
+    if (!selection.taxon) { goHome('none'); return; }
+    urlRestoreRequest.current?.abort();
+    const controller = new AbortController(); urlRestoreRequest.current = controller;
+    try {
+      const find = async (ottId: number) => {
+        const matches = await client.search(`ott${ottId}`, controller.signal);
+        const node = matches.find(item => item.ottId === ottId);
+        if (!node) throw new Error(`OTT ${ottId} is not available in this tree publication.`);
+        return node;
+      };
+      const first = await find(selection.taxon);
+      if (!selection.compare) { setCompareFirst(undefined); setCompareSecond(undefined); setComparison(null);
+        focusNode(first, false, 0, Infinity, 'none'); return; }
+      const second = await find(selection.compare);
+      const [firstDetails, secondDetails] = await Promise.all([
+        client.details(first.index, controller.signal), client.details(second.index, controller.signal),
+      ]);
+      beginComparison(firstDetails, secondDetails, 'none');
+    } catch (error) {
+      if (!controller.signal.aborted) setNavigationError(error instanceof Error ? error.message : 'This shared view could not be opened.');
+    }
+  }, [beginComparison, client, focusNode, goHome]);
+  useEffect(() => { restoreUrlSelectionRef.current = restoreUrlSelection; }, [restoreUrlSelection]);
+  useEffect(() => {
+    const restore = () => { void restoreUrlSelectionRef.current(); };
+    restore();
+    window.addEventListener('popstate', restore);
+    return () => { window.removeEventListener('popstate', restore); urlRestoreRequest.current?.abort(); };
+  }, []);
   const zoomBy = (amount: number) => {
     atHome.current = false;
     setCamera(current => animate({ ...current, zoom: Math.max(current.minZoom, Math.min(current.maxZoom, current.zoom + amount)) }));
   };
   const lineage = useMemo(() => details?.lineage ?? [], [details]);
-  const lineageIds = useMemo(() => new Set(lineage.map(node => node.id)), [lineage]);
+  const lineageIds = useMemo(() => new Set((comparison
+    ? [...comparison.shared, ...comparison.firstBranch, ...comparison.secondBranch] : lineage).map(node => node.id)), [comparison, lineage]);
   const namedLineage = lineage.filter(node => !node.isSyntheticNode);
   const breadcrumbs = namedLineage.length > 8 ? [namedLineage[0], ...namedLineage.slice(-6)] : namedLineage;
   const descendants = details?.children ?? [];
@@ -369,6 +469,10 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
     Number(Boolean(profile.wikidata || profile.wikipedia?.wikidataId)) + Number(Boolean(profile.facts?.length || profile.image)) : 1;
   const profileTier = profile?.wikipedia || profile?.facts?.length || profile?.image ? 'Enriched profile'
     : profile ? 'Taxonomic profile' : 'OpenTree record';
+  const comparisonKey = comparison ? `${comparison.first.node.index}:${comparison.second.node.index}` : '';
+  const activeComparisonProfiles = comparisonProfiles?.key === comparisonKey ? comparisonProfiles : null;
+  const firstComparisonLineage = comparison ? conciseLineage(comparison.firstBranch) : [];
+  const secondComparisonLineage = comparison ? conciseLineage(comparison.secondBranch) : [];
   const profileImageUrl = profile?.image ? new URL(profile.image.src,
     new URL(import.meta.env.BASE_URL, window.location.href)).href : undefined;
   const labelNodes = useMemo(() => visibleLabels(manifest.presentation === 'life' ? namedNodes.filter(n => n.index !== 0) : namedNodes, camera, size, selected?.id), [namedNodes, camera, size, selected, manifest.presentation]);
@@ -380,16 +484,10 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
       getTargetPosition: { value: lines, size: 2, stride: 32, offset: 16 },
     } };
   }, [scene]);
-  const highlightedLines = useMemo(() => {
-    const indices = new Set(lineage.map(node => node.index));
-    const values: number[] = [];
-    scene?.lineTargets.forEach((index, i) => { if (indices.has(index)) values.push(...scene.lines.subarray(i * 4, i * 4 + 4)); });
-    const lines = new Float64Array(values);
-    return { length: lines.length / 4, attributes: {
-      getSourcePosition: { value: lines, size: 2, stride: 32, offset: 0 },
-      getTargetPosition: { value: lines, size: 2, stride: 32, offset: 16 },
-    } };
-  }, [scene, lineage]);
+  const highlightedLines = useMemo(() => packedLineage(scene, comparison ? [] : lineage), [scene, comparison, lineage]);
+  const sharedComparisonLines = useMemo(() => packedLineage(scene, comparison?.shared ?? []), [scene, comparison]);
+  const firstComparisonLines = useMemo(() => packedLineage(scene, comparison?.firstBranch ?? []), [scene, comparison]);
+  const secondComparisonLines = useMemo(() => packedLineage(scene, comparison?.secondBranch ?? []), [scene, comparison]);
   const layers = useMemo(() => {
     const parameters = { depthCompare: 'always' as const, depthWriteEnabled: false };
     return [
@@ -398,12 +496,17 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
         stroked: true, getLineColor: [96, 128, 116, 40], getLineWidth: 1, lineWidthUnits: 'pixels' }),
       new LineLayer({ id: 'branches', data: lineData, parameters, getColor: [107, 124, 116, 150], getWidth: 1.1, widthUnits: 'pixels' }),
       new LineLayer({ id: 'lineage', data: highlightedLines, parameters, getColor: [37, 118, 99, 255], getWidth: 2.5, widthUnits: 'pixels' }),
+      new LineLayer({ id: 'comparison-shared', data: sharedComparisonLines, parameters, getColor: [37, 118, 99, 255], getWidth: 3, widthUnits: 'pixels' }),
+      new LineLayer({ id: 'comparison-first', data: firstComparisonLines, parameters, getColor: [179, 119, 62, 255], getWidth: 3, widthUnits: 'pixels' }),
+      new LineLayer({ id: 'comparison-second', data: secondComparisonLines, parameters, getColor: [62, 112, 158, 255], getWidth: 3, widthUnits: 'pixels' }),
       new ScatterplotLayer<MapTreeNode>({ id: 'nodes', data: namedNodes, pickable: true, parameters,
         getPosition: node => node.position, radiusUnits: 'pixels',
-        getRadius: node => node.id === selected?.id ? 7 : node.isTerminal ? 3 : 4.5,
-        getFillColor: node => node.id === selected?.id ? [30, 119, 99] : lineageIds.has(node.id) ? [79, 144, 126] : [75, 94, 83],
+        getRadius: node => node.id === selected?.id || node.id === comparison?.first.node.id || node.id === comparison?.second.node.id ? 7 : node.isTerminal ? 3 : 4.5,
+        getFillColor: node => node.id === comparison?.first.node.id ? [179, 119, 62] : node.id === comparison?.second.node.id ? [62, 112, 158]
+          : node.id === selected?.id ? [30, 119, 99] : lineageIds.has(node.id) ? [79, 144, 126] : [75, 94, 83],
         stroked: true, getLineColor: [255, 255, 255], getLineWidth: 1.5, lineWidthUnits: 'pixels',
-        updateTriggers: { getRadius: [selected?.id], getFillColor: [selected?.id, lineageIds] } }),
+        updateTriggers: { getRadius: [selected?.id, comparison?.first.node.id, comparison?.second.node.id],
+          getFillColor: [selected?.id, comparison?.first.node.id, comparison?.second.node.id, lineageIds] } }),
       new TextLayer<MapTreeNode>({ id: 'labels', data: labelNodes, pickable: true, parameters,
         getPosition: node => node.position, getText: node => labelText(node, size), getSize: labelSize,
         sizeUnits: 'pixels', fontFamily: 'Arial, sans-serif', fontWeight: 500,
@@ -412,11 +515,13 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
         background: true, getBackgroundColor: [248, 249, 244, 230], backgroundPadding: [4, 2],
         updateTriggers: { getColor: [selected?.id], getText: [size.width], getPixelOffset: [camera, size] } }),
     ];
-  }, [regions, showRegions, lineData, highlightedLines, lineageIds, namedNodes, selected, labelNodes, camera, size]);
+  }, [regions, showRegions, lineData, highlightedLines, sharedComparisonLines, firstComparisonLines,
+    secondComparisonLines, lineageIds, namedNodes, selected, comparison, labelNodes, camera, size]);
   const activeDataset = manifest.presentation === 'life' ? 'life' : manifest.root.ottId === 81461 ? 'aves' : 'primates';
   return (
     <main className="app" ref={container} data-tree-ready={Boolean(scene)} data-pending-taxon={pendingTaxon ?? undefined}
       data-profile-status={profileStatus}
+      data-comparison={comparison ? `${comparison.first.node.ottId ?? comparison.first.node.index}:${comparison.second.node.ottId ?? comparison.second.node.index}` : undefined}
       data-scene-node-count={scene?.nodes.length ?? 0}
       data-camera-zoom={camera.zoom.toFixed(4)} data-camera-target={camera.target.slice(0, 2).map(value => value.toFixed(3)).join(',')}>
       <DeckGL views={view} viewState={deckView(camera)} layers={layers}
@@ -437,7 +542,9 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
         onHover={info => queuePrefetch(info.object && 'scientificName' in info.object ? info.object as StreamNode : undefined)}
         onClick={info => {
           if (info.object) focusNode(info.object as StreamNode);
-          else { focusRequest.current?.abort(); setPendingTaxon(null); setPendingNode(null); setDetails(null); setSearchOpen(false); }
+          else { focusRequest.current?.abort(); setComparison(null); setComparisonProfiles(null); setCompareFirst(undefined); setCompareSecond(undefined);
+            setCompareMenuOpen(false);
+            setPendingTaxon(null); setPendingNode(null); setDetails(null); setSearchOpen(false); syncTaxonUrl(); }
         }}
         onError={error => setRenderError(error.message)}
         onAfterRender={() => { if (scene) telemetry.onPaint(scene.nodes.some(n => n.index === selected?.index) ? selected?.index : undefined); }}
@@ -449,7 +556,7 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
           <input aria-label="Search taxa" placeholder="Search a taxon or OpenTree ID…" value={query}
             role="combobox" aria-autocomplete="list" aria-expanded={searchOpen && !!query.trim()} aria-controls="taxon-results"
             aria-activedescendant={searchOpen && results[activeResult] ? `result-${results[activeResult].node.id}` : undefined}
-            onFocus={() => setSearchOpen(true)}
+            onFocus={() => { setSearchOpen(true); setDatasetMenuOpen(false); setJourneyMenuOpen(false); setCompareMenuOpen(false); }}
             onChange={event => { setQuery(event.target.value); setActiveResult(0); setSearchOpen(true); }}
             onKeyDown={event => {
               if (event.key === 'Escape') { setSearchOpen(false); return; }
@@ -468,7 +575,8 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
             <div id="taxon-results" role="listbox" aria-label="Matching taxa">
               {results.length ? results.map((result, index) => <button type="button" role="option" aria-selected={index === activeResult}
                 id={`result-${result.node.id}`} key={result.node.id} onPointerEnter={() => queuePrefetch(result.node)} onPointerLeave={() => queuePrefetch()}
-                onPointerDown={() => prefetchNow(result.node)} onFocus={() => queuePrefetch(result.node)} onClick={() => focusNode(result.node)}>
+                onPointerDown={event => { event.preventDefault(); prefetchNow(result.node); }}
+                onFocus={() => queuePrefetch(result.node)} onClick={() => focusNode(result.node)}>
                 <span className="search-result-title"><strong><span>{result.node.scientificName}</span></strong>{result.commonName && <em>{result.commonName}</em>}</span>
                 <small><span>{result.rank ?? (result.node.isTerminal ? 'Terminal taxon' : 'Clade')}</span>
                   <span>{result.matchKind && result.matchedName && result.matchedName.localeCompare(result.node.scientificName, undefined, { sensitivity: 'base' }) !== 0
@@ -481,7 +589,7 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
           if (!event.currentTarget.contains(event.relatedTarget)) setDatasetMenuOpen(false);
         }} onKeyDown={event => { if (event.key === 'Escape') setDatasetMenuOpen(false); }}>
           <button className="header-menu-trigger" aria-haspopup="menu" aria-expanded={datasetMenuOpen} onClick={() => {
-            setJourneyMenuOpen(false); setDatasetMenuOpen(open => !open);
+            setJourneyMenuOpen(false); setCompareMenuOpen(false); setDatasetMenuOpen(open => !open);
           }}>Explore <b aria-hidden="true">⌄</b></button>
           {datasetMenuOpen && <div className="header-menu-popover dataset-menu-popover" role="menu" aria-label="Tree datasets">
             <span>Choose a tree</span>
@@ -497,7 +605,7 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
           if (!event.currentTarget.contains(event.relatedTarget)) setJourneyMenuOpen(false);
         }} onKeyDown={event => { if (event.key === 'Escape') setJourneyMenuOpen(false); }}>
           <button className="header-menu-trigger" aria-haspopup="menu" aria-expanded={journeyMenuOpen} onClick={() => {
-            setDatasetMenuOpen(false); setJourneyMenuOpen(open => !open); loadJourneyCatalog();
+            setDatasetMenuOpen(false); setCompareMenuOpen(false); setJourneyMenuOpen(open => !open); loadJourneyCatalog();
           }}>Journeys <b aria-hidden="true">⌄</b></button>
           {journeyMenuOpen && <div className="header-menu-popover" role="menu" aria-label="Guided journeys">
             <span>Guided journeys</span>
@@ -507,13 +615,44 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
               : <p className="journey-menu-loading">Loading journeys…</p>}
           </div>}
         </div>}
+        {!manifest.synthetic && <div className="header-menu compare-menu" onBlur={event => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setCompareMenuOpen(false);
+        }} onKeyDown={event => { if (event.key === 'Escape') setCompareMenuOpen(false); }}>
+          <button className="header-menu-trigger" aria-haspopup="dialog" aria-expanded={compareMenuOpen} onClick={() => {
+            setDatasetMenuOpen(false); setJourneyMenuOpen(false); setCompareMenuOpen(open => !open); setLinkNotice(null);
+          }}><span>Compare{comparison && <i className="comparison-active-dot" aria-label="Comparison active" />}</span>
+            <b aria-hidden="true">⌄</b></button>
+          {compareMenuOpen && <CompareMenu client={client} profileClient={profileClient}
+            current={comparison ? null : details?.node ?? selected} first={compareFirst} second={compareSecond}
+            active={Boolean(comparison)} pending={comparePending} linkNotice={linkNotice}
+            onFirst={setCompareFirst} onSecond={setCompareSecond} onCompare={beginComparisonNodes}
+            onSwap={() => {
+              if (!compareFirst || !compareSecond) return;
+              setCompareFirst(compareSecond); setCompareSecond(compareFirst);
+              if (comparison) {
+                const reversed = compareTaxa(comparison.second, comparison.first); setComparison(reversed);
+                syncTaxonUrl(reversed.first.node, reversed.second.node, 'replace');
+              }
+            }}
+            onCopy={() => {
+              if (comparison) void copySelectionLink(comparison.first.node, comparison.second.node);
+              else if (compareFirst && compareSecond) void copySelectionLink(compareFirst, compareSecond);
+            }}
+            onEnd={() => {
+              const target = comparison?.second.node;
+              setComparison(null); setComparisonProfiles(null); setCompareFirst(undefined); setCompareSecond(undefined);
+              setCompareMenuOpen(false);
+              if (target) focusNode(target, false, 0, Infinity, 'replace');
+              else syncTaxonUrl(selected ?? undefined, undefined, 'replace');
+            }} />}
+        </div>}
       </header>
       <nav className="map-controls" aria-label="Map controls">
         <button onClick={() => revisit('back')} disabled={!past.length} aria-label="Back to previous view" title="Back">←</button>
         <button onClick={() => revisit('forward')} disabled={!future.length} aria-label="Forward to next view" title="Forward">→</button>
         <button onClick={() => zoomBy(1)} aria-label="Zoom in" title="Zoom in">+</button>
         <button onClick={() => zoomBy(-1)} aria-label="Zoom out" title="Zoom out">−</button>
-        <button onClick={goHome} aria-label="Home — fit entire tree" title="Fit entire tree">⌂</button>
+        <button onClick={() => goHome()} aria-label="Home — fit entire tree" title="Fit entire tree">⌂</button>
         <button className="region-toggle" onClick={() => setShowRegions(value => !value)} aria-label="Show clade regions" aria-pressed={showRegions} title="Toggle clade regions">◒</button>
       </nav>
       {selected && breadcrumbs.length > 0 && <nav className="breadcrumbs" aria-label="Taxon lineage">
@@ -525,12 +664,58 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
       <footer className="map-footer"><span><strong>{manifest.namedCount.toLocaleString()}</strong> named taxa · {root.leafCount} tips<span className="desktop-hint"> · Drag to pan · Scroll to zoom</span></span>
         <span className="attribution">{manifest.synthetic ? 'Generated benchmark data · ' : 'Data: Open Tree of Life · '}{manifest.provenance && <><a href={treeDataUrl(`data/${manifest.presentation === 'life' ? 'life' : 'aves'}/${manifest.version}/manifest.json`)} target="_blank" rel="noreferrer">{manifest.provenance.synthId}</a> · </>}<a href="https://lifemap.cnrs.fr/" target="_blank" rel="noreferrer">Inspired by Lifemap</a></span>
       </footer>
-      {selected && !['library', 'playing', 'complete'].includes(journeyState.view) && <aside className="detail-panel" aria-label="Taxon details">
-        <button className="close-button" onClick={() => { focusRequest.current?.abort(); setPendingTaxon(null); setPendingNode(null); setDetails(null); }} aria-label="Close details">×</button>
+      {comparison && !['library', 'playing', 'complete'].includes(journeyState.view) && <aside className="comparison-panel" aria-label="Taxon comparison">
+        <button className="close-button" onClick={() => { const target = comparison.second.node; setComparison(null); setComparisonProfiles(null);
+          focusNode(target, false, 0, Infinity, 'replace'); }} aria-label="Close comparison">×</button>
+        <div className="comparison-eyebrow">Evolutionary comparison</div>
+        <h1>{comparison.first.node.scientificName} <span>&amp;</span> {comparison.second.node.scientificName}</h1>
+        <button className="comparison-mrca" onClick={() => focusNode(comparison.mrca, false, 0, Infinity, 'none')}>
+          <small>Most recent common ancestor</small><strong>{taxonDisplayName(comparison.mrca)}</strong><span>Center on the map →</span>
+        </button>
+        <div className="comparison-legend" aria-label="Comparison map legend"><span className="shared">Shared ancestry</span>
+          <span className="first">{comparison.first.node.scientificName}</span><span className="second">{comparison.second.node.scientificName}</span></div>
+        <div className="comparison-taxa">
+          {([[comparison.first, activeComparisonProfiles?.first, firstComparisonLineage, 'first'],
+            [comparison.second, activeComparisonProfiles?.second, secondComparisonLineage, 'second']] as const).map(([item, itemProfile, branch, side]) =>
+            <article className={`comparison-taxon ${side}`} key={item.node.id}>
+              <div className="rank">{itemProfile?.rank ?? item.node.rank ?? (item.node.isTerminal ? 'Terminal taxon' : 'Clade')}</div>
+              <h2>{item.node.scientificName}</h2>
+              {profileCommonName(itemProfile, item.node) && <p className="comparison-common">{profileCommonName(itemProfile, item.node)}</p>}
+              <p className="comparison-count"><strong>{item.node.leafCount.toLocaleString()}</strong> terminal {item.node.leafCount === 1 ? 'taxon' : 'taxa'}</p>
+              {activeComparisonProfiles ? itemProfile?.wikipedia
+                ? <p className="comparison-description">{itemProfile.wikipedia.extract}</p>
+                : <p className="comparison-description muted">No sourced description is currently available.</p>
+                : <p className="comparison-description muted">Loading profile…</p>}
+              {itemProfile?.conservation && <p className={`comparison-status status-${itemProfile.conservation.code.toLocaleLowerCase()}`}>
+                {itemProfile.conservation.system}: {itemProfile.conservation.category} ({itemProfile.conservation.code})</p>}
+              <div className="comparison-branch" aria-label={`${item.node.scientificName} lineage from the common ancestor`}>
+                {branch.length ? branch.map((node, index) => <span key={node.id}>{index > 0 && <i>›</i>}{node.scientificName}</span>)
+                  : <span>This taxon is the common ancestor.</span>}
+              </div>
+              <button className="comparison-view" onClick={() => { setComparison(null); setComparisonProfiles(null);
+                focusNode(item.node, false, 0, Infinity, 'replace'); }}>View profile</button>
+            </article>)}
+        </div>
+        <p className="comparison-note">Highlighted paths show ancestry in the OpenTree synthesis. Their drawn lengths do not represent elapsed time or genetic distance.</p>
+        <div className="comparison-actions"><button onClick={() => void copySelectionLink(comparison.first.node, comparison.second.node)}>Copy comparison link</button>
+          <button onClick={() => { const reversed = compareTaxa(comparison.second, comparison.first); setComparison(reversed);
+            setCompareFirst(reversed.first.node); setCompareSecond(reversed.second.node);
+            syncTaxonUrl(reversed.first.node, reversed.second.node, 'replace'); }}>Swap sides</button></div>
+        {linkNotice && <p className="link-notice" role="status">{linkNotice}</p>}
+      </aside>}
+      {selected && !comparison && !['library', 'playing', 'complete'].includes(journeyState.view) && <aside className="detail-panel" aria-label="Taxon details">
+        <button className="close-button" onClick={() => { focusRequest.current?.abort(); setCompareMenuOpen(false); setPendingTaxon(null);
+          setPendingNode(null); setDetails(null); syncTaxonUrl(); }} aria-label="Close details">×</button>
         <div className="rank">{profile?.rank ?? selected.rank ?? (selected.isTerminal ? 'Terminal taxon' : 'Clade')}</div>
         <h1>{selected.scientificName}</h1>
         {primaryCommonName && <p className="common-name">{primaryCommonName}</p>}
         <div className="taxon-stat"><strong>{selected.leafCount.toLocaleString()}</strong><span>terminal {selected.leafCount === 1 ? 'taxon' : 'taxa'} in this subtree</span></div>
+        {details?.node.ottId && <div className="profile-actions" aria-label="Taxon actions">
+          <button className="compare-start" onClick={() => { setCompareFirst(details.node); setCompareSecond(undefined);
+            setDatasetMenuOpen(false); setJourneyMenuOpen(false); setCompareMenuOpen(true); setLinkNotice(null); }}>Compare this taxon</button>
+          <button onClick={() => void copySelectionLink(details.node)}>Copy taxon link</button>
+        </div>}
+        {linkNotice && <p className="link-notice" role="status">{linkNotice}</p>}
         {details && <section className="evolution-context"><h2>Evolutionary context</h2><dl>
           <div><dt>Parent group</dt><dd>{parentGroup ? <button onPointerEnter={() => queuePrefetch(parentGroup)}
             onPointerLeave={() => queuePrefetch()} onPointerDown={() => prefetchNow(parentGroup)} onFocus={() => queuePrefetch(parentGroup)}
@@ -603,7 +788,7 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
       {pendingTaxon && <div className="stream-notice" role="status">Opening {pendingTaxon}…</div>}
       {!scene && <div className="stream-notice" role="status">Loading this part of the tree…</div>}
       {scene?.stats.limited && <div className="stream-notice" role="status">Showing an overview. Zoom in for more detail.</div>}
-      {details?.childrenTruncated && selected && <div className="children-note">Showing {descendants.length} named descendants. Search to find more.</div>}
+      {!comparison && details?.childrenTruncated && selected && <div className="children-note">Showing {descendants.length} named descendants. Search to find more.</div>}
       {journeyState.view === 'paused' && <button className="journey-resume" onClick={() => goJourneyStep(journeyState.step)}>
         <span aria-hidden="true">✦</span><span><small>Journey paused</small>Resume: {activeJourney?.title ?? 'guided journey'}</span><b>→</b></button>}
       {['library', 'playing', 'complete'].includes(journeyState.view) && <Suspense fallback={<aside className="journey-panel journey-loading" aria-label="Loading journey"><div className="loading-indicator" /></aside>}>
