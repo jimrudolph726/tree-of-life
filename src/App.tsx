@@ -75,10 +75,6 @@ function waitForSignal<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> 
   });
 }
 
-function isPositioned(node: Summary): node is StreamNode {
-  return 'bounds' in node && 'position' in node && 'radius' in node;
-}
-
 function terminalTaxaLabel(node: Summary) {
   const count = node.isTerminal ? 1 : node.leafCount;
   return `${count.toLocaleString()} terminal ${count === 1 ? 'taxon' : 'taxa'}`;
@@ -130,8 +126,19 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
   const [size, setSize] = useState(getSize);
   const [camera, setCamera] = useState<CameraState>(() => openingCamera(root, getSize(), manifest));
   const [anchor, setAnchor] = useState(0);
-  const view = useMemo(() => new OrthographicView({ id: `tree-${anchor}`, flipY: true }), [anchor]);
+  const [viewRevision, setViewRevision] = useState(0);
+  const view = useMemo(() => new OrthographicView({ id: `tree-${anchor}-${viewRevision}`, flipY: true }), [anchor, viewRevision]);
   const interaction = useRef({ active: false, changedAt: 0 });
+  // Every anchor has its own local coordinate system, and even a new camera in
+  // the same anchor must retire any in-flight wheel animation. Keep an
+  // immediate frame identity so late deck.gl events cannot overwrite a newly
+  // committed camera before React finishes rendering that view.
+  const activeView = useRef({ anchor: 0, revision: 0 });
+  const activateFrame = useCallback((nextAnchor: number) => {
+    const revision = activeView.current.revision + 1;
+    activeView.current = { anchor: nextAnchor, revision };
+    setViewRevision(revision);
+  }, []);
   const [details, setDetails] = useState<Details | null>(null);
   const [pendingNode, setPendingNode] = useState<Summary | null>(null);
   const [pendingTaxon, setPendingTaxon] = useState<string | null>(null);
@@ -171,6 +178,7 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
   const initialJourneyLoaded = useRef(false);
   const homeCamera = useMemo(() => openingCamera(root, size, manifest), [root, size, manifest]);
   const { scene: liveScene, error: streamError, loading: sceneLoading, prime } = useScene(client, anchor, camera, size, (nextAnchor, nextCamera) => {
+    activateFrame(nextAnchor);
     setAnchor(nextAnchor); setCamera({ ...nextCamera, transitionDuration: 0 });
   }, () => !interaction.current.active && performance.now() - interaction.current.changedAt > 300);
   const latestVisibleScene = useRef<Scene | null>(null);
@@ -289,10 +297,6 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
     const controller = new AbortController(); focusRequest.current = controller;
     const previous = { camera, anchor, details, home: atHome.current };
     const prepared = prepareFocus(node, zoomOut, maximumZoom);
-    if (isPositioned(node)) {
-      atHome.current = false;
-      setCamera(animate(zoomOutCamera(centeredFocusCamera(node, size), zoomOut, maximumZoom)));
-    }
     setPendingNode(node); setDetails(null);
     setNavigationSlow(false); setPendingTaxon(node.scientificName);
     setNavigationError(null); setSearchOpen(false); setQuery('');
@@ -302,14 +306,19 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
       if (controller.signal.aborted) return;
       setPast(history => [...history.slice(-49), previous]); setFuture([]);
       atHome.current = false; prime(completed.scene);
+      // Details, geometry, anchor, and camera belong to one coordinate frame.
+      // Commit them together only after the replacement scene is drawable.
+      // An instant frame swap also avoids rendering a narrowly fetched scene
+      // through an unrelated starting camera during a transition.
+      activateFrame(completed.scene.anchor);
       setDetails(completed.details); setAnchor(completed.scene.anchor);
-      setCamera(completed.scene.anchor === anchor ? animate(completed.camera) : { ...completed.camera, transitionDuration: 0 });
+      setCamera({ ...completed.camera, transitionDuration: 0 });
       setHeldScene(null); setPendingTaxon(null); recordFocusReady(node.index);
     }).catch(error => { if (!controller.signal.aborted) {
       atHome.current = previous.home; setNavigationError(error.message); setPendingTaxon(null); setPendingNode(null);
       setHeldScene(null); setDetails(previous.details); setCamera(animate(previous.camera));
     } });
-  }, [size, anchor, camera, details, startFocus, recordFocusReady, prime, prepareFocus, journeyState.view, syncTaxonUrl]);
+  }, [anchor, camera, details, startFocus, recordFocusReady, prime, prepareFocus, journeyState.view, syncTaxonUrl, activateFrame]);
   const beginComparison = useCallback((first: Details, second: Details, urlMode: HistoryMode = 'push') => {
     if (first.node.index === second.node.index) return;
     try {
@@ -403,10 +412,11 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
     setComparison(null); setComparisonProfiles(null); setCompareFirst(undefined); setCompareSecond(undefined); setCompareMenuOpen(false);
     setExploreMenuOpen(false); setHeldScene(null);
     setPendingTaxon(null); setPendingNode(null);
+    activateFrame(0);
     setDetails(null); setQuery(''); setSearchOpen(false); setNavigationError(null); setAnchor(0);
     setCamera(anchor === 0 ? animate(homeCamera) : { ...homeCamera, transitionDuration: 0 });
     syncTaxonUrl(undefined, undefined, urlMode);
-  }, [anchor, camera, details, homeCamera, journeyState.view, syncTaxonUrl]);
+  }, [anchor, camera, details, homeCamera, journeyState.view, syncTaxonUrl, activateFrame]);
   const openExploreHome = useCallback(() => {
     setExploreMenuOpen(false);
     if (manifest.presentation === 'life') {
@@ -444,6 +454,7 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
     if (direction === 'back') { setPast(history.slice(0, -1)); setFuture(values => [...values, current]); }
     else { setFuture(history.slice(0, -1)); setPast(values => [...values, current]); }
     setComparison(null); setComparisonProfiles(null); setCompareFirst(undefined); setCompareSecond(undefined); setCompareMenuOpen(false);
+    activateFrame(visit.anchor);
     atHome.current = visit.home; setDetails(visit.details); setAnchor(visit.anchor);
     setCamera({ ...visit.camera, transitionDuration: 0 }); setQuery(''); setSearchOpen(false);
     syncTaxonUrl(visit.details?.node, undefined, 'replace');
@@ -573,11 +584,16 @@ export function TreeMap({ client, profileClient, journeyClient, manifest }: { cl
       data-profile-status={profileStatus}
       data-comparison={comparison ? `${comparison.first.node.ottId ?? comparison.first.node.index}:${comparison.second.node.ottId ?? comparison.second.node.index}` : undefined}
       data-scene-node-count={scene?.nodes.length ?? 0}
-      data-camera-zoom={camera.zoom.toFixed(4)} data-camera-target={camera.target.slice(0, 2).map(value => value.toFixed(3)).join(',')}>
+      data-camera-anchor={anchor} data-camera-zoom={camera.zoom.toFixed(4)}
+      data-camera-target={camera.target.slice(0, 2).map(value => value.toFixed(3)).join(',')}>
       <DeckGL views={view} viewState={deckView(camera)} layers={layers}
         controller={{ type: TreeOrthographicController, dragPan: true, scrollZoom: true,
           doubleClickZoom: true, touchZoom: true, touchRotate: false, keyboard: true }}
-        onViewStateChange={({ viewState, interactionState }) => {
+        onViewStateChange={({ viewId, viewState, interactionState }) => {
+          // A transition can emit one last callback after its OrthographicView
+          // has been replaced. Its target is meaningless in the new anchor's
+          // coordinate system, so never allow it back into application state.
+          if (viewId !== `tree-${activeView.current.anchor}-${activeView.current.revision}`) return;
           if (interactionState.isDragging || interactionState.isZooming) atHome.current = false;
           interaction.current.changedAt = performance.now();
           setCamera({ ...cameraFromView(viewState, camera),

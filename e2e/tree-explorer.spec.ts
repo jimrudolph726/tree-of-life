@@ -140,6 +140,38 @@ test('selection responds before the focused scene finishes loading', async ({ pa
   } finally { release(); }
 });
 
+test('repeated focus and zoom-out keep a drawable coordinate frame', async ({ page }) => {
+  test.skip(hosted, 'This reliability loop targets the deterministic checked-in Aves publication.');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  const { app, browserErrors } = await openTree(page);
+  const search = page.getByRole('combobox', { name: 'Search taxa' });
+  const canvas = page.locator('canvas').first();
+
+  for (const name of ['Camarhynchus psittacula', 'Gallus gallus', 'Aves']) {
+    await search.fill(name);
+    const result = page.getByRole('option').filter({ has: page.locator('span', { hasText: new RegExp(`^${name}$`) }) });
+    await expect(result).toBeVisible();
+    await result.click();
+    await expect(page.getByRole('complementary', { name: 'Taxon details' }).getByRole('heading', { name })).toBeVisible();
+    await expect(app).not.toHaveAttribute('data-pending-taxon', name);
+    await expect.poll(async () => Number(await app.getAttribute('data-scene-node-count'))).toBeGreaterThan(0);
+
+    const values = [await app.getAttribute('data-camera-anchor'), await app.getAttribute('data-camera-zoom'),
+      ...(await app.getAttribute('data-camera-target') ?? '').split(',')].map(Number);
+    expect(values.every(Number.isFinite)).toBe(true);
+
+    const box = await canvas.boundingBox();
+    expect(box).not.toBeNull();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.wheel(0, 100);
+    await page.waitForTimeout(250);
+    await expect.poll(async () => Number(await app.getAttribute('data-scene-node-count'))).toBeGreaterThan(0);
+    await expect(page.getByRole('alert')).toHaveCount(0);
+  }
+
+  expect(browserErrors).toEqual([]);
+});
+
 test('scientific profiles stay off the initial path and load after selection', async ({ page }) => {
   test.skip(hosted, 'The deployed profile version advances with this release.');
   const profileRequests: string[] = [];
